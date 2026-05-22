@@ -1,5 +1,6 @@
 ﻿'use client'
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CheckIcon, CheckCircle2, Truck, PackageCheck, Star, ArrowRight, ShieldCheck, Clock, MapPin, Smile, Check } from "lucide-react";
@@ -38,9 +39,11 @@ export default function Landing() {
             <a href="#fordele" className="hover:text-zinc-900 transition-colors">Fordele</a>
             <a href="#priser" className="hover:text-zinc-900 transition-colors">Priser</a>
             <a href="#anmeldelser" className="hover:text-zinc-900 transition-colors">Anmeldelser</a>
-            <Button className="bg-primary hover:bg-[#246337] text-white font-medium px-6 rounded-full h-11 hidden md:inline-flex">
-              Bestil nu
-            </Button>
+            <Link href="/book">
+              <Button className="bg-primary hover:bg-[#246337] text-white font-medium px-6 rounded-full h-11 hidden md:inline-flex">
+                Bestil nu
+              </Button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -96,9 +99,11 @@ export default function Landing() {
                 <li className="flex gap-2 items-center"><CheckIcon className="w-6 h-6 text-primary" />Inkl. afhentning</li>
               </motion.ul>
               <motion.div variants={fadeUpVariant}>
-                <Button size="lg" className=" text-white rounded-full">
-                  Bestil nu
-                </Button>
+                <Link href="/book">
+                  <Button size="lg" className="text-white rounded-full">
+                    Bestil nu
+                  </Button>
+                </Link>
               </motion.div>
             </div>
           </motion.div>
@@ -283,7 +288,7 @@ export default function Landing() {
                     <span>Rengjorte kasser</span>
                   </li>
                 </ul>
-                <Button className="w-full font-semibold h-12 bg-zinc-900 text-white hover:bg-zinc-800 rounded-xl">Vælg lille</Button>
+                <Link href="/book"><Button className="w-full font-semibold h-12 bg-zinc-900 text-white hover:bg-zinc-800 rounded-xl">Vælg lille</Button></Link>
               </Card>
             </motion.div>
 
@@ -316,7 +321,7 @@ export default function Landing() {
                     <span>Rengjorte kasser</span>
                   </li>
                 </ul>
-                <Button className="w-full font-semibold h-12 bg-primary text-white hover:bg-[#246337] rounded-xl">Vælg mellem</Button>
+                <Link href="/book"><Button className="w-full font-semibold h-12 bg-primary text-white hover:bg-[#246337] rounded-xl">Vælg mellem</Button></Link>
               </Card>
             </motion.div>
 
@@ -346,7 +351,7 @@ export default function Landing() {
                     <span>Rengjorte kasser</span>
                   </li>
                 </ul>
-                <Button className="w-full font-semibold h-12 bg-zinc-900 text-white hover:bg-zinc-800 rounded-xl">Vælg stor</Button>
+                <Link href="/book"><Button className="w-full font-semibold h-12 bg-zinc-900 text-white hover:bg-zinc-800 rounded-xl">Vælg stor</Button></Link>
               </Card>
             </motion.div>
           </motion.div>
@@ -426,10 +431,12 @@ export default function Landing() {
               Bestil dine kasser online på få minutter. Vi leverer, du pakker, vi henter. Ingen overraskelser, ingen ekstraomkostninger.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-white text-primary hover:bg-zinc-50 font-semibold text-lg px-10 h-14 rounded-full group">
-                Bestil kasser nu
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              <Link href="/book">
+                <Button className="bg-white text-primary hover:bg-zinc-50 font-semibold text-lg px-10 h-14 rounded-full group">
+                  Bestil kasser nu
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
             </div>
           </div>
         </motion.div>
