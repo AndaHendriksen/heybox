@@ -25,7 +25,7 @@ function StepperButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-9 h-9 rounded-full border border-zinc-300 flex items-center justify-center text-lg hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+      className="w-12 h-12 text-2xl border text-zinc-400 border-zinc-400 cursor-pointer rounded-full flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
     >
       {children}
     </button>
@@ -51,9 +51,9 @@ export default function StepPackage({ value, onChange, onNext, onBack }: Props) 
   return (
     <StepShell
       title="Hvor mange bokse?"
-      description="1 boks pr. m² er en god tommelfingerregel."
+      description="Én boks pr. m² er en god tommelfingerregel."
     >
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
         {PACKAGE_KEYS.map((key) => {
           const pkg = PACKAGES[key]
           const isSelected = selected === key && boxCount === pkg.boxes
@@ -62,35 +62,35 @@ export default function StepPackage({ value, onChange, onNext, onBack }: Props) 
             <button
               key={key}
               onClick={() => selectPackage(key)}
-              className={`cursor-pointer text-left w-full rounded-2xl border-2 p-4 transition-all ${
+              className={`cursor-pointer bg-white text-left w-full rounded-2xl border p-4 transition-all ${
                 isSelected
-                  ? 'border-primary bg-primary/5'
-                  : 'border-zinc-200 hover:border-zinc-300 bg-white'
+                  ? 'border-primary'
+                  : 'border-zinc-300/0 hover:border-zinc-300'
               }`}
             >
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="font-semibold">{pkg.label}</p>
-                  <p className="text-sm text-zinc-500">{pkg.boxes} m²</p>
                 </div>
-                <p className="font-semibold text-zinc-900 shrink-0">{pkg.boxes} bokse</p>
+                {/* <p className="font-semibold text-zinc-900 shrink-0">{pkg.boxes} bokse</p> */}
+                <p className="font-semibold text-zinc-900 shrink-0">{pkg.boxes} m²</p>
               </div>
             </button>
           )
         })}
       </div>
 
-      <div className="mt-5 flex items-center justify-between bg-zinc-50 rounded-xl px-4 py-3">
-        <span className="text-sm text-zinc-500">Finjuster antal bokse:</span>
+      <div className="mt-24 flex flex-col items-center justify-between">
         <div className="flex items-center gap-3">
           <StepperButton onClick={() => adjustCount(-1)} disabled={boxCount <= 25}>
             –
           </StepperButton>
-          <span className="w-8 text-center font-semibold text-zinc-900">{boxCount || '–'}</span>
+          <span className="w-38 text-6xl text-center font-semibold text-zinc-900">{boxCount || '–'}</span>
           <StepperButton onClick={() => adjustCount(1)}>
             +
           </StepperButton>
         </div>
+        <span className="text-sm text-zinc-500">Bokse</span>
       </div>
 
     </StepShell>

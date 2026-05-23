@@ -30,7 +30,7 @@ function addDays(date: Date, days: number): Date {
 
 function formatDanish(date: Date): string {
   return date.toLocaleDateString('da-DK', {
-    weekday: 'long',
+    // weekday: 'long',
     day: 'numeric',
     month: 'long',
   })
@@ -75,23 +75,23 @@ export default function StepDate({ value, onChange }: Props) {
         />
       </div>
 
-      <div className="mt-4 bg-zinc-50 rounded-xl px-4 py-3 text-sm space-y-1">
-        <div className="flex justify-between">
-          <span className="text-zinc-500">Levering</span>
-          <span className="font-medium capitalize">{formatDanish(selected)}</span>
+      <div className="mt-2 bg-white flex justify-between rounded-xl px-4 py-3 text-sm">
+        <div className="">
+          <p className="text-zinc-500">Levering</p>
+          <p className="font-bold text-xl">{formatDanish(selected)}</p>
         </div>
-        <div className="flex justify-between">
-          <span className="text-zinc-500">Afhentning</span>
-          <span className="font-medium capitalize">{formatDanish(pickupDate)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-zinc-500">Lejeperiode</span>
-          <span className="font-medium">
-            {totalWeeks} uger
-            {value.extraWeeks > 0 && (
+        <div className="text-center">
+          <p className="text-zinc-500">Uger</p>
+          <p className="font-bold text-xl">
+            {totalWeeks}
+            {/* {value.extraWeeks > 0 && (
               <span className="text-primary ml-1">(+{value.extraWeeks} ekstra)</span>
-            )}
-          </span>
+            )} */}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-zinc-500">Afhentning</p>
+          <p className="font-bold text-xl">{formatDanish(pickupDate)}</p>
         </div>
       </div>
 
@@ -102,15 +102,15 @@ export default function StepDate({ value, onChange }: Props) {
             <button
               onClick={() => onChange({ extraWeeks: Math.max(0, value.extraWeeks - 1) })}
               disabled={value.extraWeeks === 0}
-              className="w-7 h-7 rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="w-7 h-7 cursor-pointer rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              –
+              -
             </button>
             <span className="w-4 text-center font-medium text-zinc-900">{value.extraWeeks}</span>
             <button
               onClick={() => onChange({ extraWeeks: Math.min(4, value.extraWeeks + 1) })}
               disabled={value.extraWeeks === 4}
-              className="w-7 h-7 rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="w-7 h-7 cursor-pointer rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               +
             </button>
@@ -120,7 +120,7 @@ export default function StepDate({ value, onChange }: Props) {
           <p className="text-sm font-medium text-zinc-900">
             +{tier.extraWeekPricePerBox.toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr/boks
           </p>
-          <p className="text-xs text-zinc-400">+{extraWeekTotal.toLocaleString('da-DK', { maximumFractionDigits: 2 })} kr/uge i alt</p>
+          {/* <p className="text-xs text-zinc-400">+{extraWeekTotal.toLocaleString('da-DK', { maximumFractionDigits: 2 })} kr/uge i alt</p> */}
         </div>
       </div>
 

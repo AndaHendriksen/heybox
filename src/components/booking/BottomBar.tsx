@@ -52,7 +52,7 @@ export default function BottomBar({
             <button
               type="button"
               onClick={onBack}
-              className="h-12 w-12 shrink-0 rounded-xl border border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 transition-colors"
+              className="h-12 w-12 cursor-pointer shrink-0 rounded-xl border border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 transition-colors"
             >
               ←
             </button>

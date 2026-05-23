@@ -12,13 +12,13 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
         {Array.from({ length: total }).map((_, i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-              i < current ? 'bg-primary' : 'bg-zinc-200'
+            className={`h-[3px] flex-1 rounded-full transition-colors duration-300 ${
+              i < current ? 'bg-primary' : 'bg-zinc-300'
             }`}
           />
         ))}
       </div>
-      <p className="text-sm text-zinc-400">Trin {current} af {total}</p>
+      {/* <p className="text-sm text-zinc-400">Trin {current} af {total}</p> */}
     </div>
   )
 }

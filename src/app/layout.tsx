@@ -8,8 +8,8 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "heybox – Lej plastikkasser til flytning",
-  description: "Lej stærke plastikkasser til præcis samme pris som pap. Levering og afhentning inkluderet. Ingen bil nødvendig.",
+  title: "heybox - lej flyttekasser til flytning",
+  description: "Lej stærke flyttekasser til præcis samme pris som pap. Levering og afhentning inkluderet. Ingen bil nødvendig.",
 };
 
 export default function RootLayout({
