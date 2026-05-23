@@ -23,7 +23,7 @@ export const INITIAL_BOOKING_STATE: BookingState = {
   toPostcode: '',
   deliveryDate: null,
   extraWeeks: 0,
-  boxCount: 0,
+  boxCount: 25,
   selectedPackage: null,
   addCleaning: false,
   addCarrying: false,

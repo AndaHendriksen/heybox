@@ -42,7 +42,6 @@ export default function StepDate({ value, onChange }: Props) {
   const tier = getTier(value.boxCount)
   const totalWeeks = tier.baseWeeks + value.extraWeeks
   const pickupDate = addDays(selected, totalWeeks * 7)
-  const extraWeekTotal = value.boxCount * tier.extraWeekPricePerBox
 
   function handleSelect(date: Date | undefined) {
     if (date) onChange({ deliveryDate: date })
@@ -50,11 +49,6 @@ export default function StepDate({ value, onChange }: Props) {
 
   return (
     <StepShell title="Hvornår skal vi levere?" description='Vi leverer pt. kun i weekenderne.'>
-      {/* <div className="flex items-start gap-2 bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 mb-6 text-sm text-zinc-600">
-        <InfoIcon className="w-4 h-4 mt-0.5 shrink-0 text-zinc-400" />
-        <span>Vi leverer kun i weekenderne (lørdag og søndag)</span>
-      </div> */}
-
       <div className="flex justify-center">
         <Calendar
           mode="single"
@@ -75,19 +69,14 @@ export default function StepDate({ value, onChange }: Props) {
         />
       </div>
 
-      <div className="mt-2 bg-white flex justify-between rounded-xl px-4 py-3 text-sm">
+      <div className="mt-3 mb-8 bg-white flex justify-between rounded-xl px-1 text-sm">
         <div className="">
           <p className="text-zinc-500">Levering</p>
           <p className="font-bold text-xl">{formatDanish(selected)}</p>
         </div>
         <div className="text-center">
           <p className="text-zinc-500">Uger</p>
-          <p className="font-bold text-xl">
-            {totalWeeks}
-            {/* {value.extraWeeks > 0 && (
-              <span className="text-primary ml-1">(+{value.extraWeeks} ekstra)</span>
-            )} */}
-          </p>
+          <p className="font-bold text-xl">{totalWeeks}</p>
         </div>
         <div className="text-right">
           <p className="text-zinc-500">Afhentning</p>
@@ -120,10 +109,8 @@ export default function StepDate({ value, onChange }: Props) {
           <p className="text-sm font-medium text-zinc-900">
             +{tier.extraWeekPricePerBox.toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr/boks
           </p>
-          {/* <p className="text-xs text-zinc-400">+{extraWeekTotal.toLocaleString('da-DK', { maximumFractionDigits: 2 })} kr/uge i alt</p> */}
         </div>
       </div>
-
     </StepShell>
   )
 }

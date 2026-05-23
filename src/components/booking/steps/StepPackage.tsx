@@ -1,6 +1,6 @@
 'use client'
 
-import { Package, PACKAGES, BookingState } from '@/lib/booking-types'
+import { BookingState } from '@/lib/booking-types'
 import StepShell from './StepShell'
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
   onBack: () => void
 }
 
-const PACKAGE_KEYS = ['micro', 'small', 'medium', 'large'] as const
+const SIZES = [25, 40, 60, 90, 120, 150]
 
 function StepperButton({
   onClick,
@@ -25,7 +25,7 @@ function StepperButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-12 h-12 text-2xl border text-zinc-400 border-zinc-400 cursor-pointer rounded-full flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed"
+      className="w-12 h-12 text-2xl border text-zinc-400 border-zinc-300 cursor-pointer rounded-full flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed"
     >
       {children}
     </button>
@@ -34,18 +34,10 @@ function StepperButton({
 
 export default function StepPackage({ value, onChange, onNext, onBack }: Props) {
   const boxCount = value.boxCount
-  const selected = value.selectedPackage
-
-  function selectPackage(key: Package) {
-    onChange({ selectedPackage: key, boxCount: PACKAGES[key].boxes })
-  }
 
   function adjustCount(delta: number) {
     const next = Math.max(1, boxCount + delta)
-    const matchingKey = (Object.keys(PACKAGES) as Package[]).find(
-      (k) => PACKAGES[k].boxes === next
-    ) ?? null
-    onChange({ boxCount: next, selectedPackage: matchingKey })
+    onChange({ boxCount: next, selectedPackage: null })
   }
 
   return (
@@ -53,39 +45,28 @@ export default function StepPackage({ value, onChange, onNext, onBack }: Props) 
       title="Hvor mange bokse?"
       description="Én boks pr. m² er en god tommelfingerregel."
     >
-      <div className="flex flex-col gap-2">
-        {PACKAGE_KEYS.map((key) => {
-          const pkg = PACKAGES[key]
-          const isSelected = selected === key && boxCount === pkg.boxes
-
-          return (
-            <button
-              key={key}
-              onClick={() => selectPackage(key)}
-              className={`cursor-pointer bg-white text-left w-full rounded-2xl border p-4 transition-all ${
-                isSelected
-                  ? 'border-primary'
-                  : 'border-zinc-300/0 hover:border-zinc-300'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="font-semibold">{pkg.label}</p>
-                </div>
-                {/* <p className="font-semibold text-zinc-900 shrink-0">{pkg.boxes} bokse</p> */}
-                <p className="font-semibold text-zinc-900 shrink-0">{pkg.boxes} m²</p>
-              </div>
-            </button>
-          )
-        })}
+      <div className="grid grid-cols-3 gap-2">
+        {SIZES.map((size) => (
+          <button
+            key={size}
+            onClick={() => onChange({ boxCount: size, selectedPackage: null })}
+            className={`cursor-pointer rounded-xl py-3 border text-center font-semibold transition-all ${
+              boxCount === size
+                ? 'shadow-lg shadow-black/5 border-primary/20'
+                : 'bg-gray-50 border-gray-50 text-gray-500'
+            }`}
+          >
+            {size} m²
+          </button>
+        ))}
       </div>
 
       <div className="mt-24 flex flex-col items-center justify-between">
         <div className="flex items-center gap-3">
           <StepperButton onClick={() => adjustCount(-1)} disabled={boxCount <= 25}>
-            –
+            -
           </StepperButton>
-          <span className="w-38 text-6xl text-center font-semibold text-zinc-900">{boxCount || '–'}</span>
+          <span className="w-38 text-6xl text-center font-semibold text-zinc-900">{boxCount || '-'}</span>
           <StepperButton onClick={() => adjustCount(1)}>
             +
           </StepperButton>

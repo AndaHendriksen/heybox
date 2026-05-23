@@ -95,13 +95,13 @@ export default function StepAddresses({ value, onChange, onNext }: Props) {
       <div className="space-y-5">
         <AddressInput
           id="from-address"
-          label="Fra adresse"
+          label="Leveres til"
           value={value.fromAddress}
           onChange={(v) => onChange({ fromAddress: v })}
         />
         <AddressInput
           id="to-address"
-          label="Til adresse"
+          label="Afhentes fra"
           value={value.toAddress}
           onChange={(v) => onChange({ toAddress: v })}
         />

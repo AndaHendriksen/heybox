@@ -29,7 +29,7 @@ export default function BottomBar({
   onBack,
 }: BottomBarProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-zinc-100">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/10 backdrop-blur-xs border-t border-zinc-100">
       <div className="max-w-xl mx-auto px-4 py-3 flex flex-col gap-3">
         {showPriceBar && boxCount > 0 && (
           <div className="flex items-center justify-between text-sm">
