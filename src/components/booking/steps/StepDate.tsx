@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react'
 import { Calendar } from '@/components/ui/calendar'
-import { BookingState, getTier } from '@/lib/booking-types'
+import type { BookingState } from '@/lib/booking/types'
+import { getTier } from '@/lib/booking/utils'
 import { InfoIcon } from 'lucide-react'
 import StepShell from './StepShell'
 

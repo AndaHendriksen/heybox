@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { formatTotal } from '@/lib/booking-types'
+import { formatTotal } from '@/lib/booking/utils'
 
 interface BottomBarProps {
   showPriceBar: boolean

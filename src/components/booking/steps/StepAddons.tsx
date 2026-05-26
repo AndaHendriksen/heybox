@@ -1,6 +1,7 @@
 'use client'
 
-import { BookingState, getTier } from '@/lib/booking-types'
+import type { BookingState } from '@/lib/booking/types'
+import { getTier } from '@/lib/booking/utils'
 import StepShell from './StepShell'
 
 interface Props {

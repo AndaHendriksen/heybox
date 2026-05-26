@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { BookingState } from '@/lib/booking-types'
+import type { BookingState } from '@/lib/booking/types'
 import StepShell from './StepShell'
 
 interface Props {
@@ -14,10 +14,19 @@ interface Props {
   onBack: () => void
 }
 
+const COUNTRY_CODES = [
+  { code: '+45', label: '🇩🇰 +45' },
+  { code: '+46', label: '🇸🇪 +46' },
+  { code: '+47', label: '🇳🇴 +47' },
+  { code: '+49', label: '🇩🇪 +49' },
+  { code: '+44', label: '🇬🇧 +44' },
+]
+
 interface FormValues {
   name: string
   email: string
   phone: string
+  phoneCountryCode: string
 }
 
 export default function StepContact({ value, onNext, onBack }: Props) {
@@ -30,6 +39,7 @@ export default function StepContact({ value, onNext, onBack }: Props) {
       name: value.name,
       email: value.email,
       phone: value.phone,
+      phoneCountryCode: value.phoneCountryCode,
     },
   })
 
@@ -78,16 +88,26 @@ export default function StepContact({ value, onNext, onBack }: Props) {
 
         <div className="space-y-1.5">
           <Label htmlFor="phone">Telefon</Label>
-          <Input
-            id="phone"
-            type="tel"
-            placeholder="20 12 34 56"
-            className={errors.phone ? 'border-red-400' : ''}
-            {...register('phone', {
-              required: 'Telefon er påkrævet',
-              minLength: { value: 8, message: 'Mindst 8 cifre' },
-            })}
-          />
+          <div className="flex gap-2">
+            <select
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              {...register('phoneCountryCode')}
+            >
+              {COUNTRY_CODES.map(({ code, label }) => (
+                <option key={code} value={code}>{label}</option>
+              ))}
+            </select>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="20 12 34 56"
+              className={errors.phone ? 'border-red-400 flex-1' : 'flex-1'}
+              {...register('phone', {
+                required: 'Telefon er påkrævet',
+                minLength: { value: 8, message: 'Mindst 8 cifre' },
+              })}
+            />
+          </div>
           {errors.phone && (
             <p className="text-xs text-red-500">{errors.phone.message}</p>
           )}

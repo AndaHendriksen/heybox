@@ -1,107 +1,86 @@
-# Brainstorm: Booking Flow — Leje af flyttekasser
+# Brainstorm: Summary Page Redesign
 
 ## Problem Definition
-- **User:** En person der skal flytte inden for Storkøbenhavn og har brug for midlertidig leje af kasserne til at pakke, transportere og pakke ud.
-- **Goal:** Booke de rigtige kasser til sin flytning hurtigt og uden forvirring — med levering den rette weekend.
-- **Friction:** Der er mange valg (adresser, datoer, pakker, tilkøb, kontaktinfo) og brugeren mister overblikket eller stopper halvvejs hvis det føles som én lang formular.
-- **Problem Statement:** Den person der skal flytte behøver at bestille kasser til sin flytning, men for mange valg på én gang gør at flowet føles overvældende og svært at gennemskue.
+- **User:** A customer who has just filled in 5 steps of a booking form
+- **Goal:** Feel confident all their details are correct before confirming (and paying)
+- **Friction:** The current table layout presents every field as equal-weight key-value pairs — no visual hierarchy, no sense of sequence — making it hard to mentally picture the actual flow of events
+
+- **Problem Statement:** A booking customer needs to review their order and feel confident it's right, but a flat table of rows gives no sense of the chronological journey their boxes will take.
 
 ---
 
 ## HMW Question
-> How might we gøre det så enkelt at booke flyttekasser at brugeren altid ved hvad der sker, hvad det koster og hvad næste trin er?
+> How might we make the summary feel like a preview of the customer's actual moving day, not a data dump?
 
 ---
 
 ## Directions Considered
-*Alle ideer genereret under diverge, grupperet efter SCAMPER lens.*
 
-- **Substitute — Weekend-only kalender:** Erstat en standard datepicker med en kalender der visuelt kun kan klikkes på lørdage/søndage. Hverdage er nedtonede og ikke-klikbare — ingen forklaring nødvendig.
-- **Substitute — Adressevalidering via map-preview:** Erstat ren tekstindtastning med autocomplete + lille kort der bekræfter "Ja, denne adresse er i Storkøbenhavn" live, før brugeren trykker næste.
-<!-- Der behøver ikke at være noget lille kort -->
-- **Combine — Pakkevalg + prisberegner i ét:** Kombiner "Vælg pakke" med en real-time prisboks der opdateres i bunden mens brugeren vælger — så prisen aldrig er en overraskelse.
-- **Combine — Tilkøb som del af opsummeringen:** Kombiner tilkøbs-skærmen med opsummeringen, så brugeren ser hvad de allerede har valgt og tilføjer ekstra oven på det, frem for en isoleret "extras"-side.
-- **Adapt — Pizza-bestillingens progressionsmodel:** Lån fra Dominos/Just Eat: tydelig step-indikator øverst, "Tilføj til kurv"-knap i bunden der altid viser løbende pris, og en sammenfatning inden betaling.
-- **Adapt — Airbnb-tjek ud af renter:** Adapter Airbnbs "hvornår og hvem"-sekvens: adresser + dato tidligt, detaljer (pakker, tilkøb) bagefter, personinfo til sidst. Prisen vises i en sticky boks undervejs.
-- **Eliminate — Personinfo sidst:** Fjern navn/email/tlf fra starten. Brugeren er kommitted til købet FØR de skal give persondata — reducerer drop-off markant.
-- **Eliminate — Standard uger er pre-valgt:** Fjern beslutningen om uger fra den primære flow; 2 uger er default og synlig. Tilkøb af ekstra uger er en lille "+"-knap — ikke et selvstændigt trin.
-- **Put to other use — Flowet som tillids-signal:** Brug hvert "næste"-trin til at vise en kort social proof-linje ("Over 400 familier i KBH har lejet hos os") — flowet er ikke bare booking, det er også overbevisning.
-<!-- Det har jeg ikke noget data på endnu, så drop dette -->
-- **Put to other use — Opsummerings-skærmen som delings-URL:** Den færdige booking kan deles som link til partner/ægtefælle der skal godkende — flow tjener to brugere, ikke én.
-<!-- Virkelig god idé men ikke vigtigt på nuværende tidspunkt -->
+- **Substitute:** Replace each table row with a timeline card — one card per event (delivery, rental, pickup). Icons replace labels: truck down, calendar, truck up.
+- **Substitute:** Replace plain text addresses with a stylized address "chip" with a pin icon, making addresses feel more like destinations.
+- **Combine:** Merge the rental duration card with a visual date-range bar — showing exactly when the boxes arrive and when they leave.
+- **Combine:** Combine the user info and total into one "Your booking" footer card so the personal + financial close together feel like a receipt.
+- **Adapt:** Borrow the **flight itinerary** pattern (e.g. Airbnb, Google Flights) — origin → transit → destination, connected by a dashed line. Boarding-pass aesthetic.
+- **Adapt:** Borrow **delivery tracking** UI (e.g. PostNord, GLS) — a vertical timeline with dots and connector lines showing completed vs. upcoming events.
+- **Eliminate:** Remove the section headers entirely and let icons carry the meaning — fewer words, faster scan.
+- **Eliminate:** Don't show the carrying addon as a separate row — instead embed it as a sub-label inside the delivery/pickup card ("Båret ind i boligen" directly under the address).
+- **Put to other use:** The same timeline layout renders as a confirmation email — customer sees the exact same visual after booking as before, which builds trust.
 
 ---
 
-## Direction A: Den Lineære Guide ("Én ting ad gangen")
+## Direction A: Vertical Timeline Cards
+**Selected because:** The timeline metaphor directly mirrors the physical journey: boxes go down (delivery), stay (rental), come back up (pickup). It's the most intuitive pattern for a logistics service and maps perfectly to your 5-group structure.
 
-**Selected because:** Matcher præcis det ønskede "super simpelt og overskueligt" krav. Én beslutning pr. screen eliminerer kognitiv belastning. Brugeren kan aldrig være i tvivl om hvad de skal gøre nu.
-
-**Key risk/assumption:** At brugere ikke frustreres af mange klik/screens — risikerer at føles langsomt på desktop. Forudsætter at mobilbrugere er primær målgruppe, hvor én ting pr. screen er naturligt.
-
-**Distinct from Direction B:** Her er der ingen synlig pris eller opsummering undervejs — fuld fokus på ét valg ad gangen. Prisen afsløres kun på det dedikerede opsummeringstrin.
+**Key risk/assumption:** The carrying addon (`addCarrying`) is a single boolean in `BookingState` — it applies to both delivery and pickup with the same value. The UI must make it clear the same preference applies both ways, otherwise users might wonder if they can choose differently per direction.
 
 ### User Journey
-1. **Entry Point:** Landingpage → stor CTA "Book dine kasser" → Step 1 indlæses (progress: 1/5)
-2. **Step 1 – Fra/Til adresser:** To adressefelter med autocomplete. Grønt flueben + "Levering mulig" vises når begge er i Storkøbenhavn. Rødt ikon + "Vi leverer ikke her endnu" hvis udenfor. → Næste
-3. **Step 2 – Vælg afleveringsdag:** Kalender kun med weekender klikbare. Default = næste lørdag fremhævet. Lille tekst: "Standard leje: 2 uger. Afhentning sker 2 uger senere." → Næste
-4. **Step 3 – Vælg pakke:** Tre kort (Lille / Mellem / Stor) med ikon, antal kasser og basispris. Tap på et kort markerer det. → Næste
-5. **Step 4 – Tilkøb:** To toggle-rækker. "Rengøring af kasser +79 kr" (default: slået fra, label: "Vi rengør selv"). "Båret ind/op +79 kr" (default: slået fra). Simpelt og binært. → Næste
-6. **Step 5 – Dine oplysninger:** Navn, email, telefon. Ingen unødvendige felter. → Se opsummering
-7. **Opsummering:** Alt vises samlet. Total pris i fed. "Bekræft booking"-knap → Success-screen med ordrenummer + email-bekræftelse.
-Det mangler en sidste ting - vi har ikke nogle kasser endnu. Derfor skal success screen være en "Undskyld" screen hvor vi tilbyder at komme med papkasser til samme pris (evt. minus 100kr)
+1. **Entry Point:** User taps "Se opsummering" from the contact step → page slides in showing the timeline
+2. **Action:** User scans the three event cards top-to-bottom → **Response:** Timeline connector line visually chains them together, cleaning reminder badge appears inline if `addCleaning === false`
+3. **Action:** User notices wrong address → **Response:** Taps a subtle "Rediger" link on the card (or uses back navigation) to fix it
+4. **Goal achieved:** User reads total at the bottom, taps "Bekræft booking" with confidence
 
 ### Key UI Components
-- Step-progress-bar øverst (1 af 5 / 2 af 5...)
-- Adresse-autocomplete med inline Storkøbenhavn-validering
-<!-- Skal vi gøre brugeren opmærksom på at det kun er storkøbenhavn? -->
-- Weekend-only kalender (hverdage er visuelt disabled, ikke skjult)
-<!-- Også her burde der måske være en "Vi leverer kun i weekenden" -->
-- Pakke-valgkort med ikon, beskrivelse og pris
-- Toggle-rækker til tilkøb (ikke checkboxes — større touch-target)
-- Read-only opsummerings-kort inden bekræftelse
-- Sticky "Næste"-knap i bunden der altid er synlig
+- **Timeline rail:** A vertical line on the left with colored dots per event (delivery = green, rental = blue, pickup = orange)
+- **Event card:** Icon + headline + address + date + carrying sub-label. No label prefixes — context is self-evident from position.
+- **Rental bridge card:** Shows duration ("6 uger") + date range pill (e.g. "14. jun → 26. jul"). If `addCleaning === false`, shows an amber inline notice: "Husk at rengøre kasserne inden afhentning"
+- **User info card:** Name, email, phone — minimal, no table row feel
+- **Total footer:** Price per box left, total amount right — large type, clear anchor
 
 ### Edge Cases
-- Hvad hvis brugeren indtaster en adresse der er på grænsen (f.eks. Dragør eller Albertslund)? → Validering skal have en præcis Storkøbenhavn-definition. Vis en "Kontakt os"-link frem for en hård fejl.
-- Hvad hvis brugeren vil have flere uger end standard? → "Vil du leje længere? +X kr/uge per kasse" vises som et subtilt tilkøb på pakke-skærmen — ikke et separat trin.
-- Hvad hvis brugeren går tilbage og ændrer pakken? → Progress gemmes. Tilkøb og personinfo bibeholdes. Prisen opdateres på opsummeringen.
-
+- What if delivery and pickup are the same address? The two event cards would show identical addresses — consider collapsing or noting "Samme adresse" to avoid confusion.
+<!-- That is an extremely rare case. And if they are the same, the user will know so we don't need to consider this -->
+- What if `extraWeeks === 0`? The rental card just says "4 uger inkl." without mentioning extras — keep this short and clear.
+- What if the pickup date hasn't been explicitly set in state? Pickup date must be computed: `deliveryDate + totalWeeks weeks`. This calculation needs to be solid and match user expectations.
+<!-- Pickup date is set when selecting deliveryDate -->
 ---
 
-## Direction B: Den Smarte Kurv ("Se totalen vokse")
+## Direction B: Boarding Pass Stack
+**Selected because:** The boarding-pass aesthetic is visually distinctive and immediately signals "this is your ticket" — which raises the perceived value of the booking and creates a moment worth pausing on before confirming.
 
-**Selected because:** Giver brugere der er prisbevidste fuld kontrol og transparens. Flowet minder om e-commerce-booking de kender — kurv, real-time pris, tillid via "ingen skjulte gebyrer"-signal.
-
-**Key risk/assumption:** At brugere er motiverede nok til at tilpasse og sammenligne — forudsætter at de allerede er ret sikre på at de vil bestille (lavere konvertering for "bare-kigger"-segment).
-
-**Distinct from Direction A:** Her er en persistent prisoversigt synlig på siden/bunden hele vejen igennem. Brugeren kan se hvad ting koster mens de vælger.
+**Key risk/assumption:** This pattern works beautifully on desktop but can feel cramped on mobile — the horizontal segments and torn-edge dividers need careful implementation to read well at 390px wide.
 
 ### User Journey
-1. **Entry Point:** Landingpage → "Beregn din pris" CTA → Booking-siden åbner med tom kurv til højre (desktop) / collapsible prisboks i bunden (mobil)
-2. **Trin 1 – Adresser:** Fra/Til adressefelter med autocomplete og Storkøbenhavn-check. Kurven viser "Levering: KBH ✓"
-3. **Trin 2 – Dato + varighed:** Weekend-kalender. Under datoen: "2 uger inkluderet. Tilføj ekstra uger: [ – ] 2 [ + ]". Kurv opdateres live.
-4. **Trin 3 – Pakke:** Visuelt pakkevalg. Kurven viser pakkenavn + basispris øjeblikkeligt.
-5. **Trin 4 – Tilkøb:** To toggle-rækker. Kurven udvides med tilkøbene mens de slås til.
-6. **"Se din ordre"-knap** → Opsummeringsskærm med alle detaljer + totalbeløb → Udfyld kontaktinfo → Bekræft.
+1. **Entry Point:** Summary step animates in; user sees a card styled like a train/flight ticket
+2. **Action:** User reads top section (delivery) → perforated divider → rental duration → perforated divider → pickup → **Response:** Each section uses subtle background color shifts to distinguish zones
+3. **Action:** User sees cleaning reminder as a stamp/badge on the rental zone
+4. **Goal achieved:** User info and total sit below the ticket card; user confirms
 
 ### Key UI Components
-- Sticky sidebar/bottom-sheet: "Din kurv" med løbende total
-- Real-time prisberegner koblet til alle valg
-- Weekend-kalender med inline uge-tæller (+/- knapper)
-- Pakkevalg-kort med "Tilføj til kurv"-knap per pakke
-- Animeret prisboks der "blinker" kort når prisen ændres
-- Opsummerings-modal inden kontaktinfo
+- **Ticket card:** Single card with two perforated (dashed) horizontal dividers separating the three event zones
+- **Zone header:** Small caps label ("LEVERING", "LEJE", "AFHENTNING") + icon, minimal
+- **Rental zone:** Duration as a large number ("6 uger") + date range. Cleaning reminder as a corner badge if applicable.
+- **Below-ticket area:** User info row + total, styled as a receipt tail
 
 ### Edge Cases
-- Hvad hvis brugeren ser en høj totalpris og vil sammenligne pakker? → De kan skifte pakke frit og se prisen ændres live — kurven er ikke låst til ét valg.
-- Hvad hvis kurven er tom men brugeren trykker "Bekræft"? → "Du har ikke valgt en pakke endnu" — highlight det manglende felt, scroll til det.
-- Hvad hvis brugeren er på mobil og kurven skjuler indholdet? → Bottom-sheet er collapsible: standard kollaps, tap-for-at-udvide. Totalen vises altid i collapsed state.
+- What if the box count is large (e.g. 50 boxes)? The ticket card becomes content-heavy — may need scroll within the card.
+- What if the user is on a very small screen? Perforated dividers may not render distinctly enough.
+- What if both addresses are very long? Text overflow inside the fixed-width ticket zones is a real risk.
 
 ---
 
 ## Recommendation
-**Recommended direction: A — Den Lineære Guide**
+**Recommended direction: A (Vertical Timeline Cards)**
 
-**Why:** Målgruppen (folk der skal flytte) er i en stressfuld situation og har ikke overskud til at optimere en kurv. Én beslutning ad gangen reducerer kognitiv belastning og øger gennemførselsraten. Mobil-first-oplevelsen er naturlig med ét trin per screen. Prisoverraskelserisikoen håndteres ved opsummeringen, som vises inden endelig bekræftelse.
+**Why:** The timeline pattern is mobile-first, naturally handles content of variable length, and is the most familiar metaphor in modern logistics UX (same pattern PostNord, GLS, and Bring all use). It maps directly to your proposed 5-group structure without any structural compromise, and the left-rail connector line does all the storytelling work without adding visual noise. Direction B is striking but fragile at mobile widths.
 
-**Key assumption to validate:** At brugere er villige til at gennemføre 5 screens uden at se en pris undervejs — og at opsummeringen ikke skaber for mange exit-punkter. Test dette ved at måle drop-off på opsummerings-skærmen specifikt.
+**Key assumption to validate:** The cleaning reminder (`addCleaning === false`) inside the rental card must be seen as helpful context, not an upsell attempt. Test that the wording ("Husk at rengøre kasserne inden afhentning") reads as a friendly reminder, not a push to add the paid service after the user already declined it.

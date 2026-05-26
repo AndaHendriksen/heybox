@@ -1,6 +1,6 @@
 'use client'
 
-import { BookingState } from '@/lib/booking-types'
+import type { BookingState } from '@/lib/booking/types'
 import StepShell from './StepShell'
 
 interface Props {
@@ -32,7 +32,7 @@ function StepperButton({
   )
 }
 
-export default function StepPackage({ value, onChange, onNext, onBack }: Props) {
+export default function StepBoxes({ value, onChange, onNext, onBack }: Props) {
   const boxCount = value.boxCount
 
   function adjustCount(delta: number) {
@@ -61,7 +61,7 @@ export default function StepPackage({ value, onChange, onNext, onBack }: Props) 
         ))}
       </div>
 
-      <div className="mt-24 flex flex-col items-center justify-between">
+      <div className="mt-16 flex flex-col items-center justify-between">
         <div className="flex items-center gap-3">
           <StepperButton onClick={() => adjustCount(-1)} disabled={boxCount <= 25}>
             -

@@ -2,17 +2,19 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BookingState, INITIAL_BOOKING_STATE, calcTotal, calcEffectivePricePerBox } from '@/lib/booking-types'
-import { isStorkobenhavn, extractPostcode } from '@/lib/storkobenhavn'
+import type { BookingState } from '@/lib/booking/types'
+import { INITIAL_BOOKING_STATE } from '@/lib/booking/constants'
+import { calcTotal, calcEffectivePricePerBox } from '@/lib/booking/utils'
+import { isStorkobenhavn } from '@/utils/geo'
 import ProgressBar from './ProgressBar'
 import BottomBar from './BottomBar'
 import StepAddresses from './steps/StepAddresses'
 import StepDate from './steps/StepDate'
-import StepPackage from './steps/StepPackage'
+import StepBoxes from './steps/StepBoxes'
 import StepAddons from './steps/StepAddons'
 import StepContact from './steps/StepContact'
 import StepSummary from './steps/StepSummary'
-import SuccessApology from './SuccessApology'
+import StepApology from './steps/StepApology'
 
 const TOTAL_STEPS = 5
 
@@ -37,11 +39,6 @@ function getNextWeekend(): Date {
   return d
 }
 
-function isAddressValid(address: string): boolean {
-  const postcode = extractPostcode(address)
-  return !!postcode && isStorkobenhavn(postcode)
-}
-
 export default function BookingWizard() {
   const [step, setStep] = useState(1)
   const [dir, setDir] = useState(1)
@@ -55,38 +52,34 @@ export default function BookingWizard() {
     if (partial) updateBooking(partial)
     setDir(1)
     setStep((s) => s + 1)
+    window.scrollTo(0, 0)
   }
 
   function goBack() {
     setDir(-1)
     setStep((s) => s - 1)
+    window.scrollTo(0, 0)
   }
 
   const showProgress = step <= TOTAL_STEPS
   const showPriceBar = step >= 2 && step <= 5 && booking.boxCount > 0
-  const step1Valid = isAddressValid(booking.fromAddress) && isAddressValid(booking.toAddress)
+  const step1Valid =
+    isStorkobenhavn(booking.deliveryPostcode) && isStorkobenhavn(booking.pickupPostcode)
 
   const bottomNavProps = (() => {
     switch (step) {
-      case 1: return {
-        onNext: () => goNext({
-          fromPostcode: extractPostcode(booking.fromAddress) ?? '',
-          toPostcode: extractPostcode(booking.toAddress) ?? '',
-        }),
-        nextDisabled: !step1Valid,
-        showBack: false,
-      }
+      case 1: return { onNext: () => goNext(), nextDisabled: !step1Valid, showBack: false }
       case 2: return { onNext: () => goNext(), nextDisabled: booking.boxCount === 0, showBack: true }
       case 3: return { onNext: () => goNext({ deliveryDate: booking.deliveryDate ?? getNextWeekend() }), showBack: true }
       case 4: return { onNext: () => goNext(), showBack: true }
       case 5: return { nextLabel: 'Se opsummering', nextFormId: 'contact-form', showBack: true }
-      case 6: return { nextLabel: 'Bekræft booking', onNext: () => goNext(), showBack: true }
+      case 6: return { onNext: () => goNext(), nextLabel: 'Bekræft og betal', showBack: true }
       default: return { showBack: false }
     }
   })()
 
   return (
-    <div className="flex flex-col items-center justify-start pt-3 pb-10 px-4 pb-44">
+    <div className="flex flex-col items-center justify-start pt-3 pb-10 px-4 pb-32">
       <div className="w-full max-w-xl">
         {showProgress && <ProgressBar current={step} total={TOTAL_STEPS} />}
 
@@ -108,7 +101,7 @@ export default function BookingWizard() {
               />
             )}
             {step === 2 && (
-              <StepPackage
+              <StepBoxes
                 value={booking}
                 onChange={updateBooking}
                 onNext={goNext}
@@ -143,7 +136,7 @@ export default function BookingWizard() {
               <StepSummary booking={booking} />
             )}
             {step === 7 && (
-              <SuccessApology booking={booking} />
+              <StepApology booking={booking} />
             )}
           </motion.div>
         </AnimatePresence>
