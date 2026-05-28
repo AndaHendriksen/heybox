@@ -34,7 +34,7 @@ export const users = pgTable('users', {
   phone_country_code: varchar({ length: 6 }).notNull().default('+45'),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
-}, (table) => ([
+}, () => ([
   pgPolicy("Users: public read", { as: "permissive", for: "select", to: ["public"], using: sql`true` }),
   pgPolicy("Users: self insert", { as: "permissive", for: "insert", to: ["authenticated"], withCheck: sql`(auth.uid() = id)` }),
   pgPolicy("Users: self update", { as: "permissive", for: "update", to: ["authenticated"], using: sql`(auth.uid() = id)` }),
@@ -55,6 +55,7 @@ export const pricingTiers = pgTable('pricing_tiers', {
   uniqueIndex('pricing_tiers_one_active_per_threshold')
     .on(table.max_boxes)
     .where(sql`is_active = true`),
+  pgPolicy("Pricing tiers: public read", { as: "permissive", for: "select", to: ["public"], using: sql`true` }),
 ]))
 
 export const bookings = pgTable('bookings', {
@@ -82,7 +83,6 @@ export const bookings = pgTable('bookings', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (table) => ([
   index('bookings_dates_idx').on(table.delivery_date, table.pickup_date),
-  pgPolicy("Bookings: public insert", { as: "permissive", for: "insert", to: ["public"], withCheck: sql`true` }),
   pgPolicy("Bookings: owner select", { as: "permissive", for: "select", to: ["authenticated"], using: sql`(auth.uid() = user_id)` }),
 ]))
 
@@ -93,4 +93,5 @@ export const boxPool = pgTable('box_pool', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (table) => ([
   check('box_pool_single_row', sql`${table.id} = 1`),
+  pgPolicy("Box pool: public read", { as: "permissive", for: "select", to: ["public"], using: sql`true` }),
 ]))

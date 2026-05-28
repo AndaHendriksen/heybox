@@ -26,7 +26,7 @@ export const PACKAGES = {
 
 export const TIERS: Tier[] = [
   { maxBoxes: 49,       baseWeeks: 2, pricePerBox: 15.95, extraWeekPricePerBox: 3,    cleaningPricePerBox: 5, carryingPricePerBox: 3 },
-  { maxBoxes: 79,       baseWeeks: 3, pricePerBox: 15.95, extraWeekPricePerBox: 1.50, cleaningPricePerBox: 0, carryingPricePerBox: 0 },
-  { maxBoxes: 139,      baseWeeks: 4, pricePerBox: 15.95, extraWeekPricePerBox: 1.25, cleaningPricePerBox: 0, carryingPricePerBox: 0 },
-  { maxBoxes: Infinity, baseWeeks: 5, pricePerBox: 14.25, extraWeekPricePerBox: 1.00, cleaningPricePerBox: 0, carryingPricePerBox: 0 },
+  { maxBoxes: 79,       baseWeeks: 3, pricePerBox: 15.95, extraWeekPricePerBox: 2, cleaningPricePerBox: 0, carryingPricePerBox: 0 },
+  { maxBoxes: 139,      baseWeeks: 4, pricePerBox: 14.95, extraWeekPricePerBox: 1.5, cleaningPricePerBox: 0, carryingPricePerBox: 0 },
+  { maxBoxes: Infinity, baseWeeks: 5, pricePerBox: 13.95, extraWeekPricePerBox: 1, cleaningPricePerBox: 0, carryingPricePerBox: 0 },
 ]

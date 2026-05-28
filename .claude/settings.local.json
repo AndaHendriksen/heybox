@@ -9,7 +9,11 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(Test-Path \"c:\\\\Users\\\\andah\\\\OneDrive\\\\Dokumenter\\\\GitHub\\\\heybox\\\\brainstorm.md\")",
       "Bash(Select-Object Name, Mode)",
-      "Bash(npx drizzle-kit *)"
+      "Bash(npx drizzle-kit *)",
+      "WebSearch",
+      "WebFetch(domain:www.dst.dk)",
+      "WebFetch(domain:www.bolius.dk)",
+      "WebFetch(domain:unitedcontainer.com)"
     ]
   }
 }
