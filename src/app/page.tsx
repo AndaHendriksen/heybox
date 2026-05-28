@@ -23,6 +23,59 @@ export default function Landing() {
 
 function Hero() {
   return (
+      <section className="max-w-[900px] mx-auto relative z-60 mb-1 mt-18">
+        <div className="min-h-[calc(100vh-8rem)] flex flex-col justify-end p-4 mx-auto">
+          <div className="h-full flex items-center mt-12 mb-2">
+            <div className="w-2/3 md:1/3 lg:w-1/2 mx-auto relative mt-32 lg:mt-8">
+                <img
+                  src="/images/heybox-angle-modified.png"
+                  alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
+                  className="w-full"
+                />
+              <div className="absolute z-60 top-[4%] left-[64%] md:left-[70%] md:top-[8%] lg:left-[82%] w-[110%] lg:w-full -translate-[100%]">
+                <div className="text-left -rotate-25 pl-[25%] lg:pl-0">
+                  <p className="leading-4 text-gray-500">SAMME PRIS SOM PAP</p>
+                  <p className="font-bold lg:text-2xl">Fra 13.95 kr/kasse</p>
+                </div>
+                <img
+                  src="/arrow-down-01.svg" alt="Lej flyttekasser fra 15.95kr"
+                  className="ml-[50%] mt-1 md:ml-[40%] md:mt-8 w-16 lg:ml-28 lg:mt-18 lg:w-20" />
+              </div>
+            </div>
+          </div>
+          <div className="h-full flex items-center justify-center text-center pb-24">
+            <div className="">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-[1.2] tracking-tight mb-4">
+                Lej flyttekasser billigt og nemt i København
+              </h1>
+              <p className="text-lg md:text-xl text-black/50 mb-12 text-balance">
+                Lej robuste plastikkasser fra samme priser som at købe papkasser i byggemarkedet og slæbe dem hjem selv.
+              </p>
+              
+              <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-6">
+                <div>
+                  <Link href="/booking">
+                    <Button size="lg" className="text-white rounded-full">
+                      Beregn din pris
+                    </Button>
+                  </Link>
+                </div>
+                <div className="inline-block">
+                  <ul className="md:text-lg mb-10 mx-auto">
+                    <li className="flex gap-2 items-center"><CheckIcon className="w-6 h-6 text-primary" />Inkl. levering</li>
+                    <li className="flex gap-2 items-center"><CheckIcon className="w-6 h-6 text-primary" />Inkl. afhentning</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+  )
+}
+
+function HeroOld() {
+  return (
       <Section className="relative overflow-hidden mb-1 mt-18">
         <Card className="min-h-[calc(100vh-8rem)] p-4 mx-auto lg:grid lg:grid-cols-2 relative z-10">
           <div className="h-full flex items-center mt-12 mb-12">
@@ -72,8 +125,8 @@ function Hero() {
 function NoDriving() {
   return (
     <Section>
-      <Card className="px-4 py-4 md:px-8 md:py-32 lg:grid lg:grid-cols-2 items-center justify-center">
-        <div className="md:px-16">
+      <Card className="p-4 lg:px-8 grid lg:grid-cols-2 items-center justify-center">
+        <div className="md:pl-16">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2] tracking-tight mb-4">
             Ingen tur til byggemarkedet
           </h2>
@@ -86,12 +139,12 @@ function NoDriving() {
             </Button>
           </Link>
         </div>
-        <div className="w-2/3 md:1/3 lg:w-1/2 mx-auto order-first lg:order-last relative md:mt-32 lg:mt-8">
+        <div className="order-first lg:order-last lg:mt-8">
           <img
             src="/images/3d-icon-crowded-bus.png"
             // src="/images/3d-icon-byggemarked.png"
             alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
-            className="w-full"
+            className="w-2/3 mx-auto"
           />
         </div>
       </Card>
@@ -102,16 +155,16 @@ function NoDriving() {
 function BoxQuality() {
   return (
     <Section>
-      <Card className="p-4 lg:px-8 lg:py-32 grid lg:grid-cols-2 items-center justify-center">
-          <div className="w-2/3 md:1/3 lg:w-1/2 mx-auto relative md:mt-32 lg:mt-8">
+      <Card className="p-4 lg:px-8 lg:py-16 grid lg:grid-cols-2 items-center justify-center">
+          <div className="relative md:mt-32 lg:mt-8">
             <img
               src="/images/3d-icon-weight.png"
               alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
-              className="w-5/6 m-auto"
+              className="w-2/3 m-auto"
             />
           </div>
           <div>
-          <div className="lg:px-16">
+          <div className="lg:pr-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2] tracking-tight mb-4">
               Stærkere og nemmere end pap
             </h2>
@@ -135,8 +188,8 @@ function BoxQuality() {
 function NoCleanup() {
   return (
       <Section>
-        <Card className="p-4 lg:px-8 lg:py-32 grid lg:grid-cols-2 items-center justify-center">
-            <div className="lg:px-16">
+        <Card className="p-4 lg:px-8 grid lg:grid-cols-2 items-center justify-center">
+            <div className="lg:pl-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2] tracking-tight mb-4">
               Intet oprydningsarbejde bagefter
             </h2>
@@ -149,11 +202,11 @@ function NoCleanup() {
               </Button>
             </Link>
           </div>
-          <div className="w-2/3 md:1/3 lg:w-2/3 mx-auto order-first lg:order-last lg:mt-8">
+          <div className="order-first lg:order-last lg:mt-8">
             <img
               src="/images/3d-icon-trashedbox.png"
               alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
-              className="w-full"
+              className="mx-auto"
             />
           </div>
         </Card>
@@ -163,7 +216,7 @@ function NoCleanup() {
 
 function HowItWorks() {
   return (
-    <section id="saadan-virker-det" className="mb-1">
+    <Section>
       <div className="max-w-[1500px] mx-auto">
         <div className="grid md:grid-cols-3 gap-1 relative">
           <Card className="px-4 pt-16 pb-16 text-center">
@@ -188,7 +241,7 @@ function HowItWorks() {
           </Card>
         </div>
       </div>
-    </section>
+    </Section>
   )
 }
 
@@ -220,8 +273,8 @@ function CTA() {
 
 function Section({ children, className }: Readonly<{ children: React.ReactNode, className?: string }>) {
   return (
-    <section className={`mb-1 ${className}`}>
-      <div className="max-w-[1500px] mx-auto">
+    <section className={`px-4 mb-1 ${className}`}>
+      <div className="max-w-[1300px] mx-auto">
         {children}
       </div>
     </section>
