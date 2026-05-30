@@ -3,7 +3,8 @@ import { Button } from "./ui/button";
 
 export function Menu({ bgColor = "bg-olive-100/70" }: { bgColor?: string}) {
   return (
-    <nav className={`w-full backdrop-blur-lg z-50 fixed top-0 ${bgColor}`}>
+    // <nav className={`w-full backdrop-blur-lg z-50 fixed top-0 ${bgColor}`}>
+    <nav>
       <div className="px-6 py-2 flex items-center justify-between">
         <div className="">
           <img src="/heybox-logo.svg" alt="heybox logo" className="w-20" />

@@ -11,7 +11,7 @@ import { motion, type Variants } from "framer-motion"
 const STATS = {
   flytningerPerAar: 861_718,        // DST 2025
   fysiskeFlytninger: 507_000,       // DST / 1.7 husstandsfaktor (inference)
-  gnsBoligM2: 80,                   // Bolius 2026 (lejer-snit)
+  gnsBoligM2: 53.9,                   // Bolius 2026 (lejer-snit)
   kasserPerM2: 1,                   // Tommelfingerregel
   genbrugPerKasse: 5,               // United Container (middelscenarie)
   nyeKasserPerAar: 8_112_000,       // Beregnet
