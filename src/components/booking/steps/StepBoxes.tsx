@@ -10,7 +10,7 @@ interface Props {
   onBack: () => void
 }
 
-const SIZES = [25, 40, 60, 90, 120, 150]
+const SIZES = [20, 30, 40, 60, 80, 100, 120, 150]
 
 function StepperButton({
   onClick,
@@ -45,7 +45,7 @@ export default function StepBoxes({ value, onChange, onNext, onBack }: Props) {
       title="Hvor mange bokse?"
       description="Én boks pr. m² er en god tommelfingerregel."
     >
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {SIZES.map((size) => (
           <button
             key={size}
@@ -63,11 +63,11 @@ export default function StepBoxes({ value, onChange, onNext, onBack }: Props) {
 
       <div className="mt-16 flex flex-col items-center justify-between">
         <div className="flex items-center gap-3">
-          <StepperButton onClick={() => adjustCount(-1)} disabled={boxCount <= 25}>
+          <StepperButton onClick={() => adjustCount(-5)} disabled={boxCount <= 20}>
             -
           </StepperButton>
           <span className="w-38 text-6xl text-center font-semibold text-zinc-900">{boxCount || '-'}</span>
-          <StepperButton onClick={() => adjustCount(1)}>
+          <StepperButton onClick={() => adjustCount(5)}>
             +
           </StepperButton>
         </div>

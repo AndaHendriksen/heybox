@@ -13,7 +13,7 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
           <div
             key={i}
             className={`h-[3px] flex-1 rounded-full transition-colors duration-300 ${
-              i < current ? 'bg-primary' : 'bg-gray-200'
+              i < current ? 'bg-purple-300' : 'bg-gray-200'
             }`}
           />
         ))}

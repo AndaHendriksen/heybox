@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { CheckIcon, ArrowRight } from "lucide-react";
 import { Menu } from "@/components/menu";
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-olive-100 text-zinc-900 font-sans selection:bg-primary selection:text-white">
+    <div>
       <Menu />
       <Hero />
+      <WeMakeItEasy />
       <NoDriving />
       <HowItWorks />
       <BoxQuality />
@@ -27,151 +27,209 @@ export default function Landing() {
 
 function Hero() {
   return (
-      <section className="max-w-[900px] mx-auto relative z-60 mb-1 md:mt-18">
-        <div className="min-h-[80vh] flex flex-col justify-end p-4 mx-auto">
-          <div className="h-full flex items-center md:mt-12 mb-2">
-            <div className="px-3 md:1/3 lg:w-1/2 mx-auto relative mt-32 lg:mt-8">
-                <img
-                  src="/images/heybox-angle-modified.png"
-                  alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
-                  className="w-full"
-                />
-              <div className="absolute z-60 -top-[14%] left-[64%] md:left-[70%] md:top-[6%] lg:left-[82%] w-[110%] lg:w-full -translate-[80%] md:-translate-[100%]">
-                <div className="text-left -rotate-25 pl-[25%] lg:pl-0">
-                  <p className="leading-4 text-gray-400">Samme pris som pap</p>
-                  <p className="font-bold lg:text-2xl my-0.5">Fra 13.95 kr/kasse</p>
-                  {/* <p className="leading-4 text-gray-400">Inkl. levering og afhentning</p> */}
-                </div>
-                <img
-                  src="/arrow-down-01.svg" alt="Lej flyttekasser fra 15.95kr"
-                  className="ml-[50%] mt-1 md:ml-[40%] md:mt-8 w-16 lg:ml-28 lg:mt-15 lg:w-20" />
-              </div>
-            </div>
-          </div>
-          <div className="h-full flex items-center justify-center text-center pb-24">
-            <div className="">
-              <h1 className="text-2xl md:text-5xl lg:text-6xl font-bold leading-[1.2] tracking-tight mb-4">
-                Lej flyttekasser billigt og nemt i København
-              </h1>
-              <p className="text-lg md:text-xl text-black/50 mb-12 md:text-balance">
-                Lej robuste plastikkasser fra samme priser som at købe papkasser i byggemarkedet og slæbe dem hjem selv.
-              </p>
-              
-              <div className="flex flex-col md:flex-row items-center md:items-start justify-center gap-6">
-                <div>
-                  <Link href="/booking">
-                    <Button size="lg" className="text-white rounded-full">
-                      Beregn din pris
-                    </Button>
-                  </Link>
-                </div>
-                <div className="inline-block">
-                  <ul className="md:text-lg mb-10">
-                    <li className="flex gap-2 items-center"><CheckIcon className="w-6 h-6 text-primary" />Inkl. levering</li>
-                    <li className="flex gap-2 items-center"><CheckIcon className="w-6 h-6 text-primary" />Inkl. afhentning</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
+    <section className="min-h-[90vh] grid grid-cols-1 lg:grid-cols-2 border-b border-black">
+      <div className="pt-24 lg:pt-0 bg-green-200 flex items-center p-8 border-b border-black lg:border-b-0 lg:border-r">
+        <div className="md:w-2/3 mx-auto relative">
+          <img
+            src="/images/heybox-angle-modified.png"
+            alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
+            className="w-full"
+          />
+          <div className="text-sm md:text-lg absolute bottom-4 right-2 text-right flex flex-col items-end">
+            <TransparentCard><p className="font-bold">Lej fra 13.95 kr/kasse</p></TransparentCard>
+            <TransparentCard><CheckIcon className="w-4 h-4 mt-0.5" /><p>Inkl. levering og afhentning</p></TransparentCard>
           </div>
         </div>
-      </section>
+      </div>
+      <div className="p-4 pb-12 flex items-center justify-center">
+        <div className="lg:px-4 xl:px-8">
+          <h1 className="text-3xl md:text-3xl lg:text-5xl xl:text-6xl text-balance uppercase font-black mb-4">
+            Lej flyttekasser billigt og nemt.
+          </h1>
+          <p className="md:text-lg lg:text-xl mb-12 md:text-balance">
+            Lej robuste plastkasser fra samme priser som at købe papkasser i byggemarkedet og slæbe dem hjem selv.
+          </p>
+          <Link href="/booking">
+            <Button size="lg" className="bg-purple-200">
+              Beregn din pris <ArrowRight className="w-6 h-6 ml-1 -mr-3" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function WeMakeItEasy() {
+  return (
+    <SectionInfo 
+      title={<>Vi fjerner<br />bøvlet.</>}
+      description="Vi leverer kasserne, du pakker, og når du er på plads i din nye bolig, henter vi kasserne igen. Simpelt."
+    />
+  )
+}
+
+function SectionInfo({ preTitle, title, description }: Readonly<{ preTitle?: string, title: React.ReactNode, description: string }>) {
+  return (
+    <Section className="py-16 md:py-32">
+      <div className="max-w-[1400px] md:px-0 mx-auto md:grid md:grid-cols-2">
+        <div className="p-6 pl-0">
+          {preTitle && (
+            <p className="-mt-4">{preTitle}</p>
+          )}
+          <h2 className="text-4xl lg:text-7xl font-black uppercase">
+            {title}
+          </h2>
+        </div>
+        <div className="md:py-6 lg:py-8 md:pr-0 lg:pl-24">
+          <p className="text-lg md:text-xl text-black/50">
+            {description}
+          </p>
+        </div>
+      </div>
+    </Section>
+  )
+}
+
+function TransparentCard({ children }: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <div className="px-2 md:px-3 pt-1 pb-0.5 flex items-center gap-1 mb-0.5 border border-black bg-white shadow-[3px_4px_0_0_rgba(0,0,0,1)]">
+      {children}
+    </div>
   )
 }
 
 function NoDriving() {
   return (
-    <Section>
-      <Card className="min-h-[60vh] p-4 lg:px-8 grid lg:grid-cols-2 items-center justify-center">
-        <div className="lg:pl-16">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2] tracking-tight mb-4">
-            Ingen tur til byggemarkedet
-          </h2>
-          <p className="text-lg md:text-xl text-black/50 mb-12">
-            Drop køen i byggemarkedet. Vores kasser koster det samme som papkasser, men vi leverer dem direkte til din dør, så du kan bruge tiden på det der betyder noget.
-          </p>
-          <Link href="/booking">
-            <Button size="lg" className="text-white rounded-full">
-              Beregn din pris
-            </Button>
-          </Link>
-        </div>
-        <div className="order-first lg:order-last lg:mt-8">
-          <img
-            src="/images/3d-icon-crowded-bus.png"
-            // src="/images/3d-icon-byggemarked.png"
-            alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
-            className="w-2/3 md:w-1/3 lg:w-2/3 lg:mx-auto"
-          />
-        </div>
-      </Card>
-    </Section>
+    <SectionContent
+      imgLast={true}
+      hasBorderTop={true}
+      imgSrc="3d-icon-crowded-bus.png"
+      imgAlt="Ingen tur til byggemarkedet - illustration af en overfyldt bus."
+      title="Ingen tur til byggemarkedet"
+      descriptions={["Drop køen i byggemarkedet. Vores kasser koster det samme som papkasser, men vi leverer dem direkte til din dør, så du kan bruge tiden på det der betyder noget."]}
+      ctaText="Spar turen"
+      ctaLink="/booking"
+      bgColor="bg-blue-100"
+      btnColor="bg-green-200"
+    />
   )
 }
 
 function BoxQuality() {
   return (
-    <Section>
-      <Card className="min-h-[60vh] p-4 lg:px-8 grid lg:grid-cols-2 items-center justify-center">
-          <div className="relative md:mt-32 lg:mt-8">
-            <img
-              src="/images/3d-icon-weight.png"
-              alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
-              className="w-2/3 md:w-1/3 lg:w-2/3 lg:m-auto"
-            />
-          </div>
-          <div>
-          <div className="lg:pr-16">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2] tracking-tight mb-4">
-              Stærkere og nemmere end pap
-            </h2>
-            <p className="text-lg md:text-xl text-black/50 mb-6">
-              Ingen kasser der skal samles med tape. Ingen bunde der falder ud. Vores kasser er robuste, stables perfekt og lukkes med et enkelt klik.
-            </p>
-            <div>
-              <Link href="/booking">
-                <Button size="lg" className="text-white rounded-full">
-                  Beregn din pris
-                </Button>
-              </Link>
-            </div>
-          </div>
-          </div>
-      </Card>
-    </Section>
+    <SectionContent
+      imgSrc="3d-icon-weight.png"
+      imgAlt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
+      title="Stærkere og nemmere end pap"
+      descriptions={["Ingen kasser der skal samles med tape. Ingen bunde der falder ud. Vores kasser er robuste, stables perfekt og lukkes med et enkelt klik."]}
+      ctaText="Beskyt dine ting"
+      ctaLink="/booking"
+      bgColor="bg-purple-100"
+      btnColor="bg-blue-200"
+    />
   )
 }
 
 function NoCleanup() {
   return (
-      <Section>
-        <Card className="min-h-[60vh] p-4 lg:px-8 grid lg:grid-cols-2 items-center justify-center">
-          <div className="lg:pl-16">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2] tracking-tight mb-4">
-              Intet oprydningsarbejde bagefter
-            </h2>
-            <p className="text-lg md:text-xl text-black/50 mb-12">
-              Med papkasser sidder du tilbage med et bjerg af affald når flytningen er overstået. Vi sørger for at hente kasserne, så du bare kan slappe af og nyde dit nye sted.
+    <SectionContent
+      imgLast={true}
+      imgSrc="3d-icon-sleep-cocoon.png"
+      imgAlt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
+      title="Ingen oprydning bagefter"
+      descriptions={["Med papkasser sidder du tilbage med et bjerg af affald når flytningen er overstået. Vi sørger for at hente kasserne, så du bare kan slappe af og nyde dit nye sted."]}
+      ctaText="Nyd tiden"
+      ctaLink="/booking"
+      bgColor="bg-yellow-100"
+      btnColor="bg-purple-200"
+    />
+  )
+}
+
+interface SectionContentProps {
+  imgLast?: boolean;
+  imgSrc: string;
+  imgAlt: string;
+  title: string;
+  descriptions: string[];
+  ctaText: string;
+  ctaLink: string;
+  bgColor: string;
+  btnColor: string;
+  hasBorderTop?: boolean;
+}
+
+function SectionContent({ imgLast, imgSrc, imgAlt, title, descriptions, ctaText, ctaLink, bgColor, btnColor, hasBorderTop }: SectionContentProps) {
+  return (
+    <Section>
+      <div className={`border-b border-x border-black grid lg:grid-cols-2 items-center justify-center ${hasBorderTop ? 'border-t' : ''}`}>
+        <div className={`${imgLast ? 'lg:order-1 lg:border-l' : 'lg:order-0'} ${bgColor} border-b lg:border-b-0 border-black lg:py-24`}>
+          <img src={`/images/${imgSrc}`} alt={imgAlt} className="w-2/3 lg:w-2/3 mx-auto" />
+        </div>
+        <div className={`${imgLast ? '': 'lg:border-l border-black'} h-full px-4 py-12 lg:p-0 flex flex-col justify-center lg:px-16`}>
+          <h2 className="text-2xl md:text-3xl lg:text-5xl uppercase font-bold leading-[1.2] tracking-tight mb-4">
+            {title}
+          </h2>
+          {descriptions.map((desc, index) => (
+            <p key={index} className="text-lg md:text-xl text-black/50 mb-8 md:mb-12">
+              {desc}
             </p>
-            <Link href="/booking">
-              <Button size="lg" className="text-white rounded-full">
-                Beregn din pris
-              </Button>
-            </Link>
-          </div>
-          <div className="order-first lg:order-last lg:mt-8">
-            <img
-              src="/images/3d-icon-sleep-cocoon.png"
-              alt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
-              className="w-2/3 md:w-1/3 lg:w-2/3 lg:m-auto"
-            />
-          </div>
-        </Card>
-      </Section>
+          ))}
+          <Link href={ctaLink}>
+            <Button size="lg" className={btnColor}>
+              {ctaText} <ArrowRight className="w-4 h-4 ml-1 -mr-3" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </Section>
+  )
+}
+
+function HowItWorks() {
+  return (
+    <SectionThreeInfoColumns
+      columns={[
+        {
+          title: "1. Vi leverer",
+          description: "Vælg en dato der passer dig, så leverer vi kasserne. Gratis."
+        },
+        {
+          title: "2. Du pakker & flytter",
+          description: "Ingen tape, ingen samling, ingen frustration. Solide kasser der passer på dine ting."
+        },
+        {
+          title: "3. Vi henter",
+          description: "Når du er på plads i din nye bolig, henter vi kasserne igen. Simpelt."
+        },
+      ]}
+    />
   )
 }
 
 
+interface ThreeInfoColumnsProps {
+  title: string,
+  description: string,
+  subdescription?: string,
+}
+
+function SectionThreeInfoColumns({ hasBorderTop, xlTitle, columns }: Readonly<{ hasBorderTop?: boolean, xlTitle?: boolean, columns: ThreeInfoColumnsProps[] }>) {
+  return (
+    <Section>
+      <div className={`grid md:grid-cols-3 gap-1 relative border-x border-b border-black ${hasBorderTop ? 'border-t' : ''}`}>
+        {columns.map((column, index) => (
+          <div key={index} className={`px-4 lg:px-8 py-8 lg:py-16 ${index !== 0 ? 'border-t md:border-t-0 md:border-l border-gray-300 border-dashed' : ''}`}>
+            <h3 className={`text-lg ${xlTitle ? 'md:text-2xl lg:text-4xl xl:text-5xl' : ''} font-bold uppercase mb-1`}>{column.title}</h3>
+            <p>{column.description}</p>
+            {column.subdescription && <p className="text-sm text-gray-500 mt-2">{column.subdescription}</p>}
+          </div>
+        ))}
+      </div>
+    </Section>
+  )
+}
 
 const STATS = {
   flytningerPerAar: 861718,        // DST 2025 (per person via CPR)
@@ -190,84 +248,59 @@ const tonPapAffaldPerAar = (kasserSmidtUdPerAar * STATS.papkasseVaegtKg) / 1000
 
 const formatMio = (n: number) =>
   `~${(n / 1_000_000).toLocaleString("da-DK", { maximumFractionDigits: 1 })} mio.`
-const formatTon = (n: number) => `~${Math.round(n).toLocaleString("da-DK")} ton`
+const formatTon = (n: number) => `${Math.round(n).toLocaleString("da-DK")} ton`
 
 function CardboardIntro() {
   return (
-    <Section className="mt-24 md:mt-32 mb-16">
-      <div className="mx-auto text-center">
-        <p className="text-primary font-semibold uppercase tracking-wide mb-4">Danmark drukner i flyttepap</p>
-        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2] tracking-tight mb-4">
-          Estimeret {formatTon(tonPapAffaldPerAar)} papaffald om året
-        </h2>
-        <p className="text-lg md:text-xl text-black/50 text-balance">
-          Hver gang nogen flytter, ender bunkevis af papkasser ofte som engangsaffald. På landsplan løber det hurtigt op i tal, der er svære at forestille sig.
-        </p>
-      </div>
-    </Section>
-  )
-}
-
-function Stat({ value, label, source }: Readonly<{ value: string, label: string, source?: string }>) {
-  return (
-    <Card className="p-6 lg:p-8 text-center flex flex-col items-center justify-center">
-      <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary leading-none mb-3">
-        {value}
-      </span>
-      <p className="text-gray-500 leading-snug">{label}</p>
-      {source && <p className="text-xs text-gray-400 mt-3">{source}</p>}
-    </Card>
+    <SectionInfo 
+      preTitle="Estimeret"
+      title={<>{formatTon(tonPapAffaldPerAar)}<br />papaffald</>}
+      description="Hver gang nogen flytter, ender bunkevis af papkasser ofte som engangsaffald. På landsplan løber det hurtigt op i tal, der er svære at forestille sig."
+    />
   )
 }
 
 function CardboardStats() {
   return (
-    <Section>
-      <div className="grid md:grid-cols-3 lg:grid-cols-3 gap-1">
-        <Stat
-          value={STATS.flytningerPerAar.toLocaleString("da-DK")}
-          label="adresseflytninger i Danmark hvert år"
-          source="Danmarks Statistik, 2025"
-        />
-        <Stat
-          value={formatMio(kasseanvendelserPerAar)}
-          label="flyttekasser bruges årligt ved flytninger"
-          source="Estimat (DST + Bolius/KL)"
-        />
-        <Stat
-          value={formatMio(kasserSmidtUdPerAar)}
-          label="papkasser smides ud hvert år"
-          source={`Estimat (${STATS.genbrugPerKasse} genbrug pr. kasse)`}
-        />
-      </div>
-    </Section>
+    <SectionThreeInfoColumns
+      xlTitle={true}
+      hasBorderTop={true}
+      columns={[
+        {
+          title: `${STATS.flytningerPerAar.toLocaleString("da-DK")}`,
+          description: "adresseflytninger i Danmark hvert år",
+          subdescription: "Danmarks Statistik, 2025"
+        },
+        {
+          title: `${formatMio(kasseanvendelserPerAar)}`,
+          description: "flyttekasser bruges årligt ved flytninger",
+          subdescription: "Estimat (DST + Bolius/KL)"
+        },
+        {
+          title: `${formatMio(kasserSmidtUdPerAar)}`,
+          description: "papkasser smides ud hvert år",
+          subdescription: `Estimat (${STATS.genbrugPerKasse} genbrug pr. kasse)`
+        },
+      ]}
+    />
   )
 }
 
 function CardboardReuse() {
   return (
-    <Section>
-      <Card className="p-4 lg:px-8 lg:py-16 grid lg:grid-cols-2 items-center justify-center">
-        <div className="lg:pl-16">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-[1.2] tracking-tight mb-4">
-            En papkasse holder ikke længe
-          </h2>
-          <p className="text-lg md:text-xl text-black/50 mb-6">
-            Standard flyttekasser i bølgepap tåler typisk kun 2-6 genbrug, og fugt eller dårlig opbevaring forkorter ofte levetiden yderligere. Derfor ender millioner af kasser som affald hvert år.
-          </p>
-          <p className="text-lg md:text-xl text-black/50">
-            Vores plastkasser er bygget til at blive brugt igen og igen - samme kasser, mange flytninger, ingen affaldsbjerge.
-          </p>
-        </div>
-        <div className="order-first lg:order-last lg:mt-8">
-          <img
-            src="/images/3d-icon-trashedbox.png"
-            alt="Brugte papkasser der ender som affald efter en flytning"
-            className="w-2/3 md:w-1/3 lg:w-full lg:mx-auto"
-          />
-        </div>
-      </Card>
-    </Section>
+    <SectionContent
+      imgSrc="3d-icon-trashedbox.png"
+      imgAlt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
+      title="Papkasser genbruges sjældent"
+      descriptions={[
+        "Standard papkasser i bølgepap tåler typisk kun 2-6 genbrug, og fugt eller dårlig opbevaring forkorter ofte levetiden yderligere. Derfor ender millioner af kasser som affald hvert år.",
+        "Vores plastkasser er bygget til at blive brugt igen og igen - samme kasser, mange flytninger, ingen affaldsbjerge."
+      ]}
+      ctaText="Stop forbruget"
+      ctaLink="/booking"
+      bgColor="bg-gray-100"
+      btnColor="bg-green-200"
+    />
   )
 }
 
@@ -292,56 +325,26 @@ function CardboardSources() {
   ]
   return (
     <Section>
-      <div className="text-center mx-auto text-xs text-black/40 mt-4">
-        <p className="mb-2">
-          Flyttetal opgøres pr. person (CPR) af Danmarks Statistik. Antallet af kasser og nye kasser pr. år er estimater baseret på gennemsnitlige boligstørrelser og genbrugsrater og kan variere.
-        </p>
-        <p>
-          Kilder:{" "}
-          {sources.map((s, i) => (
-            <span key={s.href}>
-              <a
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline hover:text-primary transition-colors"
-              >
-                {s.label}
-              </a>
-              {i < sources.length - 1 ? " · " : ""}
-            </span>
-          ))}
-        </p>
-      </div>
-    </Section>
-  )
-}
-
-function HowItWorks() {
-  return (
-    <Section>
-      <div className="max-w-[1500px] mx-auto">
-        <div className="grid md:grid-cols-3 gap-1 relative">
-          <Card className="px-4 pt-16 pb-16 text-center">
-            <h3 className="text-2xl font-semibold mb-4">1. Vi leverer</h3>
-            <p className="text-zinc-500 leading-relaxed">
-              Vælg en dato der passer dig, så leverer vi kasserne, helt gratis.
-            </p>
-          </Card>
-
-          <Card className="px-4 pt-16 pb-16 text-center">
-            <h3 className="text-2xl font-semibold mb-4">2. Du pakker & flytter</h3>
-            <p className="text-zinc-500 leading-relaxed">
-              Ingen tape, ingen samling, ingen frustration. Solide kasser der passer på dine ting.
-            </p>
-          </Card>
-
-          <Card className="px-4 pt-16 pb-16 text-center">
-            <h3 className="text-2xl font-semibold mb-4">3. Vi henter</h3>
-            <p className="text-zinc-500 leading-relaxed">
-              Når du er på plads i din nye bolig, henter vi kasserne igen. Simpelt.
-            </p>
-          </Card>
+      <div className="border-b border-black border-x border-gray-300 border-dashed">
+        <div className="text-center mx-auto text-xs text-black/40 p-4">
+          <p className="mb-2">
+            Flyttetal opgøres pr. person (CPR) af Danmarks Statistik. Antallet af kasser og nye kasser pr. år er estimater baseret på gennemsnitlige boligstørrelser og genbrugsrater og kan variere.
+          </p>
+          <p>
+            Kilder:{" "}
+            {sources.map((s, i) => (
+              <span key={s.href}>
+                <a href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-primary transition-colors"
+                >
+                  {s.label}
+                </a>
+                {i < sources.length - 1 ? " · " : ""}
+              </span>
+            ))}
+          </p>
         </div>
       </div>
     </Section>
@@ -350,31 +353,31 @@ function HowItWorks() {
 
 function CTA() {
   return (
-    <section className="py-24 md:py-32 px-6">
-      <div className="p-12 md:p-20 text-center relative overflow-hidden">
+    <Section className="my-24">
+      <div className="p-4 md:p-20 text-center relative overflow-hidden">
         <div className="relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Klar til en flytning der bare kører?</h2>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">Klar til en flytning der bare kører?</h2>
           <p className="text-lg md:text-xl  mb-10 max-w-2xl mx-auto">
             Bestil dine kasser online på få minutter. Vi leverer, du pakker, vi henter. Ingen overraskelser, ingen ekstraomkostninger.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/booking">
-              <Button size="lg" className="text-white rounded-full">
+              <Button size="lg" className="bg-purple-200">
                 Beregn din pris
-                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 ml-1 -mr-3" />
               </Button>
             </Link>
           </div>
         </div>
       </div>
-    </section>
+    </Section>
   )
 }
 
 function Section({ children, className }: Readonly<{ children: React.ReactNode, className?: string }>) {
   return (
-    <section className={`px-4 mb-1 ${className}`}>
-      <div className="max-w-[1300px] mx-auto">
+    <section className={`px-4  ${className || ""}`}>
+      <div className="max-w-[1400px] mx-auto">
         {children}
       </div>
     </section>
@@ -383,11 +386,12 @@ function Section({ children, className }: Readonly<{ children: React.ReactNode, 
 
 function Footer() {
   return (
-    <footer className="bg-zinc-50 py-16 px-6 border-t border-zinc-200">
-        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
+    <footer className="bg-gray-50 py-16 px-6 border-t border-gray-300 border-dashed">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <img src="/heybox-logo.svg" alt="heybox logo" className="w-20" />
+              <h1 className="text-3xl font-bold tracking-tight">heybox</h1>
+              {/* <img src="/heybox-logo.svg" alt="heybox logo" className="w-20" /> */}
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed max-w-xs">
               Lej robuste flyttekasser til samme pris som pap. Vi leverer til din dør og henter igen. Altid gratis.

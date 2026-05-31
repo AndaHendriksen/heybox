@@ -52,7 +52,7 @@ export default function BottomBar({
             <button
               type="button"
               onClick={onBack}
-              className="h-12 w-12 cursor-pointer shrink-0 rounded-xl border border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 transition-colors"
+              className="h-12 w-12 cursor-pointer shrink-0 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 transition-colors"
             >
               ←
             </button>
@@ -62,7 +62,7 @@ export default function BottomBar({
               ? { type: 'submit', form: nextFormId }
               : { type: 'button', onClick: onNext })}
             disabled={nextDisabled}
-            className="flex-1 h-12 rounded-xl text-white font-semibold"
+            className="bg-green-200 flex-1 h-12 font-semibold"
           >
             {nextLabel}
           </Button>

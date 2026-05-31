@@ -79,7 +79,7 @@ export default function BookingWizard() {
   })()
 
   return (
-    <div className="flex flex-col items-center justify-start pt-3 pb-10 px-4 pb-32">
+    <div className="flex flex-col items-center justify-start pt-1 pb-10 px-4 pb-32">
       <div className="w-full max-w-xl">
         {showProgress && <ProgressBar current={step} total={TOTAL_STEPS} />}
 
