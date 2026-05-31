@@ -177,7 +177,7 @@ function SectionContent({ imgLast, imgSrc, imgAlt, title, descriptions, ctaText,
             </p>
           ))}
           <Link href={ctaLink}>
-            <Button size="lg" className={btnColor}>
+            <Button className={btnColor}>
               {ctaText} <ArrowRight className="w-4 h-4 ml-1 -mr-3" />
             </Button>
           </Link>
