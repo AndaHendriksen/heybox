@@ -28,7 +28,7 @@ export default function Landing() {
 function Hero() {
   return (
     <section className="min-h-[90vh] grid grid-cols-1 lg:grid-cols-2 border-b border-black">
-      <div className="pt-24 lg:pt-0 bg-green-200 flex items-center p-8 border-b border-black lg:border-b-0 lg:border-r">
+      <div className="lg:pt-0 bg-green-200 flex items-center p-8 border-b border-black lg:border-b-0 lg:border-r">
         <div className="md:w-2/3 mx-auto relative">
           <img
             src="/images/heybox-angle-modified.png"
@@ -43,10 +43,10 @@ function Hero() {
       </div>
       <div className="p-4 pb-12 flex items-center justify-center">
         <div className="lg:px-4 xl:px-8">
-          <h1 className="text-3xl md:text-3xl lg:text-5xl xl:text-6xl text-balance uppercase font-black mb-4">
+          <h1 className="text-2xl md:text-3xl lg:text-5xl xl:text-6xl text-balance uppercase font-black mb-4">
             Lej flyttekasser billigt og nemt.
           </h1>
-          <p className="md:text-lg lg:text-xl mb-12 md:text-balance">
+          <p className="md:text-lg lg:text-xl mb-8 md:mb-12 md:text-balance">
             Lej robuste plastkasser fra samme priser som at købe papkasser i byggemarkedet og slæbe dem hjem selv.
           </p>
           <Link href="/booking">
