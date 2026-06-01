@@ -8,7 +8,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "heybox - lej flyttekasser til flytning",
+  title: "heybox! Lej flyttekasser til flytning",
   description: "Lej stærke flyttekasser til præcis samme pris som pap. Levering og afhentning inkluderet. Ingen bil nødvendig.",
 };
 

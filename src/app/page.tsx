@@ -159,17 +159,18 @@ interface SectionContentProps {
   bgColor: string;
   btnColor: string;
   hasBorderTop?: boolean;
+  imgFullSize?: boolean;
 }
 
-function SectionContent({ imgLast, imgSrc, imgAlt, title, descriptions, ctaText, ctaLink, bgColor, btnColor, hasBorderTop }: SectionContentProps) {
+function SectionContent({ imgLast, imgSrc, imgAlt, title, descriptions, ctaText, ctaLink, bgColor, btnColor, hasBorderTop, imgFullSize = false }: SectionContentProps) {
   return (
     <Section>
       <div className={`border-b border-x border-black grid lg:grid-cols-2 items-center justify-center ${hasBorderTop ? 'border-t' : ''}`}>
-        <div className={`${imgLast ? 'lg:order-1 lg:border-l bg-linear-to-tl' : 'lg:order-0 bg-linear-to-br'} from-yellow-50 to-orange-100 border-b lg:border-b-0 border-black lg:py-24`}>
-          <img src={`/images/${imgSrc}`} alt={imgAlt} className="w-2/3 lg:w-2/3 mx-auto" />
+        <div className={`${imgLast ? 'lg:order-1 lg:border-l bg-linear-to-tl' : 'lg:order-0 bg-linear-to-br'} from-yellow-50 to-orange-100 border-b lg:border-b-0 border-black ${imgFullSize ? '' : 'lg:py-24'}`}>
+          <img src={`/images/${imgSrc}`} alt={imgAlt} className={`mx-auto ${imgFullSize ? 'w-6/7' : 'w-2/3 lg:w-2/3'}`} />
         </div>
         <div className={`${imgLast ? '': 'lg:border-l border-black'} h-full px-4 py-12 lg:p-0 flex flex-col justify-center lg:px-16`}>
-          <h2 className="text-2xl md:text-3xl lg:text-5xl uppercase font-bold leading-[1.2] tracking-tight mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl uppercase font-bold leading-[1.2] tracking-tight mb-4">
             {title}
           </h2>
           {descriptions.map((desc, index) => (
@@ -291,6 +292,7 @@ function CardboardReuse() {
     <SectionContent
       imgSrc="3d-icon-trashedbox.png"
       imgAlt="Ødelagt papkasse - illustration"
+      imgFullSize={true}
       title="Papkasser genbruges sjældent"
       descriptions={[
         "Standard papkasser i bølgepap tåler typisk kun 2-6 genbrug, og fugt eller dårlig opbevaring forkorter ofte levetiden yderligere. Derfor ender millioner af kasser som affald hvert år.",
@@ -390,7 +392,7 @@ function Footer() {
         <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <h1 className="text-3xl font-bold tracking-tight">heybox</h1>
+              <h1 className="text-3xl font-bold tracking-tight">heybox!</h1>
               {/* <img src="/heybox-logo.svg" alt="heybox logo" className="w-20" /> */}
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed max-w-xs">
