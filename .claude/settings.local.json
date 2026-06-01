@@ -13,7 +13,8 @@
       "WebSearch",
       "WebFetch(domain:www.dst.dk)",
       "WebFetch(domain:www.bolius.dk)",
-      "WebFetch(domain:unitedcontainer.com)"
+      "WebFetch(domain:unitedcontainer.com)",
+      "WebFetch(domain:heybox.dk)"
     ]
   }
 }

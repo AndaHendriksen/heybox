@@ -392,7 +392,7 @@ function Footer() {
         <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <h1 className="text-3xl font-bold tracking-tight">heybox!</h1>
+              <div className="text-3xl font-bold tracking-tight">heybox!</div>
               {/* <img src="/heybox-logo.svg" alt="heybox logo" className="w-20" /> */}
             </div>
             <p className="text-zinc-500 text-sm leading-relaxed max-w-xs">
