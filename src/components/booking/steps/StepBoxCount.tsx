@@ -32,7 +32,7 @@ function StepperButton({
   )
 }
 
-export default function StepBoxes({ value, onChange, onNext, onBack }: Props) {
+export default function StepBoxCount({ value, onChange, onNext, onBack }: Props) {
   const boxCount = value.boxCount
 
   function adjustCount(delta: number) {
@@ -50,10 +50,10 @@ export default function StepBoxes({ value, onChange, onNext, onBack }: Props) {
           <button
             key={size}
             onClick={() => onChange({ boxCount: size, selectedPackage: null })}
-            className={`cursor-pointer rounded-xl py-3 border text-center font-semibold transition-all ${
+            className={`cursor-pointer py-3 border text-center font-semibold duration-600 transition-all ${
               boxCount === size
-                ? 'shadow-lg shadow-black/5 border-primary/20'
-                : 'bg-gray-50 border-gray-50 text-gray-500'
+                ? 'bg-blue-200 shadow-[3px_4px_0_0_rgba(0,0,0,1)] border-black'
+                : 'bg-gray-50 border-gray-200'
             }`}
           >
             {size} m²

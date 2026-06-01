@@ -62,7 +62,7 @@ export default function BottomBar({
               ? { type: 'submit', form: nextFormId }
               : { type: 'button', onClick: onNext })}
             disabled={nextDisabled}
-            className="bg-green-200 flex-1 h-12 font-semibold"
+            className="bg-green-300 flex-1 h-12 font-semibold"
           >
             {nextLabel}
           </Button>

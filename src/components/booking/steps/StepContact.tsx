@@ -90,7 +90,7 @@ export default function StepContact({ value, onNext, onBack }: Props) {
           <Label htmlFor="phone">Telefon</Label>
           <div className="flex gap-2">
             <select
-              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              className="h-12 border border-input bg-background px-2 text-sm"
               {...register('phoneCountryCode')}
             >
               {COUNTRY_CODES.map(({ code, label }) => (

@@ -57,6 +57,10 @@ export default function StepDate({ value, onChange }: Props) {
           onSelect={handleSelect}
           defaultMonth={defaultDate}
           weekStartsOn={1}
+          modifiers={{
+            inRange: { after: selected, before: pickupDate },
+            rangeEnd: pickupDate,
+          }}
           disabled={(date) => {
             const day = date.getDay()
             const today = new Date()
@@ -70,7 +74,7 @@ export default function StepDate({ value, onChange }: Props) {
         />
       </div>
 
-      <div className="mt-3 mb-8 bg-white flex justify-between rounded-xl px-1 text-sm">
+      {/* <div className="mt-3 mb-8 bg-white flex justify-between rounded-xl px-1 text-sm">
         <div className="">
           <p className="text-zinc-500">Levering</p>
           <p className="font-bold text-xl">{formatDanish(selected)}</p>
@@ -83,7 +87,7 @@ export default function StepDate({ value, onChange }: Props) {
           <p className="text-zinc-500">Afhentning</p>
           <p className="font-bold text-xl">{formatDanish(pickupDate)}</p>
         </div>
-      </div>
+      </div> */}
 
       <div className="mt-3 flex items-center justify-between text-sm text-zinc-500">
         <div className="flex items-center gap-3">

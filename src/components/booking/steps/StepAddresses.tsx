@@ -158,20 +158,20 @@ function AddressAutocomplete({
           autoComplete="off"
           className={`pr-10 ${
             validation === 'valid'
-              ? 'border-primary focus-visible:ring-green-500'
+              ? 'focus-visible:ring-green-500'
               : validation === 'invalid'
               ? 'border-red-400 focus-visible:ring-red-400'
               : ''
           }`}
         />
         {validation === 'valid' && (
-          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary" />
+          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 text-green-500" />
         )}
         {validation === 'invalid' && (
-          <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-red-400" />
+          <XCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 text-red-400" />
         )}
         {open && suggestions.length > 0 && (
-          <ul className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto text-sm">
+          <ul className="absolute z-50 mt-1 w-full bg-white border border-gray-200 shadow-lg max-h-60 overflow-auto text-sm">
             {suggestions.map((s) => (
               <li
                 key={s.placeId}
@@ -184,15 +184,9 @@ function AddressAutocomplete({
           </ul>
         )}
       </div>
-      {validation === 'valid' && (
-        <p className="text-xs text-green-600">Levering mulig</p>
-      )}
       {validation === 'invalid' && (
         <p className="text-xs text-red-500">
-          Vi leverer ikke her endnu.{' '}
-          <a href="mailto:hej@heybox.dk" className="underline">
-            Kontakt os
-          </a>
+          Vi leverer ikke her endnu.
         </p>
       )}
     </div>

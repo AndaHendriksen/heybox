@@ -28,7 +28,7 @@ export default function Landing() {
 function Hero() {
   return (
     <section className="min-h-[90vh] grid grid-cols-1 lg:grid-cols-2 border-b border-black">
-      <div className="lg:pt-0 bg-green-200 flex items-center p-8 border-b border-black lg:border-b-0 lg:border-r">
+      <div className="lg:pt-0 bg-linear-to-br from-green-100 to-green-300 flex items-center p-8 border-b border-black lg:border-b-0 lg:border-r">
         <div className="md:w-2/3 mx-auto relative">
           <img
             src="/images/heybox-angle-modified.png"
@@ -43,6 +43,7 @@ function Hero() {
       </div>
       <div className="p-4 pb-12 flex items-center justify-center">
         <div className="lg:px-4 xl:px-8">
+          <p>Hey København!</p>
           <h1 className="text-2xl md:text-3xl lg:text-5xl xl:text-6xl text-balance uppercase font-black mb-4">
             Lej flyttekasser billigt og nemt.
           </h1>
@@ -50,7 +51,7 @@ function Hero() {
             Lej robuste plastkasser fra samme priser som at købe papkasser i byggemarkedet og slæbe dem hjem selv.
           </p>
           <Link href="/booking">
-            <Button size="lg" className="bg-purple-200">
+            <Button size="lg" className="bg-green-300">
               Beregn din pris <ArrowRight className="w-6 h-6 ml-1 -mr-3" />
             </Button>
           </Link>
@@ -105,7 +106,7 @@ function NoDriving() {
       imgLast={true}
       hasBorderTop={true}
       imgSrc="3d-icon-crowded-bus.png"
-      imgAlt="Ingen tur til byggemarkedet - illustration af en overfyldt bus."
+      imgAlt="Bus proppet med mennesker - illustration"
       title="Ingen tur til byggemarkedet"
       descriptions={["Drop køen i byggemarkedet. Vores kasser koster det samme som papkasser, men vi leverer dem direkte til din dør, så du kan bruge tiden på det der betyder noget."]}
       ctaText="Spar turen"
@@ -120,7 +121,7 @@ function BoxQuality() {
   return (
     <SectionContent
       imgSrc="3d-icon-weight.png"
-      imgAlt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
+      imgAlt="En tung håndvægt - illustration"
       title="Stærkere og nemmere end pap"
       descriptions={["Ingen kasser der skal samles med tape. Ingen bunde der falder ud. Vores kasser er robuste, stables perfekt og lukkes med et enkelt klik."]}
       ctaText="Beskyt dine ting"
@@ -136,7 +137,7 @@ function NoCleanup() {
     <SectionContent
       imgLast={true}
       imgSrc="3d-icon-sleep-cocoon.png"
-      imgAlt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
+      imgAlt="Person pakket ind i en dyne - illustration"
       title="Ingen oprydning bagefter"
       descriptions={["Med papkasser sidder du tilbage med et bjerg af affald når flytningen er overstået. Vi sørger for at hente kasserne, så du bare kan slappe af og nyde dit nye sted."]}
       ctaText="Nyd tiden"
@@ -164,7 +165,7 @@ function SectionContent({ imgLast, imgSrc, imgAlt, title, descriptions, ctaText,
   return (
     <Section>
       <div className={`border-b border-x border-black grid lg:grid-cols-2 items-center justify-center ${hasBorderTop ? 'border-t' : ''}`}>
-        <div className={`${imgLast ? 'lg:order-1 lg:border-l' : 'lg:order-0'} ${bgColor} border-b lg:border-b-0 border-black lg:py-24`}>
+        <div className={`${imgLast ? 'lg:order-1 lg:border-l bg-linear-to-tl' : 'lg:order-0 bg-linear-to-br'} from-yellow-50 to-orange-100 border-b lg:border-b-0 border-black lg:py-24`}>
           <img src={`/images/${imgSrc}`} alt={imgAlt} className="w-2/3 lg:w-2/3 mx-auto" />
         </div>
         <div className={`${imgLast ? '': 'lg:border-l border-black'} h-full px-4 py-12 lg:p-0 flex flex-col justify-center lg:px-16`}>
@@ -177,8 +178,8 @@ function SectionContent({ imgLast, imgSrc, imgAlt, title, descriptions, ctaText,
             </p>
           ))}
           <Link href={ctaLink}>
-            <Button className={btnColor}>
-              {ctaText} <ArrowRight className="w-4 h-4 ml-1 -mr-3" />
+            <Button className="bg-green-300">
+              {ctaText} <ArrowRight className="w-4 h-4 ml-1 -mr-2" />
             </Button>
           </Link>
         </div>
@@ -240,7 +241,6 @@ const STATS = {
   papkasseVaegtKg: 1.2,            // ca. 1200g per standard papkasse (Silvan/Bauhaus-snit)
 }
 
-// Alle viste tal udregnes fra STATS, så de altid er konsistente.
 const boligflytningerPerAar = STATS.flytningerPerAar / STATS.gnsPersonerPerBolig
 const kasseanvendelserPerAar = boligflytningerPerAar * STATS.gnsBoligM2 * STATS.kasserPerM2
 const kasserSmidtUdPerAar = kasseanvendelserPerAar / STATS.genbrugPerKasse
@@ -290,7 +290,7 @@ function CardboardReuse() {
   return (
     <SectionContent
       imgSrc="3d-icon-trashedbox.png"
-      imgAlt="Grønne plastikflyttekasser fra HeyBox stablet i en lys stue"
+      imgAlt="Ødelagt papkasse - illustration"
       title="Papkasser genbruges sjældent"
       descriptions={[
         "Standard papkasser i bølgepap tåler typisk kun 2-6 genbrug, og fugt eller dårlig opbevaring forkorter ofte levetiden yderligere. Derfor ender millioner af kasser som affald hvert år.",
@@ -362,7 +362,7 @@ function CTA() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/booking">
-              <Button size="lg" className="bg-purple-200">
+              <Button size="lg" className="bg-green-300">
                 Beregn din pris
                 <ArrowRight className="w-4 h-4 ml-1 -mr-3" />
               </Button>

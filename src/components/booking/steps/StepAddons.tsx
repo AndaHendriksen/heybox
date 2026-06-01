@@ -25,14 +25,14 @@ function AddonChoice({
   price: number
 }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 p-1 bg-gray-50 rounded-xl">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
       <button
         type="button"
         onClick={() => onChange(false)}
-        className={`p-2 flex place-content-between items-center rounded-lg border cursor-pointer text-left transition-colors ${
-          !selected
-            ? 'bg-white shadow-xl shadow-black/8 border-primary/20'
-            : 'text-zinc-700 border-transparent'
+        className={`p-2 px-4 flex place-content-between items-center border cursor-pointer text-left transition-all duration-600 ${
+            !selected
+              ? 'bg-blue-100 shadow-[3px_4px_0_0_rgba(0,0,0,1)] border-black'
+            : 'text-zinc-700 bg-gray-50 border border-gray-200'
         }`}
       >
         <div className="text-sm">{freeLabel}</div>
@@ -41,10 +41,10 @@ function AddonChoice({
       <button
         type="button"
         onClick={() => onChange(true)}
-        className={`p-2 flex place-content-between items-center rounded-lg border cursor-pointer text-left md:text-right transition-colors ${
+        className={`p-2 px-4 flex place-content-between items-center border cursor-pointer text-left md:text-right transition-all duration-600 ${
           selected
-            ? 'bg-white shadow-xl shadow-black/8 border-primary/20'
-            : 'text-zinc-700 border-transparent'
+            ? 'bg-blue-100 shadow-[3px_4px_0_0_rgba(0,0,0,1)] border-black'
+            : 'text-zinc-700 bg-gray-50 border border-gray-200'
         }`}
       >
         <div className={`text-sm ${selected ? '' : 'text-zinc-500'}`}>{paidLabel}</div>

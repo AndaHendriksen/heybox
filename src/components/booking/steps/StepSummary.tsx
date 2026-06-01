@@ -1,7 +1,7 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
-import { Truck, Clock, BoxesIcon, SoapDispenserDroplet, User, Receipt, AlertTriangle } from 'lucide-react'
+import { Truck, Clock, BoxesIcon, SoapDispenserDroplet } from 'lucide-react'
 import type { BookingState } from '@/lib/booking/types'
 import { calcTotal, getTier, formatTotal } from '@/lib/booking/utils'
 
@@ -36,9 +36,9 @@ function TimelineCard({
   return (
     <div className="relative flex gap-3 items-start -ml-[6px]">
       <div className={`${Icon ? 'bg-white' : ''} py-1 mt-2 rounded-full flex items-center justify-center flex-shrink-0 z-10`}>
-        {Icon ? <Icon size={15} className="text-gray-400" /> : <div className='w-[15px]' />}
+        {Icon ? <Icon size={16} className="text-gray-400" /> : <div className='w-[17px]' />}
       </div>
-      <div className="flex-1 bg-zinc-50 rounded-2xl px-4 py-3">
+      <div className="flex-1 bg-zinc-50 border border-gray-200 px-4 py-3">
         {children}
       </div>
     </div>

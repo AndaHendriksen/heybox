@@ -10,7 +10,7 @@ import ProgressBar from './ProgressBar'
 import BottomBar from './BottomBar'
 import StepAddresses from './steps/StepAddresses'
 import StepDate from './steps/StepDate'
-import StepBoxes from './steps/StepBoxes'
+import StepBoxCount from './steps/StepBoxCount'
 import StepAddons from './steps/StepAddons'
 import StepContact from './steps/StepContact'
 import StepSummary from './steps/StepSummary'
@@ -81,7 +81,7 @@ export default function BookingWizard() {
   return (
     <div className="flex flex-col items-center justify-start pt-1 pb-10 px-4 pb-32">
       <div className="w-full max-w-xl">
-        {showProgress && <ProgressBar current={step} total={TOTAL_STEPS} />}
+        <ProgressBar current={step} total={TOTAL_STEPS} />
 
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div
@@ -101,7 +101,7 @@ export default function BookingWizard() {
               />
             )}
             {step === 2 && (
-              <StepBoxes
+              <StepBoxCount
                 value={booking}
                 onChange={updateBooking}
                 onNext={goNext}
