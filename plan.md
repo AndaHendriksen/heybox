@@ -1,148 +1,181 @@
-# Plan: Redesign "Om heybox" (About) page
+# Plan: Lokationer-side (leveringsområder)
 
-> **Status:** 🟢 Implemented | **Last Updated:** 2026-06-02
-> **Scope:** `src/app/(site)/about/page.tsx` (+ optional shared section extraction)
+> **Status:** 🟢 Implemented | **Last Updated:** 2026-06-03
+> **Scope:** `src/app/(site)/lokationer/page.tsx` + ny data-modul
 
 ---
 
 ## 1. Context & Objectives
 
-**Goal:** Transform the About page from a flat, centered text column (`max-w-2xl` of paragraphs) into a visually rich, scroll-driven page that inherits the frontpage's design language — bold uppercase typography, black borders, pastel gradients, hard-shadow cards, and alternating two-column section layouts. The page should **tell the founders' story** rather than just state facts.
-
-**The story to tell:**
-- Two childhood friends.
-- Stumbled into the idea through a **podcast**.
-- Looked at the **numbers and the waste** (millions of cardboard boxes thrown out every year).
-- Decided to **give it a try**.
+**Goal:** En enkel, tekstbaseret "Lokationer"-side der fortæller hvor HeyBox leverer, og som lister **navnene på alle postnumre vi leverer til**, delt op i **København** og **Storkøbenhavn**. Siden skal matche resten af sitets visuelle sprog (sorte borders, store uppercase-overskrifter, `Section`-wrapper) men uden billeder. Den skal også styrke lokal SEO ("flyttekasser København", bynavne).
 
 **Constraints:**
-- Tailwind only (project already uses Tailwind v4 utility classes, e.g. `bg-linear-to-br`).
-- Reuse the existing design vocabulary verbatim — do **not** invent a new visual style.
-- No new dependencies. Founder photos optional; fall back to existing 3D icon assets / initials if no portraits exist.
-- This is a Next.js version with breaking changes — consult `node_modules/next/dist/docs/` before touching any Next.js API (metadata, Image, Link). Existing patterns in the repo are the safest reference.
-- Keep the existing `metadata` export and the `(site)` route-group layout (shared menu/footer) intact.
-- Danish copy throughout (matches the rest of the site).
-
----
+- Tailwind only - genbrug eksisterende primitives fra `@/components/sections/blocks` og `@/components/ui/section`.
+- Ingen billeder (modsat `om-os`).
+- Ingen nye dependencies.
+- **Postnummer-listen SKAL stemme overens med leveringslogikken i `src/lib/utils/geo.ts`** (`isStorkobenhavn`). Ellers kan en bruger se en by på listen som booking-flowet afviser, eller omvendt.
+- Følg `AGENTS.md`: denne Next.js-version kan afvige - læs relevant guide i `node_modules/next/dist/docs/` før kode skrives (især metadata-API'et).
 
 ## 2. Technical Research & State
 
-### Affected Files
-- `src/app/(site)/about/page.tsx`: The page being redesigned. Currently a single `max-w-2xl` text column with `<h1>`, three `<h2>` text blocks, and a CTA button.
-- `src/app/(site)/page.tsx`: **Source of the design system.** All section primitives live here as *local, non-exported* functions:
-  - `Hero` — `min-h-[90vh]` two-column grid, `bg-linear-to-br from-green-100 to-green-300`, image + headline + CTA, `border-b border-black`.
-  - `SectionInfo({ preTitle, title, description })` — huge `text-4xl lg:text-7xl font-black uppercase` title left, large description right-aligned. **Ideal for narrative beats.**
-  - `SectionContent({ imgLast, imgSrc, imgAlt, title, descriptions[], ctaText, ctaLink, bgColor, btnColor, hasBorderTop, imgFullSize })` — bordered card, image one side / text+CTA other, alternating sides, pastel gradient image panel.
-  - `SectionThreeInfoColumns({ hasBorderTop, xlTitle, columns[] })` — 3-column grid with dashed dividers. Used for stats + "how it works."
-  - `TransparentCard` — white card, `border border-black`, hard shadow `shadow-[3px_4px_0_0_rgba(0,0,0,1)]`.
-  - `STATS` object + derived constants (`kasserSmidtUdPerAar`, `tonPapAffaldPerAar`, `formatMio`, `formatTon`) — the **waste numbers** central to the story.
-- `src/components/ui/section.tsx`: Exports `Section` (`max-w-[1400px] mx-auto` wrapper). Already shared.
-- `src/app/(site)/layout.tsx`: Wraps all `(site)` pages with menu/footer — About already inherits this; no change needed.
+- **Affected Files:**
+  - `src/app/(site)/lokationer/page.tsx`: Tom i dag (1 linje). Skal bygges som server-component i samme stil som `om-os/page.tsx` - `export const metadata` + en `default function` der sammensætter sektioner.
+  - `src/lib/utils/geo.ts`: **Sandhedskilde for leveringsområdet.** I dag: `isStorkobenhavn(postcode)` = `num >= 1000 && num <= 2959 && !OUTSIDE_POSTCODES.has(num)`, hvor `OUTSIDE_POSTCODES = {2640, 2670, 2680, 2690, 2960, 2970, 2980, 2990}`. Bemærk: 2960–2990 er allerede uden for ≤2959, så de reelt ekskluderede *inden for* intervallet er **2640, 2670, 2680, 2690**.
+  - `src/components/sections/blocks.tsx`: Genbrugelige sektioner. Relevante: `Section` (wrapper), overskrifts-/border-mønstret brugt i `om-os` (`border-x`, `max-w-[700px] mx-auto`, uppercase `font-black`-headings).
+  - `src/app/(site)/om-os/page.tsx`: Stilreference for hero + tekstsektioner.
 
-### Existing Logic to Preserve
-- The frontpage's `STATS` block is the single source of truth for the waste figures. To reuse the same numbers on About **without duplicating the math**, extract `STATS` + derived values into a shared module (see Task A.1).
-- `metadata` export pattern (canonical `/about`, openGraph) must stay.
+- **Existing Logic:** Booking-flowet (`StepAddresses.tsx`) bruger `isStorkobenhavn` til at validere leveringsadresse og afhentningsadresse. Lokationer-siden skal vise præcis det samme univers af postnumre, så forventningen sat på marketing-siden holder i booking.
 
-### New Components / Modules
-- `src/lib/stats.ts` (new) — extract `STATS`, derived constants, and `formatMio`/`formatTon` so both landing and About import the same figures.
-- `src/components/sections/*` (new, recommended) — promote the reusable section primitives out of `page.tsx` so the About page can import them instead of copy-pasting. See Decision Note in §7.
-- About-specific content components (local to `about/page.tsx`): `AboutHero`, `OriginStory`, `WasteRealization`, `Decision`, `Founders`, `ContactCTA`.
-
----
+- **New Components/Hooks:**
+  - **Ny data-modul** `src/lib/locations.ts` - en typed liste over leveringsbyerne (kode + navn + region). Bliver sandhedskilde for *visning*; bør krydstjekkes mod `geo.ts`-logikken (se Task A.1).
+  - Lokale (ikke-eksporterede) sektion-komponenter i `page.tsx`: `LocationsHero`, `LocationGrid`, evt. `NotCoveredNote` og en afsluttende CTA.
 
 ## 3. User Journey & Flow
 
-A visitor lands on `/about` and scrolls through a narrative arc that mirrors the homepage's rhythm:
-
-- [ ] **Step 1: Hook (Hero)** — Bold gradient hero. Headline frames the human angle ("Two childhood friends and a whole lot of cardboard"). Sets tone immediately, not a wall of text.
-    - [ ] 1.1 Visual: gradient panel + image/illustration; headline + 1–2 sentence lede.
-- [ ] **Step 2: The spark (Origin)** — Narrative section: the podcast moment.
-    - [ ] 2.1 `SectionInfo`-style big-title + story copy.
-- [ ] **Step 3: The reality check (Numbers & waste)** — Reuse the stat columns; "we looked at the numbers."
-    - [ ] 3.1 `SectionThreeInfoColumns` with the same waste figures as the homepage.
-- [ ] **Step 4: The decision (Give it a try)** — `SectionContent` beat: from idea to action.
-- [ ] **Step 5: Who we are (Founders)** — Two founder cards (hard-shadow `TransparentCard` style), names/roles/short bios.
-- [ ] **Step 6: Contact + CTA** — Email + closing CTA reusing the homepage's `CTA` look.
-
----
+- [ ] **Step 1:** Bruger lander på `/lokationer` (fra menu/footer eller SEO-søgning).
+    - [ ] 1.1 Ser hero: overskrift "Vi leverer i hele Storkøbenhavn" + kort intro.
+- [ ] **Step 2:** Bruger scroller til oversigten over områder.
+    - [ ] 2.1 Sektion **København** med bydele/postnumre.
+    - [ ] 2.2 Sektion **Storkøbenhavn** med omegnskommuner/postnumre.
+- [ ] **Step 3:** Bruger søger sin egen by/postnummer i listen og bekræfter dækning.
+    - [ ] 3.1 (Valgfrit) Lille note om områder vi *ikke* dækker endnu (Greve, Solrød m.fl.), så forventningen er ærlig.
+- [ ] **Step 4:** Bruger klikker CTA "Se hvad det koster" → `/booking`.
 
 ## 4. Implementation Roadmap (The To-Do)
 
-### Phase A: Shared foundation (data + design primitives)
-- [ ] **A.1:** Extract `STATS` and derived waste figures into `src/lib/stats.ts`; update `page.tsx` to import them.
-- [ ] **A.2:** Extract reusable section primitives (`SectionInfo`, `SectionContent`, `SectionThreeInfoColumns`, `TransparentCard`, `Hero` shell) from `page.tsx` into `src/components/sections/`, exporting them; refactor `page.tsx` to import. *(See §7 Decision Note — if scope must stay minimal, fall back to A.2-alt.)*
-  - [ ] **A.2-alt:** If extraction is deemed too risky/large, copy the needed primitives locally into `about/page.tsx` instead. (Higher duplication, but isolated.)
+### Phase A: Data
+- [ ] **A.1:** Opret `src/lib/locations.ts` med typed liste over leveringsbyer (kode, navn, region) - sandhedskilde for visning, krydstjekket mod `geo.ts`.
+- [ ] **A.2:** (Anbefalet, valgfrit) Tilføj en lille test/assertion der sikrer at hver by i `locations.ts` opfylder `isStorkobenhavn`, så listen og validering ikke driver fra hinanden.
 
-### Phase B: About page content & layout
-- [ ] **B.1:** Build `AboutHero` — gradient two-column hero with story headline + lede.
-- [ ] **B.2:** Build `OriginStory` — the podcast origin beat (`SectionInfo` layout).
-- [ ] **B.3:** Build `WasteRealization` — reuse stat columns with shared `stats.ts` figures + a framing line tying it to the founders' "we did the math" moment.
-- [ ] **B.4:** Build `Decision` — "we decided to give it a try" beat (`SectionContent` layout, alternating image side).
-- [ ] **B.5:** Build `Founders` — two founder cards (hard-shadow, black-border), names + roles + short bios + childhood-friends framing.
-- [ ] **B.6:** Build `ContactCTA` — contact email block + closing CTA matching homepage `CTA`.
-- [ ] **B.7:** Assemble the page, keep/refresh `metadata`, verify route-group layout still wraps correctly.
+### Phase B: UI & Integration
+- [ ] **B.1:** Byg `metadata` + side-skellet i `page.tsx` (hero-sektion).
+- [ ] **B.2:** Byg `LocationGrid`-sektion der renderer København- og Storkøbenhavn-grupperne fra `locations.ts`.
+- [ ] **B.3:** Tilføj "ikke dækket endnu"-note + afsluttende CTA til `/booking`.
+- [ ] **B.4:** Sørg for at siden er linket fra menu/footer (tjek `src/components/menu.tsx`).
 
 ---
 
 ## 5. Technical Specifications (To-Do Details)
 
-### Task [A.1]: Extract stats into `src/lib/stats.ts`
-- **Exports:** `STATS`, `boligflytningerPerAar`, `kasseanvendelserPerAar`, `kasserSmidtUdPerAar`, `tonPapAffaldPerAar`, `formatMio`, `formatTon`.
-- **Logic:** Move lines `242–258` of `page.tsx` verbatim into the module; re-import in `page.tsx`. No math changes — figures must stay identical so homepage and About agree.
-- **Why:** The "numbers and waste" are core to the About story; both pages must show the same source-of-truth numbers.
+### Task [A.1]: `src/lib/locations.ts` - data-modul
 
-### Task [A.2]: Promote section primitives to `src/components/sections/`
-- **Candidates:** `SectionInfo`, `SectionContent` (+ `SectionContentProps`), `SectionThreeInfoColumns` (+ `ThreeInfoColumnsProps`), `TransparentCard`. Consider a generic `SplitHero` shell parameterized by `headline`, `lede`, `image`, optional `badges`.
-- **Logic:** Cut from `page.tsx`, add `export`, fix imports (`Section`, `Button`, `Image`, `Link`, `ArrowRight`). Refactor `page.tsx` to import — **behavior and markup must be byte-for-byte equivalent** (visual regression risk on the homepage otherwise).
-- **Notes:** `Hero` is bespoke (uses `priority` image, `TransparentCard` badges). Either generalize with props or keep two thin variants. Keep these as server components — they're presentational; avoid adding `'use client'`.
+- **Type:**
+  ```ts
+  export type Region = "koebenhavn" | "storkoebenhavn"
+  export interface DeliveryLocation { code: string; name: string; region: Region }
+  ```
+- **Logic:** Eksportér `DELIVERY_LOCATIONS: DeliveryLocation[]` samt to afledte arrays (`koebenhavn`, `storkoebenhavn`) via `.filter`. Sortér efter `code`.
+- **Foreslået indhold** (navne på postnumre vi leverer til - udledt af `geo.ts`: 1000–2959 minus 2640/2670/2680/2690):
 
-### Task [B.1]: `AboutHero`
-- **Layout:** Mirror homepage `Hero` — `grid lg:grid-cols-2`, `bg-linear-to-br from-green-100 to-green-300` panel, `border-b border-black`. Can be shorter than `90vh` (e.g. `min-h-[60vh]`) since it's a sub-page.
-- **Copy (draft, DA):** Headline `Vi er to barndomsvenner — og alt for meget pap.` Lede: one sentence teasing the podcast + waste origin.
-- **Image:** Founder portrait if available; else reuse `/images/heybox-angle-modified.png` or `3d-icon-box.png`.
+  **København** (Københavns Kommune + Frederiksberg - bykernen):
+  | Kode | Navn |
+  |------|------|
+  | 1000–1499 | København K |
+  | 1500–1799 | København V |
+  | 1800–1999 | Frederiksberg C |
+  | 2000 | Frederiksberg |
+  | 2100 | København Ø |
+  | 2150 | Nordhavn |
+  | 2200 | København N |
+  | 2300 | København S |
+  | 2400 | København NV |
+  | 2450 | København SV |
+  | 2500 | Valby |
+  | 2700 | Brønshøj |
+  | 2720 | Vanløse |
 
-### Task [B.2]: `OriginStory`
-- **Layout:** `SectionInfo` — left big `font-black uppercase` title (`Det startede<br />med en podcast`), right narrative paragraph.
-- **Copy (draft):** Two friends listening to a podcast about reuse/waste; the idea clicked; they couldn't stop thinking about how much cardboard a single move throws away.
+  **Storkøbenhavn** (omegnskommunerne):
+  | Kode | Navn |
+  |------|------|
+  | 2600 | Glostrup |
+  | 2605 | Brøndby |
+  | 2610 | Rødovre |
+  | 2620 | Albertslund |
+  | 2625 | Vallensbæk |
+  | 2630 | Taastrup |
+  | 2635 | Ishøj |
+  | 2650 | Hvidovre |
+  | 2660 | Brøndby Strand |
+  | 2665 | Vallensbæk Strand |
+  | 2730 | Herlev |
+  | 2740 | Skovlunde |
+  | 2750 | Ballerup |
+  | 2760 | Måløv |
+  | 2765 | Smørum |
+  | 2770 | Kastrup |
+  | 2791 | Dragør |
+  | 2800 | Kongens Lyngby |
+  | 2820 | Gentofte |
+  | 2830 | Virum |
+  | 2840 | Holte |
+  | 2850 | Nærum |
+  | 2860 | Søborg |
+  | 2870 | Dyssegård |
+  | 2880 | Bagsværd |
+  | 2900 | Hellerup |
+  | 2920 | Charlottenlund |
+  | 2930 | Klampenborg |
+  | 2942 | Skodsborg |
+  | 2950 | Vedbæk |
 
-### Task [B.3]: `WasteRealization`
-- **Layout:** `SectionThreeInfoColumns` (`xlTitle`) with the three figures from `stats.ts` (`flytningerPerAar`, `kasseanvendelserPerAar`, `kasserSmidtUdPerAar`), preceded by a `SectionInfo` framing beat (`preTitle="Da vi regnede efter"`, title `{formatTon(tonPapAffaldPerAar)}<br />papaffald`).
-- **Notes:** Reuse the same `subdescription` source labels; keep figures consistent with homepage. Either link to the homepage's `CardboardSources` block or omit sources here to avoid duplication.
+  > **Bemærk om 1000–1799:** Det centrale København består teknisk af hundredvis af gade-/firmapostnumre. På siden grupperes de som "København K" og "København V" (vis evt. som interval "1050–1799") frem for at liste hvert 4-cifret nummer - ellers bliver listen ulæselig.
 
-### Task [B.4]: `Decision`
-- **Layout:** `SectionContent`, `imgLast` alternating, pastel gradient panel; pick a `bgColor`/`btnColor` from the existing palette (green/blue/purple/yellow).
-- **Copy (draft):** "Så vi besluttede at prøve" — from idea to a real service in Storkøbenhavn; same price as cardboard, delivered and collected.
-- **CTA:** `ctaText="Se hvad det koster"`, `ctaLink="/booking"`.
+  > **Ikke dækket endnu (inden for nærområdet, men ekskluderet i `geo.ts`):** 2640 Hedehusene, 2670 Greve, 2680 Solrød Strand, 2690 Karlslunde. Bruges i "ikke dækket"-noten (Task B.3) så forventningen er ærlig.
 
-### Task [B.5]: `Founders`
-- **Layout:** Two cards in a `grid md:grid-cols-2`, black border + hard shadow (`shadow-[3px_4px_0_0_rgba(0,0,0,1)]`) à la `TransparentCard`, inside a `Section`.
-- **Per card:** photo or initials avatar (circle, black border), name, role, 1–2 line bio. Emphasize the childhood-friends bond.
-- **Notes / open question:** Need real founder names, roles, and whether photos exist (see §6 / §7). Use placeholders flagged with `TODO` if not provided.
+- **⚠️ Verificér navnene:** Listen ovenfor er udledt manuelt fra postnummer-intervallet. Slå hvert navn op (officiel PostNord/postnummer-liste) før implementering, så der ikke vises forkerte bynavne.
 
-### Task [B.6]: `ContactCTA`
-- **Layout:** Contact line (`hey@heybox.dk`, `HeyBox ApS`) + closing CTA block styled like homepage `CTA` (`text-3xl md:text-5xl` heading, centered, green button).
-- **Copy:** Warm close inviting questions + "Beregn din pris" button.
+### Task [A.2]: Konsistens-tjek (valgfrit men anbefalet)
+- **Notes:** Brug `/test`-skill til en lille test: `DELIVERY_LOCATIONS.every(l => isStorkobenhavn(l.code))` skal være `true`, og de fire ekskluderede koder skal give `false`. Fanger drift mellem marketing-liste og booking-validering.
 
-### Task [B.7]: Assemble & metadata
-- **Notes:** Compose sections in narrative order (Hero → Origin → Waste → Decision → Founders → Contact/CTA). Update `metadata.description`/openGraph to reflect the story angle. Confirm `(site)/layout.tsx` still wraps menu/footer (no `<main>` duplication).
+### Task [B.1]: `metadata` + hero
+- **Logic:** Kopiér mønstret fra `om-os/page.tsx`:
+  ```ts
+  export const metadata: Metadata = {
+    title: "Lokationer",
+    description: "Vi leverer og henter flyttekasser i hele Storkøbenhavn - fra København K til Vedbæk. Se alle de byer og postnumre vi dækker.",
+    alternates: { canonical: "/lokationer" },
+    openGraph: { title: "Lokationer", description: "...", url: "/lokationer", type: "website" },
+  }
+  ```
+- **Hero:** `Section` > `div.border-x.pt-24` > `max-w-[700px] mx-auto px-4`, med:
+  - Lille pre-label: "Lokationer" (`border-b pb-4 mb-5 inline-block`).
+  - `<h1>` uppercase `font-black`: "Vi leverer i hele Storkøbenhavn".
+  - Intro-`<p>`: kort tekst om gratis levering + afhentning i hele området.
+- **Code Reference:** `om-os/page.tsx:44-63` (`AboutUs`).
 
----
+### Task [B.2]: `LocationGrid`
+- **Input/Props:** `{ title: string; locations: DeliveryLocation[] }` (kaldes to gange: København + Storkøbenhavn).
+- **Logic:** Inden i en `Section` med `border-x`: en overskrift (`<h2>` uppercase font-black, samme stil som `om-os`), efterfulgt af et responsivt grid af bynavne. Forslag: `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-px` hvor hver celle viser `name` (og evt. `code` mindre/gråt). Genbrug det stiplede/sorte border-look for at matche `SectionThreeInfoColumns`.
+- **Notes:** Hold det rent tekst - ingen billeder. Overvej `aria`-venlig liste (`<ul>`/`<li>`) frem for bare divs af hensyn til tilgængelighed og SEO.
+
+### Task [B.3]: "Ikke dækket"-note + CTA
+- **Notes:**
+  - Lille afsnit: "Vi udvider løbende. Lige nu leverer vi endnu ikke i fx Greve, Solrød og Hedehusene - men skriv til os." (Hold ærligt, undgå at love noget.)
+  - Afsluttende CTA-knap til `/booking` ("Se hvad det koster" / "Book nu"), genbrug `Button`-mønster fra `blocks.tsx` (`bg-green-300`, `ArrowRight`).
+
+### Task [B.4]: Navigation
+- **Notes:** Tjek `src/components/menu.tsx` (og evt. footer) for om `/lokationer` skal tilføjes som menupunkt. Afklar med bruger om den skal i hovedmenuen eller kun footer/SEO.
 
 ## 6. Verification Checklist
-- [ ] **Manual — visual parity:** About page reads as part of the same site as the homepage (typography, borders, gradients, shadows match).
-- [ ] **Manual — homepage regression:** After A.1/A.2 extraction, the homepage renders byte-for-byte the same (diff screenshots / visual check). The displayed waste numbers are unchanged.
-- [ ] **Manual — responsiveness:** Hero and all two/three-column sections collapse cleanly to single column on mobile (`grid-cols-1` defaults, image-first ordering sensible).
-- [ ] **Manual — story clarity:** A first-time reader understands: childhood friends → podcast → saw the waste numbers → decided to try. The narrative arc is legible while scrolling.
-- [ ] **Content:** Founder names/roles/bios filled in (no leftover `TODO` placeholders) or explicitly approved as placeholders.
-- [ ] **A11y:** Every `Image` has a meaningful `alt`; heading hierarchy is single `<h1>` then `<h2>`/`<h3>`; email link is a real `mailto:`.
-- [ ] **Build:** `next build` / lint passes; no new client-component boundaries added unnecessarily.
-
----
+- [ ] **Konsistens:** Hver by på siden valideres som `valid` i booking (`isStorkobenhavn`), og de 4 ekskluderede koder vises IKKE som dækket. (Task A.2)
+- [ ] **Navne korrekte:** Alle bynavne krydstjekket mod officiel postnummer-liste.
+- [ ] **Manual Check:** Mobil-responsivitet på by-grid'et (2 kolonner på lille skærm, flere på desktop); borders flugter med resten af sitet.
+- [ ] **SEO:** `metadata` + `canonical` sat; bynavne står som læsbar tekst (ikke billeder); siden er crawlbar og linket internt.
+- [ ] **A11y:** By-listen er semantisk markup (`ul/li`), kontrast OK.
 
 ## 7. Comments & Deviations
 
-**Decision Note [2026-06-02] — Extraction vs. duplication:** The frontpage's section primitives (`SectionInfo`, `SectionContent`, `SectionThreeInfoColumns`, `TransparentCard`, `Hero`) are currently **local, unexported** functions inside `src/app/(site)/page.tsx`. The About page cannot reuse them without either (a) **extracting** them into `src/components/sections/` (Phase A.2 — preferred: real reuse, single source of design truth, keeps the two pages in sync) or (b) **copying** them locally (A.2-alt — faster, zero homepage regression risk, but creates drift). Recommendation: **extract (A.2)**, since the point of this task is for About to *inherit* — not imitate — the homepage design. If the user prefers the smallest possible change, fall back to A.2-alt.
+Note [2026-06-03]: Valgte at gruppere det centrale København (1000–1799) som "København K/V" frem for at liste hvert gade-postnummer, da der ellers ville være hundredvis af items. De reelt ekskluderede postnumre i nærområdet er 2640/2670/2680/2690 (2960–2990 ligger allerede uden for ≤2959-intervallet i `geo.ts`).
 
-**Open question — founder details:** The page needs real names, roles, short bios, and (ideally) photos of the two founders. The `public/images/` folder currently has no portraits. Pending input, B.5 will ship with clearly-marked placeholders.
+Note [2026-06-03]: Anbefaler `src/lib/locations.ts` som sandhedskilde for *visning*, men understreger at den skal holdes i sync med `isStorkobenhavn` i `geo.ts` (sandhedskilde for *validering*) via en lille test - ellers risikerer marketing-side og booking-flow at vise modstridende dækning.
 
-**Copy note:** All headline/body copy in §5 is *draft Danish* to convey intent and layout. Final wording should be reviewed by the user before implementation.
+Note [2026-06-03] - IMPLEMENTERET: Oprettede `src/lib/locations.ts` (data, 43 byer) og byggede `src/app/(site)/lokationer/page.tsx` (hero + to LocationGrid-sektioner + "ikke dækket"-note + CTA). Tilføjede `/lokationer` til menu, footer og `sitemap.ts`.
+- **Afvigelse fra A.2:** Projektet har INGEN test-runner installeret (ingen jest/vitest), og constraint = ingen nye deps. Droppede derfor det formelle testfil og verificerede konsistensen manuelt: alle 43 postnumre opfylder `isStorkobenhavn`, og de 4 ekskluderede (2640/2670/2680/2690) er holdt ude. Bør laves til en rigtig test, hvis der senere tilføjes et test-setup.
+- **Afvigelse fra B.2:** Droppede det skrøbelige `nth-child`-border-mønster (brød på tværs af breakpoints) til fordel for `gap-px bg-gray-300` + `bg-white`-celler, som giver rene gridlines ved alle kolonneantal.
+- **Åbne spørgsmål afgjort med defaults:** (1) Central-KBH vist som intervaller ("1000–1499 København K"). (2) `/lokationer` tilføjet til BÅDE menu og footer. (3) Ikke-dækkede områder nævnes ærligt i en note. Sig til, hvis du vil have det anderledes.
+- Verificeret: `tsc --noEmit` = exit 0 (efter `next typegen`), eslint rent på de nye filer.
+
+**Åbne spørgsmål til bruger:**
+1. Skal de individuelle 1000–1799-postnumre vises som intervaller ("1050–1799 København V") eller bare som bynavne uden koder?
+2. Skal `/lokationer` i hovedmenuen, eller kun i footer/til SEO?
+3. Skal vi overhovedet nævne de ikke-dækkede områder (Greve/Solrød/Hedehusene), eller helt udelade dem?

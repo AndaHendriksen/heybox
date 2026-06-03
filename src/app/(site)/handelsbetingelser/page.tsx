@@ -2,21 +2,14 @@ import Link from 'next/link'
 
 export const metadata = {
   title: 'Vilkår og betingelser',
-  alternates: { canonical: '/terms' },
+  alternates: { canonical: '/handelsbetingelser' },
 }
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen px-4 py-16">
       <div className="w-full max-w-2xl mx-auto">
-        <Link
-          href="/"
-          className="text-sm text-zinc-400 hover:text-black transition-colors mb-8 inline-block"
-        >
-          ← Tilbage til forsiden
-        </Link>
-
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Vilkår og betingelser</h1>
+        <h1 className="text-3xl font-bold tracking-tight mb-2">Handelsbetingelser</h1>
         <p className="text-sm text-zinc-400 mb-10">Sidst opdateret: maj 2025</p>
 
         <div className="space-y-10 text-zinc-600 leading-relaxed">

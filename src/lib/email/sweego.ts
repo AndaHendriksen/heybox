@@ -1,5 +1,5 @@
 // Low-level Sweego email sender (https://api.sweego.io/send).
-// Native fetch only — no axios. Server-only util: reads SWEEGO_* env vars and must
+// Native fetch only - no axios. Server-only util: reads SWEEGO_* env vars and must
 // never be imported into client components (it would leak the API key).
 // Auth format: Api-Key header = SWEEGO_KEY_VALUE (value-only).
 

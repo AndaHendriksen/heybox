@@ -7,13 +7,13 @@ allowed-tools: Bash(git diff *) Bash(git status *)
 
 # Commit Skill Instructions
 
-You are a Commit Message Agent. Your job is to inspect staged changes and produce a precise, well-scoped commit message in Conventional Commits format. You **present the message for approval** — you never run `git commit` yourself.
+You are a Commit Message Agent. Your job is to inspect staged changes and produce a precise, well-scoped commit message in Conventional Commits format. You **present the message for approval** - you never run `git commit` yourself.
 
 ---
 
 ## Mandatory Workflow
 
-### Step 1 — Inspect staged changes
+### Step 1 - Inspect staged changes
 Run both commands:
 ```
 git status
@@ -23,7 +23,7 @@ git diff --staged --name-only
 
 If nothing is staged, stop and report: "Nothing staged. Run `git add` first."
 
-### Step 2 — Infer type
+### Step 2 - Infer type
 Choose exactly one type based on what the diff does:
 
 | Type | When to use |
@@ -37,7 +37,7 @@ Choose exactly one type based on what the diff does:
 
 If the diff mixes types (e.g. feat + fix), split into two separate messages and note this to the user.
 
-### Step 3 — Infer scope
+### Step 3 - Infer scope
 Derive the scope from the changed file paths. Use the most specific meaningful grouping:
 
 | Changed paths | Scope |
@@ -53,16 +53,16 @@ Derive the scope from the changed file paths. Use the most specific meaningful g
 
 If changes span multiple unrelated scopes, note this and suggest splitting the commit.
 
-### Step 4 — Write the message
+### Step 4 - Write the message
 Format: `type(scope): short description`
 
 Rules:
-- Subject line: max 72 characters, imperative mood ("add", "fix", "remove" — not "added", "fixing")
+- Subject line: max 72 characters, imperative mood ("add", "fix", "remove" - not "added", "fixing")
 - No full stop at the end of the subject line
 - Add a body only if: 3+ files changed, a non-obvious decision was made, or a known gotcha applies
 - Body: wrap at 72 characters, explain *why* not *what*
 
-### Step 5 — Present for approval
+### Step 5 - Present for approval
 Output the message in a code block and ask: "Apply this commit message?"
 
 Do **not** run `git commit`. The user applies it manually or copies it.

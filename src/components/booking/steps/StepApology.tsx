@@ -82,7 +82,7 @@ export default function StepApology({ booking }: Props) {
         />
         <Label htmlFor="terms" className="text-sm text-zinc-600 leading-relaxed cursor-pointer">
           Jeg har læst og accepterer{' '}
-          <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline text-black">
+          <a href="/handelsbetingelser" target="_blank" rel="noopener noreferrer" className="underline text-black">
             vilkår og betingelser
           </a>
         </Label>

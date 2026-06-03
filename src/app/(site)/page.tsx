@@ -21,6 +21,7 @@ import {
   formatMio,
   formatTon,
 } from "@/lib/stats";
+import { CtaReadyToGoSection } from "@/components/sections/cta";
 
 export default function Landing() {
   return (
@@ -38,6 +39,7 @@ export default function Landing() {
       <CardboardReuse />
       <CardboardSources />
       <Faq />
+      <CtaReadyToGoSection />
     </>
   );
 }
@@ -235,7 +237,7 @@ function CardboardSources() {
   return (
     <Section>
       <div className="border-b border-black border-x border-gray-300 border-dashed">
-        <div className="text-center mx-auto text-xs text-black/40 p-4">
+        <div className="text-center mx-auto text-xs text-gray-500 p-4">
           <p className="mb-2">
             Flyttetal opgøres pr. person (CPR) af Danmarks Statistik. Antallet af kasser og nye kasser pr. år er estimater baseret på gennemsnitlige boligstørrelser og genbrugsrater og kan variere.
           </p>

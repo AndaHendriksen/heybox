@@ -1,15 +1,21 @@
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react";
 
 export function Menu() {
   return (
-    <nav className="top-0 left-0 z-100 w-full bg-white border-b border-black px-4 py-2 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 z-100 w-full bg-white border-b border-black px-4 py-2 flex items-center justify-between">
       <Link href="/" className="text-xl md:text-2xl font-bold tracking-tight">
         heybox!
       </Link>
       <div className="flex items-center gap-4 md:gap-8 text-sm font-medium text-zinc-600">
-        <Link href="/about" className="hidden sm:inline hover:text-black transition-colors">
+        <Link href="/lokationer" className="hidden sm:inline hover:text-black transition-colors">
+          Lokationer
+        </Link>
+        <Link href="/faq" className="hidden sm:inline hover:text-black transition-colors">
+          FAQ
+        </Link>
+        <Link href="/om-os" className="hidden sm:inline hover:text-black transition-colors">
           Om os
         </Link>
         <Link href="/booking">

@@ -2,7 +2,7 @@ import { formatTotal } from '@/lib/booking/utils'
 import { firstName } from '@/lib/utils/string'
 
 // Pure builder for the customer booking-confirmation email.
-// No I/O — returns { subject, html, text } so it can be previewed/tested in isolation.
+// No I/O - returns { subject, html, text } so it can be previewed/tested in isolation.
 // HTML uses inline styles + tables only (email clients ignore <style>/Tailwind).
 
 export interface BookingConfirmationData {
@@ -57,8 +57,8 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
     ``,
     `DIN BESTILLING`,
     `Antal kasser: ${data.boxCount}`,
-    `Levering: ${deliveryDate} — ${data.deliveryAddress}, ${data.deliveryPostcode}`,
-    `Afhentning: ${pickupDate} — ${data.pickupAddress}, ${data.pickupPostcode}`,
+    `Levering: ${deliveryDate} - ${data.deliveryAddress}, ${data.deliveryPostcode}`,
+    `Afhentning: ${pickupDate} - ${data.pickupAddress}, ${data.pickupPostcode}`,
     `Lejeperiode: ${data.totalWeeks} uger`,
     `Rengøring: ${cleaningLabel}`,
     `Bæring: ${carryingLabel}`,
@@ -68,7 +68,7 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
     ``,
     `HVAD SKER DER NU?`,
     `1. Vi skriver til dig kort tid inden vi leverer på leveringsdagen.`,
-    `2. Vi leverer kasserne på den valgte dato — du betaler via MobilePay.`,
+    `2. Vi leverer kasserne på den valgte dato - du betaler via MobilePay.`,
     `3. Vi henter kasserne igen på afhentningsdatoen.`,
     ``,
     `Spørgsmål? Skriv til os på hey@heybox.dk.`,
@@ -142,7 +142,7 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
         <tr><td style="padding:22px 32px 0 32px;">
           <p style="margin:0 0 10px 0;font-size:13px;font-weight:600;color:#18181b;">Hvad sker der nu?</p>
           <p style="margin:0 0 8px 0;font-size:14px;color:#52525b;"><span style="color:#d4d4d8;font-weight:700;">1.</span>&nbsp; Vi skriver til dig kort tid inden vi leverer på leveringsdagen.</p>
-          <p style="margin:0 0 8px 0;font-size:14px;color:#52525b;"><span style="color:#d4d4d8;font-weight:700;">2.</span>&nbsp; Vi leverer kasserne på den valgte dato — du betaler via MobilePay.</p>
+          <p style="margin:0 0 8px 0;font-size:14px;color:#52525b;"><span style="color:#d4d4d8;font-weight:700;">2.</span>&nbsp; Vi leverer kasserne på den valgte dato - du betaler via MobilePay.</p>
           <p style="margin:0;font-size:14px;color:#52525b;"><span style="color:#d4d4d8;font-weight:700;">3.</span>&nbsp; Vi henter kasserne igen på afhentningsdatoen.</p>
         </td></tr>
 

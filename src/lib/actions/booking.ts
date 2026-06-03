@@ -34,7 +34,7 @@ export async function createBooking(
       .orderBy(asc(pricingTiers.max_boxes))
       .limit(1)
 
-    if (!tier) return { error: 'Ingen aktiv prisliste fundet — kontakt os på hey@heybox.dk' }
+    if (!tier) return { error: 'Ingen aktiv prisliste fundet - kontakt os på hey@heybox.dk' }
 
     const pickupDate = new Date(state.deliveryDate)
     pickupDate.setDate(pickupDate.getDate() + (tier.base_weeks + state.extraWeeks) * 7)
@@ -67,7 +67,7 @@ export async function createBooking(
       })
       .returning({ id: bookings.id, bookingNumber: bookings.booking_number })
 
-    // Confirmation email — non-blocking: a Sweego failure must not fail the booking.
+    // Confirmation email - non-blocking: a Sweego failure must not fail the booking.
     try {
       const { subject, html, text } = renderBookingConfirmation({
         bookingNumber: created.bookingNumber,

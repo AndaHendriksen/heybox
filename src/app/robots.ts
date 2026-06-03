@@ -3,7 +3,7 @@ import { SITE_URL } from "@/lib/seo"
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    // Broad allow — do NOT block AI crawlers (GPTBot, PerplexityBot, etc.); GEO depends on them.
+    // Broad allow - do NOT block AI crawlers (GPTBot, PerplexityBot, etc.); GEO depends on them.
     rules: {
       userAgent: "*",
       allow: "/",

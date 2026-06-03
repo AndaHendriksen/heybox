@@ -33,7 +33,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
             <p className="text-sm text-zinc-500 mb-1">Bookingnummer</p>
             <p className="text-2xl font-bold font-mono tracking-wider">{number}</p>
             <p className="text-xs text-zinc-400 mt-2">
-              Gem dette nummer — du kan bruge det til at følge din ordre.
+              Gem dette nummer - du kan bruge det til at følge din ordre.
             </p>
           </div>
         )}

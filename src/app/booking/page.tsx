@@ -7,10 +7,10 @@ import { Truck, X, Clock, BoxesIcon, SoapDispenserDroplet, Icon } from 'lucide-r
 export const metadata: Metadata = {
   title: 'Bestil flyttekasser',
   description:
-    'Bestil robuste flyttekasser online på få minutter. Vi leverer og henter i Storkøbenhavn — beregn din pris og vælg leveringsdato.',
+    'Bestil robuste flyttekasser online på få minutter. Vi leverer og henter i Storkøbenhavn - beregn din pris og vælg leveringsdato.',
   alternates: { canonical: '/booking' },
   openGraph: {
-    title: 'Bestil flyttekasser — heybox',
+    title: 'Bestil flyttekasser - heybox',
     description:
       'Bestil robuste flyttekasser online. Levering og afhentning i Storkøbenhavn inkluderet.',
     url: '/booking',

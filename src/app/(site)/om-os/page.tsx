@@ -14,17 +14,16 @@ import {
   formatMio,
   formatTon,
 } from "@/lib/stats"
+import { CtaReadyToGoSection } from "@/components/sections/cta"
 
 export const metadata: Metadata = {
-  title: "Om heybox",
-  description:
-    "To barndomsvenner, en podcast og alt for meget pap. Sådan blev heybox til — historien bag flyttekasse-servicen i Storkøbenhavn.",
-  alternates: { canonical: "/about" },
+  title: "Om os",
+  description: "To venner siden dagplejen med en mission om at gøre det lettere at flytte og nedbringe papaffaldet i Danmark.",
+  alternates: { canonical: "/om-os" },
   openGraph: {
-    title: "Om heybox",
-    description:
-      "To barndomsvenner snublede over idéen i en podcast, regnede på affaldet — og besluttede at prøve. Mød menneskene bag heybox.",
-    url: "/about",
+    title: "Om os",
+    description: "To venner siden dagplejen med en mission om at gøre det lettere at flytte og nedbringe papaffaldet i Danmark.",
+    url: "/om-os",
     type: "website",
   },
 }
@@ -39,6 +38,7 @@ export default function AboutPage() {
       <WasteRealization />
       <WasteStats />
       <Decision />
+      <CtaReadyToGoSection />
     </>
   )
 }
@@ -46,7 +46,7 @@ export default function AboutPage() {
 function AboutUs() {
   return (
     <Section>
-      <div className="flex items-center border-x pt-48">
+      <div className="flex items-center border-x pt-24">
           <div className="max-w-[700px] mx-auto px-4">
             <p className="md:text-lg border-b pb-4 mb-5 inline-block">Om os</p>
           <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl uppercase font-black mb-4 lg:mb-6">
@@ -152,6 +152,7 @@ function OurVision() {
 function WasteRealization() {
   return (
     <SectionInfo
+      preTitle="Estimeret"
       title={<>{formatTon(tonPapAffaldPerAar)}<br />papaffald.</>}
       description="Vi var ærligt talt chokerede, da vi regnede på det første gang. Tallet er større end vi troede. Og tallene er ud fra et best-case-scenario hvor ALLE kasser bliver genbrugt 5 gange. Det er et problem vi gerne vil løse."
     />
@@ -188,8 +189,9 @@ function Decision() {
   return (
     <SectionContent
       imgLast={true}
-      imgSrc="3d-icon-byggemarked.png"
+      imgSrc="heybox-angle-modified.png"
       imgAlt="Indkøbsvogn fra byggemarked - illustration"
+      imgBg="from-green-50 to-green-100"
       title="Vores løsning er simpel"
       descriptions={[
         "Robuste plastkasser, der kan bruges igen og igen, til præcis samme pris som papkasser i byggemarkedet. Vi leverer når du skal bruge dem og henter dem igen, når du er på plads.",

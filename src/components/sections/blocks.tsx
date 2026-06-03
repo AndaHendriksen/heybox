@@ -65,6 +65,7 @@ export interface SectionContentProps {
   imgLast?: boolean
   imgSrc: string
   imgAlt: string
+  imgBg?: string,
   title: string
   descriptions: string[]
   ctaText: string
@@ -80,6 +81,7 @@ export function SectionContent({
   imgLast,
   imgSrc,
   imgAlt,
+  imgBg = "from-yellow-50 to-orange-100",
   title,
   descriptions,
   ctaText,
@@ -90,7 +92,7 @@ export function SectionContent({
   return (
     <Section>
       <div className={`border-b border-x border-black grid lg:grid-cols-2 items-center justify-center ${hasBorderTop ? 'border-t' : ''}`}>
-        <div className={`${imgLast ? 'lg:order-1 lg:border-l bg-linear-to-tl' : 'lg:order-0 bg-linear-to-br'} from-yellow-50 to-orange-100 border-b lg:border-b-0 border-black ${imgFullSize ? '' : 'lg:py-24'}`}>
+        <div className={`${imgLast ? 'lg:order-1 lg:border-l bg-linear-to-tl' : 'lg:order-0 bg-linear-to-br'} ${imgBg} border-b lg:border-b-0 border-black ${imgFullSize ? '' : 'lg:py-24'}`}>
           <Image width="500" height="500" src={`/images/${imgSrc}`} alt={imgAlt} className={`mx-auto ${imgFullSize ? 'w-6/7' : 'w-2/3 lg:w-2/3'}`} />
         </div>
         <div className={`${imgLast ? '' : 'lg:border-l border-black'} h-full px-4 py-12 lg:p-0 flex flex-col justify-center lg:px-16`}>
@@ -100,7 +102,7 @@ export function SectionContent({
             {title}
           </h2>
           {descriptions.map((desc, index) => (
-            <p key={index} className={`text-lg md:text-xl text-black/50 ${index !== 0 ? 'mt-4' : ''}`}>
+            <p key={index} className={`text-lg md:text-xl ${index !== 0 ? 'mt-4' : ''}`}>
               {desc}
             </p>
           ))}
