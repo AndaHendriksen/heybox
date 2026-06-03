@@ -20,7 +20,7 @@ export async function sendEmail(
   opts: SendEmailOptions,
 ): Promise<{ ok: true } | { error: string }> {
   const keyValue = process.env.SWEEGO_KEY_VALUE
-  const fromName = process.env.SWEEGO_NAME ?? 'heybox'
+  const fromName = 'heybox!'
 
   if (!keyValue) {
     return { error: 'SWEEGO_KEY_VALUE mangler i miljøet' }
