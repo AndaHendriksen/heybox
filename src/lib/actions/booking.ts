@@ -4,7 +4,11 @@ import { and, asc, eq, gte, isNull, or } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { bookings, pricingTiers } from '@/lib/db/schema'
 import type { BookingState } from '@/lib/booking/types'
-import { calcTotal } from '@/lib/booking/utils'
+import { calcTotalWithoutAddons } from '@/lib/booking/utils'
+import { sendEmail } from '@/lib/email/sweego'
+import { renderBookingConfirmation } from '@/lib/email/booking-confirmation'
+
+const INTERNAL_EMAIL = 'hey@heybox.dk'
 
 function generateBookingNumber(): string {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '')
@@ -30,10 +34,13 @@ export async function createBooking(
       .orderBy(asc(pricingTiers.max_boxes))
       .limit(1)
 
-    if (!tier) return { error: 'Ingen aktiv prisliste fundet — kontakt os på hej@heybox.dk' }
+    if (!tier) return { error: 'Ingen aktiv prisliste fundet — kontakt os på hey@heybox.dk' }
 
     const pickupDate = new Date(state.deliveryDate)
     pickupDate.setDate(pickupDate.getDate() + (tier.base_weeks + state.extraWeeks) * 7)
+
+    // Canonical total = what the customer was quoted on screen (add-ons are free).
+    const total = calcTotalWithoutAddons(state)
 
     const [created] = await db
       .insert(bookings)
@@ -51,7 +58,7 @@ export async function createBooking(
         extra_weeks: state.extraWeeks,
         add_cleaning: state.addCleaning,
         add_carrying: state.addCarrying,
-        total_price: calcTotal(state),
+        total_price: total,
         customer_name: state.name,
         customer_email: state.email,
         customer_phone: state.phone,
@@ -60,9 +67,43 @@ export async function createBooking(
       })
       .returning({ id: bookings.id, bookingNumber: bookings.booking_number })
 
+    // Confirmation email — non-blocking: a Sweego failure must not fail the booking.
+    try {
+      const { subject, html, text } = renderBookingConfirmation({
+        bookingNumber: created.bookingNumber,
+        name: state.name,
+        boxCount: state.boxCount,
+        deliveryAddress: state.deliveryAddress,
+        deliveryPostcode: state.deliveryPostcode,
+        pickupAddress: state.pickupAddress,
+        pickupPostcode: state.pickupPostcode,
+        deliveryDate: new Date(state.deliveryDate),
+        pickupDate,
+        totalWeeks: tier.base_weeks + state.extraWeeks,
+        addCleaning: state.addCleaning,
+        addCarrying: state.addCarrying,
+        total,
+      })
+
+      const customer = await sendEmail({ to: state.email, toName: state.name, subject, html, text })
+      if ('error' in customer) console.error('Confirmation email failed:', customer.error)
+
+      // Internal notification (Sweego has no native BCC; separate send keeps the
+      // customer's address private).
+      const internal = await sendEmail({
+        to: INTERNAL_EMAIL,
+        subject: `Ny booking: ${created.bookingNumber}`,
+        html,
+        text,
+      })
+      if ('error' in internal) console.error('Internal booking email failed:', internal.error)
+    } catch (err) {
+      console.error('Confirmation email threw:', err)
+    }
+
     return { id: created.id, bookingNumber: created.bookingNumber }
   } catch (err) {
     console.error('createBooking failed:', err)
-    return { error: 'Noget gik galt. Prøv igen eller kontakt os på hej@heybox.dk' }
+    return { error: 'Noget gik galt. Prøv igen eller kontakt os på hey@heybox.dk' }
   }
 }

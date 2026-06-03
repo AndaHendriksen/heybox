@@ -32,7 +32,7 @@ heybox.dk is a well-written, content-rich landing site for a Copenhagen moving-b
 | `https://heybox.dk/` | Homepage | Client-rendered (`'use client'`); 3× `<h1>`; rich cited stats; footer links commented out |
 | `https://heybox.dk/booking` | Booking wizard | Inherits root title; no page-specific metadata; multi-step location form |
 | `https://heybox.dk/statestik` | Statistics / data page | **Misspelled URL** (should be `statistik`); orphaned (not linked from nav); excellent content; accordion + calculator |
-| `https://heybox.dk/terms` | Terms & conditions | Has own `metadata.title`; contains the only real company/contact info (`HeyBox ApS`, `hej@heybox.dk`) |
+| `https://heybox.dk/terms` | Terms & conditions | Has own `metadata.title`; contains the only real company/contact info (`HeyBox ApS`, `hey@heybox.dk`) |
 | `https://heybox.dk/robots.txt` | — | **HTTP 404** — does not exist |
 | `https://heybox.dk/sitemap.xml` | — | **HTTP 404** — does not exist |
 
@@ -87,7 +87,7 @@ Also exists but not separately fetched: `/booking/confirmation` (thank-you page,
 |---|---|---|
 | Author / org info | No About page, no team, no "who we are" content. The only company identity lives on `/terms`: *"HeyBox er en service leveret af HeyBox ApS, København, Danmark."* | 🔴 Needs Attention |
 | About page | Does not exist. | 🔴 Missing |
-| Contact info | Email `hej@heybox.dk` appears on `/terms`. A phone (`+45 70 12 34 56`) and hours exist **only in commented-out footer code** on the statistics page — not live. | 🟡 Needs Attention |
+| Contact info | Email `hey@heybox.dk` appears on `/terms`. A phone (`+45 70 12 34 56`) and hours exist **only in commented-out footer code** on the statistics page — not live. | 🟡 Needs Attention |
 | Trust signals | No testimonials, reviews, awards, or press mentions anywhere. (A "Anmeldelser"/reviews footer link exists but is commented out.) | 🔴 Missing |
 | Organization schema | Not present. The brand entity is never declared in machine-readable form. | 🔴 Missing |
 

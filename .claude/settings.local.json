@@ -14,7 +14,11 @@
       "WebFetch(domain:www.dst.dk)",
       "WebFetch(domain:www.bolius.dk)",
       "WebFetch(domain:unitedcontainer.com)",
-      "WebFetch(domain:heybox.dk)"
+      "WebFetch(domain:heybox.dk)",
+      "PowerShell(yarn build)",
+      "PowerShell(Start-Process -FilePath \"yarn\" -ArgumentList \"start\" -WindowStyle Hidden)",
+      "WebFetch(domain:learn.sweego.io)",
+      "WebFetch(domain:www.sweego.io)"
     ]
   }
 }

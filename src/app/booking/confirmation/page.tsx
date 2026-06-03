@@ -1,5 +1,11 @@
+import type { Metadata } from 'next'
 import { CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: 'Tak for din bestilling',
+  robots: { index: false, follow: false },
+}
 
 interface Props {
   searchParams: Promise<{ number?: string }>
@@ -19,7 +25,7 @@ export default async function ConfirmationPage({ searchParams }: Props) {
           Tak for din bestilling!
         </h1>
         <p className="text-zinc-500 mb-8">
-          Vi sender en bekræftelse snarest muligt og kontakter dig inden leveringen.
+          Vi har sendt en bekræftelse til din email og kontakter dig inden leveringen.
         </p>
 
         {number && (

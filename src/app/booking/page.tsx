@@ -1,7 +1,22 @@
+import type { Metadata } from 'next'
 import BookingWizard from '@/components/booking/BookingWizard'
 import Link from 'next/link'
 
 import { Truck, X, Clock, BoxesIcon, SoapDispenserDroplet, Icon } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Bestil flyttekasser',
+  description:
+    'Bestil robuste flyttekasser online på få minutter. Vi leverer og henter i Storkøbenhavn — beregn din pris og vælg leveringsdato.',
+  alternates: { canonical: '/booking' },
+  openGraph: {
+    title: 'Bestil flyttekasser — heybox',
+    description:
+      'Bestil robuste flyttekasser online. Levering og afhentning i Storkøbenhavn inkluderet.',
+    url: '/booking',
+    type: 'website',
+  },
+}
 
 export default function BookPage() {
   return (

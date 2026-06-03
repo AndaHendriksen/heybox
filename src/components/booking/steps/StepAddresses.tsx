@@ -5,7 +5,7 @@ import { CheckCircle2, XCircle } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { BookingState } from '@/lib/booking/types'
-import { isStorkobenhavn } from '@/utils/geo'
+import { isStorkobenhavn } from '@/lib/utils/geo'
 import StepShell from './StepShell'
 
 const MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
