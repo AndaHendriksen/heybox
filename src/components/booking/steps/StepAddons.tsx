@@ -3,6 +3,7 @@
 import type { BookingState } from '@/lib/booking/types'
 import { getTier } from '@/lib/booking/utils'
 import StepShell from './StepShell'
+import { P } from '@/components/ui/text'
 
 interface Props {
   value: BookingState
@@ -31,24 +32,26 @@ function AddonChoice({
         onClick={() => onChange(false)}
         className={`p-2 px-4 flex place-content-between items-center border cursor-pointer text-left transition-all duration-600 ${
             !selected
-              ? 'bg-blue-100 shadow-[3px_4px_0_0_rgba(0,0,0,1)] border-black'
+              ? 'bg-blue-100 shadow-primary border-black'
             : 'text-zinc-700 bg-gray-50 border border-gray-200'
         }`}
       >
-        <div className="text-sm">{freeLabel}</div>
-        <div className={`font-semibold ${!selected ? '' : 'text-zinc-400'}`}>0 kr</div>
+        <P size="small">{freeLabel}</P>
+        <P color={!selected ? 'default' : 'gray'} className="font-semibold">0 kr</P>
       </button>
       <button
         type="button"
         onClick={() => onChange(true)}
         className={`p-2 px-4 flex place-content-between items-center border cursor-pointer text-left md:text-right transition-all duration-600 ${
           selected
-            ? 'bg-blue-100 shadow-[3px_4px_0_0_rgba(0,0,0,1)] border-black'
+            ? 'bg-blue-100 shadow-primary border-black'
             : 'text-zinc-700 bg-gray-50 border border-gray-200'
         }`}
       >
-        <div className={`text-sm ${selected ? '' : 'text-zinc-500'}`}>{paidLabel}</div>
-        <div className={`font-semibold ${selected ? '' : 'text-zinc-400'}`}>+{price} kr</div>
+        <P size="small" className={`text-sm ${selected ? '' : 'text-zinc-500'}`}>{paidLabel}</P>
+        <P color={selected ? 'default' : 'gray'} className="font-semibold">
+          +{price} kr
+        </P>
       </button>
     </div>
   )
@@ -64,9 +67,9 @@ export default function StepAddons({ value, onChange, onNext, onBack }: Props) {
       title="Tilkøb"
       description="Tilføj ekstra services til din bestilling."
     >
-      <div className="space-y-4">
+      <div className="space-y-8">
         <div className="space-y-2">
-          <p className="text-sm font-medium text-zinc-700">Rengøring</p>
+          <P className="font-medium">Rengøring</P>
           <AddonChoice
             selected={value.addCleaning}
             onChange={(v) => onChange({ addCleaning: v })}
@@ -76,7 +79,7 @@ export default function StepAddons({ value, onChange, onNext, onBack }: Props) {
           />
         </div>
         <div className="space-y-2">
-          <p className="text-sm font-medium text-zinc-700">Levering</p>
+          <P className="font-medium">Levering</P>
           <AddonChoice
             selected={value.addCarrying}
             onChange={(v) => onChange({ addCarrying: v })}

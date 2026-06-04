@@ -13,7 +13,7 @@ import { H2, H3, P } from "@/components/ui/text"
 /** White card with a black border and a hard offset shadow. */
 export function TransparentCard({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <div className="px-2 md:px-3 pt-1 pb-0.5 flex items-center gap-1 mb-0.5 border border-black bg-white shadow-[3px_4px_0_0_rgba(0,0,0,1)]">
+    <div className="px-2 md:px-3 pt-1 pb-0.5 flex items-center gap-1 mb-0.5 border border-black bg-white shadow-primary">
       {children}
     </div>
   )
@@ -55,7 +55,7 @@ export function SectionInfo({
           <H2 size="display">{title}</H2>
         </div>
         <div className="md:py-6 lg:py-8 md:pr-0 lg:pl-24">
-          <P className="xl:text-right leading-8">{description}</P>
+          <P className="md:text-lg xl:text-right leading-8">{description}</P>
         </div>
       </div>
     </Section>
@@ -101,7 +101,7 @@ export function SectionContent({
             {title}
           </H2>
           {descriptions.map((desc, index) => (
-            <P key={index} className={index !== 0 ? 'mt-4' : undefined}>
+            <P key={index} className={`md:text-lg ${index !== 0 ? 'mt-4' : undefined}`}>
               {desc}
             </P>
           ))}
@@ -134,8 +134,8 @@ export function SectionThreeInfoColumns({
         {columns.map((column, index) => (
           <div key={index} className={`px-4 lg:px-8 py-8 lg:py-16 ${index === 0 ? '' : 'border-t md:border-t-0 md:border-l border-gray-400 border-dashed'}`}>
             <H3 className={xlTitle ? 'md:text-2xl lg:text-4xl xl:text-5xl' : undefined}>{column.title}</H3>
-            <p>{column.description}</p>
-            {column.subdescription && <p className="text-sm text-gray-500 mt-2">{column.subdescription}</p>}
+            <P>{column.description}</P>
+            {column.subdescription && <P size="small" color="gray" className="mt-2">{column.subdescription}</P>}
           </div>
         ))}
       </div>

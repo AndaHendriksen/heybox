@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/components/seo/JsonLd";
+import MetaPixel from "@/components/analytics/MetaPixel";
+import ConsentBanner from "@/components/analytics/ConsentBanner";
 import {
   SITE_URL,
   LOCALE,
@@ -73,6 +75,8 @@ export default function RootLayout({
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={localBusinessJsonLd()} />
         {children}
+        <MetaPixel />
+        <ConsentBanner />
       </body>
     </html>
   );

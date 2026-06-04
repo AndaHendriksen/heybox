@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import type { BookingState } from '@/lib/booking/types'
 import { isStorkobenhavn } from '@/lib/utils/geo'
 import StepShell from './StepShell'
+import { P } from '@/components/ui/text'
 
 const MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? ''
 
@@ -185,9 +186,9 @@ function AddressAutocomplete({
         )}
       </div>
       {validation === 'invalid' && (
-        <p className="text-xs text-red-500">
+        <P size="small" className="text-red-500">
           Vi leverer ikke her endnu.
-        </p>
+        </P>
       )}
     </div>
   )

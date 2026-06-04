@@ -2,6 +2,7 @@
 
 import type { BookingState } from '@/lib/booking/types'
 import StepShell from './StepShell'
+import { P } from '@/components/ui/text'
 
 interface Props {
   value: BookingState
@@ -52,7 +53,7 @@ export default function StepBoxCount({ value, onChange, onNext, onBack }: Props)
             onClick={() => onChange({ boxCount: size, selectedPackage: null })}
             className={`cursor-pointer py-3 border text-center font-semibold duration-600 transition-all ${
               boxCount === size
-                ? 'bg-blue-200 shadow-[3px_4px_0_0_rgba(0,0,0,1)] border-black'
+                ? 'bg-blue-200 shadow-primary border-black'
                 : 'bg-gray-50 border-gray-200'
             }`}
           >
@@ -71,7 +72,9 @@ export default function StepBoxCount({ value, onChange, onNext, onBack }: Props)
             +
           </StepperButton>
         </div>
-        <span className="text-sm text-zinc-500">Bokse</span>
+        <P size="small" color="gray">
+          Bokse
+        </P>
       </div>
 
     </StepShell>

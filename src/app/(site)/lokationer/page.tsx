@@ -86,7 +86,7 @@ function NotCoveredNote() {
         <div className="max-w-[700px] mx-auto px-4">
           <Eyebrow>Endnu ikke</Eyebrow>
           <H2>Vi udvider løbende</H2>
-          <P>
+          <P className="md:text-lg">
             Lige nu leverer vi endnu ikke i {formatList(NOT_COVERED_YET)}. Bor du lige uden for vores
             område? Skriv til os - så hører du fra os, så snart vi udvider.
           </P>

@@ -6,9 +6,11 @@ import type { BookingState } from '@/lib/booking/types'
 import { calcTotal, calcTotalWithoutAddons, formatTotal } from '@/lib/booking/utils'
 import { firstName } from '@/lib/utils/string'
 import { createBooking } from '@/lib/actions/booking'
+import { track } from '@/lib/analytics/meta'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { P } from '@/components/ui/text'
 
 interface Props {
   booking: BookingState
@@ -37,6 +39,12 @@ export default function StepApology({ booking }: Props) {
       if ('error' in result) {
         setBookingError(result.error)
       } else {
+        // Browser-side Purchase, deduplicated against the server CAPI event via eventID.
+        track(
+          'Purchase',
+          { value: calcTotalWithoutAddons(booking), currency: 'DKK', num_items: booking.boxCount },
+          result.eventId,
+        )
         router.push(`/booking/confirmation?number=${result.bookingNumber}`)
       }
     })
@@ -44,34 +52,33 @@ export default function StepApology({ booking }: Props) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight mb-4 mt-8">Kære {firstName(booking.name)}</h1>
-      <p className="text-zinc-500 mb-4">
-        Undskyld rigtigt mange gange!
-      </p>
-      <p className="text-zinc-500 mb-6">
-        Vi har desværre ikke nogle plastik bokse endnu. Vi ville lige teste om der
-        er interesse, før vi køber et stort lager ind.
-      </p>
-      <p className="text-zinc-500 mb-4">
-        <span className="font-bold text-black">Men!</span> Vi har nogle solide flyttekasser
-        du kan leje til samme pris. Og vi bærer dem selvfølgelig helt ind/op i lejligheden,
-        som et plaster på såret - uden merpris.
-      </p>
-      <p className="text-zinc-500 mb-4">
+      <P className="font-bold tracking-tight mb-4 mt-8">Kære {firstName(booking.name)}</P>
+      <P className="mb-4">
+        Undskyld rigtigt mange gange! Vi har desværre ikke nogle plastik bokse endnu 🥲
+      </P>
+      <P className="mb-4">
+        Vi er to venner der er vokset op sammen, og før vi bruger hele
+        vores børneopsparing på plastkasser, ville vi først teste om der er
+        interesse. Og det er du jo et bevis på at der er, så
+        titusinde tak for det! ❤️
+      </P>
+      <P className="mb-4">
+        Men! Du kan stadig undgå alt bøvlet. Vi har nemlig
+        nogle papflyttekasser du kan leje til samme pris. Og vi bærer dem selvfølgelig
+        helt ind/op i lejligheden, som et plaster på såret - uden merpris.
+      </P>
+      <p className="mb-4">Er det noget du kunne være interesseret i?</p>
+      <p>Med venlig hilsen</p>
+      <p className="mb-12">Anda & Miko</p>
+
+      <div className="bg-gray-50 border border-gray-300 p-4 mb-2">
+        <P className="text-sm text-zinc-500 mb-1">Opdateret pris (bæring inkluderet)</P>
+        <P className="text-2xl font-bold">{formatTotal(displayTotal)}</P>
+        <P className="text-xs">inkl. moms</P>
+      </div>
+      <P size="small" color="gray" className="mb-8">
         Betaling sker blot over MobilePay når vi kommer med kasserne.
-      </p>
-
-      {hasAddons && (
-        <div className="bg-zinc-50 rounded-2xl px-4 py-3 mb-6">
-          <p className="text-sm text-zinc-500 mb-1">Din pris (bæring inkluderet)</p>
-          <p className="text-2xl font-bold">{formatTotal(displayTotal)}</p>
-          <p className="text-xs text-zinc-400 mt-1">inkl. moms</p>
-        </div>
-      )}
-
-      <p className="text-zinc-500 mb-6">
-        Er du interesseret i det?
-      </p>
+      </P>
 
       <div className="flex items-start gap-3 mb-2">
         <Checkbox
@@ -89,13 +96,13 @@ export default function StepApology({ booking }: Props) {
       </div>
 
       {submitAttempted && !termsAccepted && (
-        <p className="text-sm text-red-500 mb-4">
+        <P className="text-sm text-red-500 mb-4">
           Du skal acceptere vores vilkår og betingelser for at fortsætte.
-        </p>
+        </P>
       )}
 
       <Button
-        className="w-full h-12 rounded-xl text-white font-semibold mt-4"
+        className="w-full mt-4"
         disabled={isPending}
         onClick={handleSubmit}
       >
@@ -103,7 +110,7 @@ export default function StepApology({ booking }: Props) {
       </Button>
 
       {bookingError && (
-        <p className="text-sm text-red-500 text-center mt-4">{bookingError}</p>
+        <P className="text-sm text-red-500 text-center mt-4">{bookingError}</P>
       )}
     </div>
   )

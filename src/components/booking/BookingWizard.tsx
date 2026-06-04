@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { BookingState } from '@/lib/booking/types'
 import { INITIAL_BOOKING_STATE } from '@/lib/booking/constants'
 import { calcTotal, calcEffectivePricePerBox } from '@/lib/booking/utils'
 import { isStorkobenhavn } from '@/lib/utils/geo'
+import { track, trackCustom } from '@/lib/analytics/meta'
 import ProgressBar from './ProgressBar'
 import BottomBar from './BottomBar'
 import StepAddresses from './steps/StepAddresses'
@@ -43,13 +44,43 @@ export default function BookingWizard() {
   const [step, setStep] = useState(1)
   const [dir, setDir] = useState(1)
   const [booking, setBooking] = useState<BookingState>(INITIAL_BOOKING_STATE)
+  const initiated = useRef(false)
+
+  // Top of funnel: opening the wizard = InitiateCheckout. Fire once.
+  useEffect(() => {
+    if (initiated.current) return
+    initiated.current = true
+    track('InitiateCheckout', { value: calcTotal(INITIAL_BOOKING_STATE), currency: 'DKK' })
+  }, [])
 
   function updateBooking(partial: Partial<BookingState>) {
     setBooking((prev) => ({ ...prev, ...partial }))
   }
 
+  // Emit the funnel-depth signal for the step the user is leaving. Meta uses the
+  // progression InitiateCheckout -> AddToCart -> AddPaymentInfo -> Purchase to
+  // learn how far each visitor got and optimize towards likely purchasers.
+  function emitStepEvent(leavingStep: number, merged: BookingState) {
+    const money = { value: calcTotal(merged), currency: 'DKK' }
+    switch (leavingStep) {
+      case 2:
+        track('AddToCart', { ...money, num_items: merged.boxCount })
+        break
+      case 3:
+        trackCustom('SelectDeliveryDate', money)
+        break
+      case 5:
+        track('AddPaymentInfo', money)
+        break
+    }
+    // Entering the summary step.
+    if (leavingStep + 1 === 6) trackCustom('ViewSummary', money)
+  }
+
   function goNext(partial?: Partial<BookingState>) {
+    const merged = partial ? { ...booking, ...partial } : booking
     if (partial) updateBooking(partial)
+    emitStepEvent(step, merged)
     setDir(1)
     setStep((s) => s + 1)
     window.scrollTo(0, 0)

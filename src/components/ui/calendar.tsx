@@ -207,10 +207,10 @@ function CalendarDayButton({
       className={cn(
         "disabled:opacity-100",
         modifiers.disabled ? "text-black/20 !opacity-100" : "bg-white border-gray-200",
-        "data-[selected-single=true]:bg-blue-200 data-[selected-single=true]:rounded-l-full data-[selected-single=true]:border-r-0 data-[selected-single=true]:shadow-[2px_2px_0_0_rgba(0,0,0,1.25)] data-[selected-single=true]:border-black",
-        "data-[in-range=true]:bg-blue-200 data-[in-range=true]:shadow-[2px_2px_0_0_rgba(0,0,0,1.25)] data-[in-range=true]:border-black data-[in-range=true]:border-l-0 data-[in-range=true]:border-r-0",
-        "data-[range-end-custom=true]:bg-blue-200 data-[range-end-custom=true]:border-l-0 data-[range-end-custom=true]:rounded-r-full data-[range-end-custom=true]:shadow-[2px_2px_0_0_rgba(0,0,0,1.25)] data-[range-end-custom=true]:border-black",
-        "border rounded-none flex h-full w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none [&>span]:text-xs [&>span]:opacity-70",
+        "data-[selected-single=true]:bg-blue-200 data-[selected-single=true]:rounded-l-full data-[selected-single=true]:rounded-r-none data-[selected-single=true]:border-r-0 data-[selected-single=true]:shadow-primary-small data-[selected-single=true]:border-black",
+        "data-[in-range=true]:bg-blue-200 data-[in-range=true]:rounded-none data-[in-range=true]:shadow-primary-small data-[in-range=true]:border-black data-[in-range=true]:border-l-0 data-[in-range=true]:border-r-0",
+        "data-[range-end-custom=true]:bg-blue-200 data-[range-end-custom=true]:border-l-0 data-[range-end-custom=true]:rounded-r-full data-[range-end-custom=true]:rounded-l-none data-[range-end-custom=true]:shadow-primary-small data-[range-end-custom=true]:border-black",
+        "border rounded-full flex h-full w-full min-w-[--cell-size] flex-col gap-1 font-normal leading-none focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none [&>span]:text-xs [&>span]:opacity-70",
         defaultClassNames.day,
         className
       )}

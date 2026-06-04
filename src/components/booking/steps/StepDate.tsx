@@ -4,8 +4,8 @@ import { useMemo } from 'react'
 import { Calendar } from '@/components/ui/calendar'
 import type { BookingState } from '@/lib/booking/types'
 import { getTier } from '@/lib/booking/utils'
-import { InfoIcon } from 'lucide-react'
 import StepShell from './StepShell'
+import { P } from '@/components/ui/text'
 
 interface Props {
   value: BookingState
@@ -89,31 +89,31 @@ export default function StepDate({ value, onChange }: Props) {
         </div>
       </div> */}
 
-      <div className="mt-3 flex items-center justify-between text-sm text-zinc-500">
+      <div className="mt-6 flex items-center justify-between text-sm text-zinc-500">
         <div className="flex items-center gap-3">
-          <span>Ekstra uger:</span>
+          <P>Ekstra uger:</P>
           <div className="flex items-center gap-2">
             <button
               onClick={() => onChange({ extraWeeks: Math.max(0, value.extraWeeks - 1) })}
               disabled={value.extraWeeks === 0}
-              className="w-7 h-7 cursor-pointer rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="w-8 h-8 cursor-pointer rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               -
             </button>
-            <span className="w-4 text-center font-medium text-zinc-900">{value.extraWeeks}</span>
+            <P color="gray" className="w-4 text-center font-medium">{value.extraWeeks}</P>
             <button
               onClick={() => onChange({ extraWeeks: Math.min(4, value.extraWeeks + 1) })}
               disabled={value.extraWeeks === 4}
-              className="w-7 h-7 cursor-pointer rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="w-8 h-8 cursor-pointer rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               +
             </button>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-sm font-medium text-zinc-900">
+          <P>
             +{tier.extraWeekPricePerBox.toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr/boks
-          </p>
+          </P>
         </div>
       </div>
     </StepShell>

@@ -25,6 +25,7 @@ export function Footer() {
             <li><Link href="/lokationer" className="hover:text-primary transition-colors">Lokationer</Link></li>
             <li><Link href="/#faq" className="hover:text-primary transition-colors">FAQ</Link></li>
             <li><Link href="/handelsbetingelser" className="hover:text-primary transition-colors">Handelsbetingelser</Link></li>
+            <li><Link href="/privatlivspolitik" className="hover:text-primary transition-colors">Privatlivspolitik</Link></li>
           </ul>
         </div>
 

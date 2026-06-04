@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react'
 import { Truck, Clock, BoxesIcon, SoapDispenserDroplet } from 'lucide-react'
 import type { BookingState } from '@/lib/booking/types'
 import { calcTotal, getTier, formatTotal } from '@/lib/booking/utils'
+import { P } from '@/components/ui/text'
 
 interface Props {
   booking: BookingState
@@ -26,19 +27,17 @@ function addWeeks(date: Date, weeks: number): Date {
 
 function TimelineCard({
   icon: Icon,
-  dotColor,
   children,
 }: {
   icon?: LucideIcon
-  dotColor: string
   children: React.ReactNode
 }) {
   return (
     <div className="relative flex gap-3 items-start -ml-[6px]">
       <div className={`${Icon ? 'bg-white' : ''} py-1 mt-2 rounded-full flex items-center justify-center flex-shrink-0 z-10`}>
-        {Icon ? <Icon size={16} className="text-gray-400" /> : <div className='w-[17px]' />}
+        {Icon ? <Icon size={18} className="text-gray-500" /> : <div className='w-[17px]' />}
       </div>
-      <div className="flex-1 bg-zinc-50 border border-gray-200 px-4 py-3">
+      <div className="flex-1 bg-gray-50 border border-gray-300 px-4 py-3">
         {children}
       </div>
     </div>
@@ -63,95 +62,128 @@ export default function StepSummary({ booking, error }: Props) {
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight mb-1">Opsummering</h1>
-      <p className="text-zinc-500 mb-8">Tjek at alt er korrekt inden du bekræfter.</p>
+      <P className="text-zinc-500 mb-8">Tjek at alt er korrekt inden du bekræfter.</P>
 
       <div className="relative mb-3">
-        <div className="absolute left-[1px] top-2 bottom-28 border-l border-dashed border-gray-300" />
+        <div className="absolute left-[1px] top-2 bottom-28 border-l border-dashed border-gray-400" />
 
         <div className="space-y-3">
-          <TimelineCard icon={BoxesIcon} dotColor="bg-zinc-800">
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide">{booking.boxCount} bokse</p>
+          <TimelineCard icon={BoxesIcon}>
+            <P>
+              {booking.boxCount} bokse
+            </P>
           </TimelineCard>
-          <TimelineCard icon={Truck} dotColor="bg-green-500">
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Levering</p>
-            <p className="font-semibold text-sm first-letter:uppercase">{formatDanish(deliveryDate)}</p>
-            <p className="text-sm text-zinc-700 mt-0.5">{booking.deliveryAddress}</p>
-            <p className="text-xs text-zinc-400 mt-1">{deliveryCarryingLabel}</p>
+          <TimelineCard icon={Truck}>
+            <P size="small" color="gray" className="mb-1">
+              Levering
+            </P>
+            <P className="mb-6 first-letter:uppercase">
+              {formatDanish(deliveryDate)}
+            </P>
+            <P size="small" color="gray" className="mb-1">
+              {deliveryCarryingLabel}
+            </P>
+            <P>
+              {booking.deliveryAddress}
+            </P>
           </TimelineCard>
 
-          <TimelineCard icon={Clock} dotColor="bg-zinc-400">
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Lejeperiode</p>
-            <p className="font-semibold text-sm">{totalWeeks} uger</p>
-            {/* <p className="text-xs text-zinc-400 mt-0.5">
-              {formatDanish(deliveryDate)} → {formatDanish(pickupDate)}
-            </p> */}
+          <TimelineCard icon={Clock}>
+            <P size="small" color="gray" className="mb-1">
+              Lejeperiode
+            </P>
+            <P>
+              {totalWeeks} uger
+            </P>
           </TimelineCard>
 
           {!booking.addCleaning && (
-          <TimelineCard icon={SoapDispenserDroplet} dotColor="bg-zinc-400">
-            <p className="text-xs text-zinc-400 tracking-wide">I rengør selv kasserne inden afhentning</p>
-          </TimelineCard>
+            <TimelineCard icon={SoapDispenserDroplet}>
+              <P>I rengør selv kasserne inden afhentning</P>
+            </TimelineCard>
           )}
 
-          <TimelineCard icon={Truck} dotColor="bg-orange-500">
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Afhentning</p>
-            <p className="font-semibold text-sm first-letter:uppercase">{formatDanish(pickupDate)}</p>
-            <p className="text-sm text-zinc-700 mt-0.5">{booking.pickupAddress}</p>
-            <p className="text-xs text-zinc-400 mt-1">{pickupCarryingLabel}</p>
+          <TimelineCard icon={Truck}>
+            <P size="small" color="gray" className="mb-1">
+              Afhentning
+            </P>
+            <P className="mb-6 first-letter:uppercase">
+              {formatDanish(pickupDate)}
+            </P>
+            <P size="small" color="gray" className="mb-1">
+              {pickupCarryingLabel}
+            </P>
+            <P>
+              {booking.pickupAddress}
+            </P>
           </TimelineCard>
         </div>
       </div>
       <div className="space-y-3">
-        <TimelineCard dotColor="bg-zinc-400">
-          <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-2">Dine oplysninger</p>
-          <div className="text-sm">
-              <p>{booking.name}</p>
-              <p>{booking.email}</p>
-              <p>{booking.phoneCountryCode} {booking.phone}</p>
+        <TimelineCard>
+          <P size="small" color="gray" className="mb-1">
+            Dine oplysninger
+          </P>
+          <div>
+              <P>{booking.name}</P>
+              <P>{booking.email}</P>
+              <P>{booking.phoneCountryCode} {booking.phone}</P>
           </div>
         </TimelineCard>
 
-        <TimelineCard dotColor="bg-zinc-800">
+        <TimelineCard>
           <div className="space-y-1.5 text-sm">
             <div className="flex justify-between gap-4">
-              <span className="text-zinc-500">Leje, {booking.boxCount} kasser</span>
-              <span className="font-medium">
+              <P>Leje, {booking.boxCount} kasser</P>
+              <P>
                 {(booking.boxCount * tier.pricePerBox).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr
-              </span>
+              </P>
             </div>
             {booking.extraWeeks > 0 && (
               <div className="flex justify-between gap-4">
-                <span className="text-zinc-500">{booking.extraWeeks} ekstra {booking.extraWeeks === 1 ? 'uge' : 'uger'}</span>
-                <span className="font-medium">
+                <P>
+                  {booking.extraWeeks} ekstra {booking.extraWeeks === 1 ? 'uge' : 'uger'}
+                </P>
+                <P>
                   +{(booking.extraWeeks * booking.boxCount * tier.extraWeekPricePerBox).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr
-                </span>
+                </P>
               </div>
             )}
             {booking.addCleaning && (
               <div className="flex justify-between gap-4">
-                <span className="text-zinc-500">Rengøring</span>
-                <span className="font-medium">
+                <P>
+                  Rengøring
+                </P>
+                <P>
                   +{(booking.boxCount * tier.cleaningPricePerBox).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr
-                </span>
+                </P>
               </div>
             )}
             {booking.addCarrying && (
               <div className="flex justify-between gap-4">
-                <span className="text-zinc-500">Bæretjeneste</span>
-                <span className="font-medium">
+                <P>
+                  Bæretjeneste
+                </P>
+                <P>
                   +{(booking.boxCount * tier.carryingPricePerBox).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr
-                </span>
+                </P>
               </div>
             )}
           </div>
-          <div className="border-t border-zinc-200 mt-3 pt-3 space-y-1.5">
+          <div className="border-t border-gray-300 mt-3 pt-3 space-y-1.5">
             <div className="flex justify-between gap-4 text-xs text-zinc-400">
-              <span>Heraf moms 25%</span>
-              <span>{(total / 5).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr</span>
+              <P>Heraf moms 25%</P>
+              <P>
+                {(total / 5).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr
+              </P>
             </div>
             <div className="flex items-baseline justify-between gap-4">
-              <span className="text-sm text-zinc-500">Total inkl. moms</span>
-              <span className="text-2xl font-bold">{formatTotal(total)}</span>
+              <P size="lead" className="font-bold">
+                Total inkl. moms
+              </P>
+              <P size="lead" className="font-bold">
+                {formatTotal(total)}
+              </P>
             </div>
           </div>
         </TimelineCard>

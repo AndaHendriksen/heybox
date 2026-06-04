@@ -1,175 +1,179 @@
-# Plan: Typography System (H1 → H2, H3, P, Eyebrow)
+# Plan: Meta (Facebook + Instagram) Marketing & Funnel Tracking
 
-> **Status:** 🟡 In Progress | **Last Updated:** 2026-06-04
-> **Scope:** `src/components/ui/text.tsx` + marketing `(site)` pages
+> **Status:** 🟢 Approved — implementing | **Last Updated:** 2026-06-04
+> **Scope:** Analytics layer — `src/components/analytics/*`, `src/lib/analytics/*`, booking funnel wiring
 
 ---
 
 ## 1. Context & Objectives
 
-**Goal:** Extend the existing `H1` primitive into a complete, reusable typography set (`H2`, `H3`, `P`, plus an `Eyebrow` label) so the marketing pages stop hand-rolling Tailwind class strings. "Done" = every marketing heading/paragraph can be expressed with a component, margins/paddings behave predictably, and the dominant existing styles are preserved 1:1.
+**Goal:** Be able to run and *optimize* Facebook & Instagram ad campaigns for heybox. Concretely, "done" means:
+1. Meta can attribute conversions to ads (Pixel installed + verified domain).
+2. Meta receives **funnel-depth signals** — for every visitor it knows how far into the booking flow they got (landed → chose boxes → entered contact → confirmed), so its algorithm can target look-alikes of people who go deep / convert.
+3. Tracking is **server-side reinforced** (Conversions API) so it survives ad-blockers, iOS/Safari ITP, and missing cookies — critical because our real conversion happens in a server action with no online payment.
+4. It is **GDPR/ePrivacy compliant** (Denmark/EU) — no tracking cookies fire before consent.
+
+**Answer to "can we tell Meta how far along a user got?"** → **Yes.** This is exactly what Meta's *standard funnel events* are for. We fire a progressively "deeper" event at each booking step (`InitiateCheckout` → `AddToCart` → `AddPaymentInfo` → `Purchase`). Meta's optimization model reads this depth automatically and learns to show ads to people who resemble those who reached the deepest steps. We additionally send custom events for finer-grained retargeting audiences.
 
 **Constraints:**
-- Tailwind v4 only, no new dependencies (`clsx`, `tailwind-merge`, `class-variance-authority` already installed).
-- Use the existing `cn` helper from `@/lib/utils/index`.
-- **Scope = marketing `(site)` pages only.** The booking flow (`src/components/booking/**`, `src/app/booking/**`) and legal pages use a *different* design language (`font-bold tracking-tight`, not uppercase) — do **not** unify them in this pass.
-- Backward compatible: replacing existing markup must produce identical rendered classes.
-
----
+- This is **NOT** the Next.js you know (v16.2.6, App Router, React 19). Use the `next/script` component and check `node_modules/next/dist/docs/` before coding. Server actions (not API routes) are the conversion point.
+- Must use Tailwind v4 for any consent-banner UI; match existing component style (shadcn/radix, zinc palette).
+- No online payment exists — payment is MobilePay on delivery. The "Purchase" signal therefore fires on **booking confirmation**, not on a payment callback.
+- Keep PII safe: emails/phones sent to Meta CAPI **must be SHA-256 hashed**. Never log raw PII to Meta.
+- Prefer **no heavy new dependencies**. Pixel loads via raw script; CAPI is a plain `fetch`. A tiny consent helper is hand-rolled rather than pulling a CMP library.
 
 ## 2. Technical Research & State
 
-### Affected Files
-- `src/components/ui/text.tsx`: **The system.** Currently exports only `H1`. Will gain `H2`, `H3`, `P`, `Eyebrow`.
-- `src/lib/utils/index` (`cn`): clsx + tailwind-merge wrapper. **Critical** — see "Key Finding" below.
-- `src/app/(site)/page.tsx`, `om-os/page.tsx`, `lokationer/page.tsx`, `faq/page.tsx`: consumers (migration targets).
-- `src/components/sections/blocks.tsx`, `cta.tsx`, `Faq.tsx`: contain the heaviest heading/paragraph usage.
+- **Affected / new files:**
+  - `src/app/layout.tsx`: Root layout — mount `<MetaPixel/>` + `<ConsentBanner/>` here (inside `<body>`, after JsonLd). Already a Server Component; the new pieces are Client Components.
+  - `src/components/booking/BookingWizard.tsx`: Owns `step` state and `goNext`/`goBack`. The single best place to emit step-transition events — **the funnel lives here.**
+  - `src/components/booking/steps/StepApology.tsx`: Owns final submit → `createBooking`. Fires the client-side `Purchase` pixel event (with shared `eventID` for dedup).
+  - `src/lib/actions/booking.ts`: `createBooking` server action. Already has `customer_email`, `customer_phone`, `total_price`, `booking_number` → perfect payload for a **server-side `Purchase` via CAPI** with advanced matching.
+  - `src/app/booking/page.tsx` / `BookingWizard`: `/booking` mount → `InitiateCheckout`.
+  - **NEW** `src/lib/analytics/meta.ts`: Client `fbq` wrapper — typed `track(event, params, eventId?)`, generates `event_id`, no-ops before consent / if Pixel ID missing.
+  - **NEW** `src/lib/analytics/meta-capi.ts`: Server helper — POST to `https://graph.facebook.com/v21.0/<PIXEL_ID>/events`, SHA-256 hashing of email/phone/name, reads `_fbp`/`_fbc` cookies + client IP/UA from headers.
+  - **NEW** `src/components/analytics/MetaPixel.tsx`: Client Component — injects pixel base code via `next/script` once consent given; fires initial `PageView`.
+  - **NEW** `src/components/analytics/ConsentBanner.tsx`: Client Component — GDPR banner, persists choice in `localStorage` + a first-party cookie, broadcasts a `consent-changed` event the Pixel listens for.
+  - **NEW** `src/lib/analytics/consent.ts`: tiny read/write helpers for consent state.
+- **Existing logic to preserve:**
+  - `BookingWizard` step machine: steps 1–7, `TOTAL_STEPS = 5`, `goNext(partial?)` mutates `booking` then increments `step`. Events must be *side-effects* of transitions — do not change navigation behaviour or validation.
+  - `createBooking` must remain resilient: like the existing Sweego email block, the CAPI call must be wrapped so **a Meta failure never fails the booking**.
+  - Price helpers `calcTotal` / `calcTotalWithoutAddons` give the monetary `value` for events; currency is `DKK`.
+- **Funnel → Meta event map (the core design):**
 
-### Existing Logic — how `H1` works today
-```
-text-2xl md:text-3xl lg:text-4xl xl:text-6xl uppercase font-black mb-4 lg:mb-6
-```
-- Built with a raw template literal: `` `... ${className || ""}` `` — **NOT** `cn()`.
-- Bakes a bottom margin (`mb-4 lg:mb-6`) into the component itself.
+  | Booking step (in `BookingWizard`) | Meta **standard** event | `value` | Why |
+  |---|---|---|---|
+  | `/booking` page mounts (step 1 shown) | `InitiateCheckout` | quote so far | "Started the flow" |
+  | Step 2 → next (box count chosen) | `AddToCart` | `calcTotal` | First real intent + a price |
+  | Step 3 → next (date chosen) | *custom* `SelectDeliveryDate` | — | Retargeting audience only |
+  | Step 5 → next (contact submitted) | `AddPaymentInfo` | `calcTotal` | Deepest pre-commit signal = a warm lead |
+  | Step 6 summary viewed | *custom* `ViewSummary` | `calcTotal` | Retargeting audience |
+  | Final confirm success (StepApology) | `Purchase` **+** `Lead` | `total_price` | The conversion. Dual client+server. |
 
-### ⚠️ Key Finding — why the current approach breaks margin overrides
-Because `H1` concatenates strings instead of using `cn()`/`tailwind-merge`, calling `<H1 className="mb-0">` renders `... mb-4 lg:mb-6 mb-0`. Tailwind resolves conflicts by **CSS source order, not class-string order**, so the override is unreliable. **Every component in this system must route through `cn()`** so consumers can override spacing. This is the linchpin of the whole padding/margin strategy below.
+  > Standard events (`InitiateCheckout`/`AddToCart`/`AddPaymentInfo`/`Purchase`) are what Meta's optimizer and value-based look-alikes consume — that is the "how far along" signal. Custom events can't be optimization targets but make great **Custom Audiences** for retargeting (e.g. "viewed summary but didn't confirm" → re-engage ad).
 
-### Reference: `class-variance-authority` is the established pattern
-`button.tsx` and `label.tsx` already use `cva` + `cn`. We should follow that convention for size variants rather than inventing a new prop shape.
+- **Why both Pixel AND Conversions API (CAPI)?** The browser Pixel is blocked for a large share of EU users (ad-blockers, Safari ITP, no-consent). CAPI sends the same events **server-to-server** from our backend, where they can't be blocked, and includes hashed email/phone we already collect → far higher match quality. We send the `Purchase` from **both** sides with the **same `event_id`** so Meta deduplicates it. Net effect: maximal signal, no double-counting.
 
----
+- **External setup (no code, but blocks go-live):** Create Meta Business + Ad Account; create a **Dataset/Pixel** (gives `PIXEL_ID`); generate a **CAPI access token**; **verify the domain** `heybox.dk` (DNS TXT or meta-tag); configure **Aggregated Event Measurement** (rank the 8 events, mark `Purchase` priority 1) for iOS; connect Instagram account to the Page.
 
-## 3. Variance Audit (the heart of this request)
+## 3. User Journey & Flow
 
-### H2 — found 6 distinct treatments
-| # | Source | Classes | Notes |
-|---|--------|---------|-------|
-| 1 | `om-os:72,134`, `lokationer:89` | `text-xl md:text-2xl lg:text-3xl uppercase font-black mb-4 lg:mb-6` | **DOMINANT (×4).** Margin matches H1. |
-| 2 | `lokationer:67` | same sizes, but `px-4 lg:px-8 py-8 lg:py-12` (no mb) | Lives inside a bordered cell → padding, not margin. |
-| 3 | `Faq.tsx:15` | `text-3xl md:text-5xl font-black uppercase mb-8 md:mb-12` | Section-title scale (bigger). |
-| 4 | `blocks.tsx:54` (SectionInfo) | `text-4xl lg:text-7xl font-black uppercase` | Hero/display scale (biggest). |
-| 5 | `cta.tsx:11,33` | `text-3xl md:text-5xl font-bold tracking-tight mb-6` | **NOT uppercase** — different voice. |
-| 6 | `blocks.tsx:101` | `text-xl md:text-2xl lg:text-3xl uppercase font-black leading-[1.2] tracking-tight mb-4` | = #1 + tighter leading/tracking. |
+- [ ] **Step 0 — Consent gate (first visit):**
+    - [ ] 0.1 Banner appears; Pixel + CAPI are dormant. Choosing "Afvis" keeps them off permanently; "Accepter" loads the Pixel and fires `PageView`.
+- [ ] **Step 1 — Visitor lands on a page (home / FAQ / locations):**
+    - [ ] 1.1 `PageView` fires (client) once consent given.
+- [ ] **Step 2 — Visitor opens `/booking`:**
+    - [ ] 2.1 `InitiateCheckout` fires (client).
+- [ ] **Step 3 — Progresses through wizard:**
+    - [ ] 3.1 Each `goNext` from the mapped steps fires its event.
+- [ ] **Step 4 — Confirms booking (StepApology → createBooking succeeds):**
+    - [ ] 4.1 Server action sends `Purchase` via CAPI (hashed email/phone, real `total_price`, `event_id`).
+    - [ ] 4.2 Returns `event_id` to client; client fires Pixel `Purchase` with same `eventID` → deduped.
+- [ ] **Step 5 — Meta optimizes:** algorithm now sees each user's max funnel depth + final value → targets look-alikes of deep/converting users.
 
-**Decision — H2 default = treatment #1** (`text-xl md:text-2xl lg:text-3xl uppercase font-black mb-4 lg:mb-6`). It is the most common and steps down cleanly from H1 (one size-tier smaller, same margin).
-- Expose a `size` variant via `cva`: `display` (#4), `section` (#3), `default` (#1).
-- Treatment #5 (cta) is a deliberately different style (sentence-case, tracking-tight). **Leave cta.tsx untouched** — do not force it into the uppercase system.
+## 4. Implementation Roadmap (The To-Do)
 
-### H3 — found 1 treatment (consistent)
-| Source | Classes |
-|--------|---------|
-| `blocks.tsx:137` | `text-lg font-bold uppercase mb-1` (+ optional `md:text-2xl lg:text-4xl xl:text-5xl` when `xlTitle`) |
-| `om-os:110,117` (commented) | `text-lg font-bold uppercase` |
+### Phase A: Foundation (config, consent, helpers)
+- [ ] **A.1:** Add env vars + types: `NEXT_PUBLIC_META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN`, `META_CAPI_TEST_EVENT_CODE` (test only).
+- [ ] **A.2:** `src/lib/analytics/consent.ts` — get/set consent + change-event dispatcher.
+- [ ] **A.3:** `src/components/analytics/ConsentBanner.tsx` — GDPR banner (Tailwind, zinc style, Danish copy).
+- [ ] **A.4:** `src/lib/analytics/meta.ts` — typed client `fbq` wrapper + `event_id` generator (`crypto.randomUUID`).
+- [ ] **A.5:** `src/components/analytics/MetaPixel.tsx` — consent-gated `next/script` pixel loader + initial `PageView`.
+- [ ] **A.6:** Mount `<MetaPixel/>` + `<ConsentBanner/>` in `src/app/layout.tsx`.
 
-**Decision — H3 default = `text-lg font-bold uppercase mb-1`.** Note it uses `font-bold` (H1/H2 use `font-black`) — preserve that intentional weight step-down. The `xlTitle` case is a one-off; handle it with a `className` override rather than a variant.
+### Phase B: Server-side Conversions API
+- [ ] **B.1:** `src/lib/analytics/meta-capi.ts` — `sendCapiEvent()` (hashing, cookies, IP/UA, fetch, test-code, graceful failure).
+- [ ] **B.2:** In `createBooking`, after successful insert, send server `Purchase` (wrapped in try/catch like the email block). Generate `eventId`, **return it** to the client.
 
-### P — the messy one (8+ treatments, wildly varied margins)
-| Group | Example sources | Classes |
-|-------|-----------------|---------|
-| Lead / body (large) | `om-os:75,142`, `lokationer:48,92` | `md:text-lg lg:text-xl` |
-| Body (alt scale) | `blocks.tsx:57,105` | `text-lg md:text-xl` (+ conditional `mt-4`) |
-| Hero lead | `page.tsx:70` | `md:text-lg lg:text-2xl mb-8 md:mb-12` |
-| Small / muted | `blocks:139`, booking | `text-sm text-gray-500 mt-2` / `text-xs text-zinc-400` |
-| **Bottom margins seen on body P** | various | `mb-6`, `mb-8`, `mb-12`, **`mb-24`** — no consistency |
+### Phase C: Funnel wiring
+- [ ] **C.1:** `/booking` mount → `InitiateCheckout` (client).
+- [ ] **C.2:** `BookingWizard.goNext` → emit `AddToCart` (step 2), `SelectDeliveryDate` (step 3), `AddPaymentInfo` (step 5), `ViewSummary` (step 6). One small `emitFunnelEvent(step)` helper.
+- [ ] **C.3:** `StepApology.handleSubmit` success branch → client `Purchase` + `Lead` using `eventId` returned from `createBooking`.
+- [ ] **C.4:** Decide CAPI coverage for mid-funnel events (recommend: CAPI only for `Purchase`; Pixel-only for the rest, to keep it simple). Document in §7.
 
-**Decision — `P` ships with NO baked margin and NO color.** Body-paragraph spacing ranges from `mb-6` to `mb-24` depending on section; baking any value in would fight every other usage. Default `P` = `md:text-lg lg:text-xl` (the dominant lead style). Expose a `size` variant (`lead` = default, `body` = `text-lg md:text-xl`, `small` = `text-sm`). Spacing is always passed per-use via `className` (now safe because of `cn`).
+### Phase D: Verification & go-live
+- [ ] **D.1:** Test with Meta **Events Manager → Test Events** using `META_CAPI_TEST_EVENT_CODE` + the Pixel Helper browser extension.
+- [ ] **D.2:** Confirm `Purchase` shows **"Deduplicated"** (browser + server, same `event_id`).
+- [ ] **D.3:** Domain verification + AEM event ranking in Business Manager.
+- [ ] **D.4:** Confirm no events fire before consent (DevTools network: no `facebook.com/tr` calls until "Accepter").
 
-### Eyebrow — found 4+ identical usages → promote to its own component
-| Source | Classes |
-|--------|---------|
-| `om-os:52,71,133`, `lokationer:46,88` | `md:text-lg border-b pb-4 mb-5 inline-block` |
+## 5. Technical Specifications (To-Do Details)
 
-**Decision — extract an `<Eyebrow>` component** (the small underlined label that sits *above* a heading). It is structurally distinct from body `P` and repeats verbatim 5×. Its `mb-5` deliberately owns the gap to the heading below it (see margin strategy).
+### Task [A.1]: Environment variables
+- **Input/Props:** `.env.local` (and deployment env):
+  - `NEXT_PUBLIC_META_PIXEL_ID` — public, baked into client bundle (the Pixel ID is not secret).
+  - `META_CAPI_ACCESS_TOKEN` — **server-only secret**, never `NEXT_PUBLIC_`.
+  - `META_CAPI_TEST_EVENT_CODE` — optional; set during QA, unset in prod.
+- **Notes:** `.env.local` is gitignored already. Document required vars in `README.md`.
 
----
+### Task [A.4]: `meta.ts` client wrapper
+- **Logic (pseudocode):**
+  ```
+  type StdEvent = 'PageView'|'ViewContent'|'InitiateCheckout'|'AddToCart'|'AddPaymentInfo'|'Lead'|'Purchase'
+  function track(event, params?, eventId?) {
+    if (!hasConsent() || !window.fbq) return
+    window.fbq('track', event, params, eventId ? { eventID: eventId } : undefined)
+  }
+  function trackCustom(name, params?) { ...'trackCustom'... }
+  function newEventId() { return crypto.randomUUID() }
+  ```
+- **Notes:** No-op when `fbq` absent so SSR/no-consent never throws. `value` always paired with `currency: 'DKK'`.
 
-## 4. The Margin / Padding Strategy (explicit answer to the request)
+### Task [A.5]: `MetaPixel.tsx`
+- **Logic:** Client Component. Reads consent on mount + subscribes to `consent-changed`. When consent === granted and not yet loaded, inject the standard Meta base snippet via `next/script` (`strategy="afterInteractive"`), then `fbq('init', PIXEL_ID)` + `fbq('track','PageView')`. Guard against double-init. If `NEXT_PUBLIC_META_PIXEL_ID` unset, render nothing.
+- **Code Reference:** Confirm `Script` API in `node_modules/next/dist/docs/` for v16 — App Router may prefer inline `<Script id=...>{code}</Script>`.
 
-**Problem:** `H1` bakes `mb-4 lg:mb-6`. If every component bakes its own margin we hit (a) the last-child trailing-gap problem, and (b) unpredictable overrides (see §2 Key Finding).
+### Task [A.3]: `ConsentBanner.tsx`
+- **Logic:** If a stored choice exists, render nothing. Else fixed bottom banner: short Danish text + link to a privacy/cookie policy + "Accepter" / "Afvis". On choice: persist to `localStorage('heybox_consent')` + cookie, dispatch `consent-changed`.
+- **Notes:** Match zinc/rounded styling of existing cards. Consider a tiny footer "Cookieindstillinger" link to reopen it.
 
-**Chosen model — "Top-down ownership + overridable defaults":**
+### Task [B.1]: `meta-capi.ts` — `sendCapiEvent`
+- **Input/Props:**
+  ```
+  sendCapiEvent({
+    eventName, eventId, eventSourceUrl,
+    userData: { email?, phone?, firstName?, lastName?, fbp?, fbc?, clientIp?, userAgent? },
+    customData?: { value?, currency?, contents?, num_items? },
+  })
+  ```
+- **Logic:**
+  1. Build `user_data`: SHA-256 (lowercase/trim) `em`, `ph` (digits only, incl. country code), `fn`; pass through `fbp`, `fbc`, `client_ip_address`, `client_user_agent` unhashed.
+  2. POST JSON `{ data: [{ event_name, event_time: now, event_id, action_source:'website', event_source_url, user_data, custom_data }], test_event_code? }` to `graph.facebook.com/v21.0/<PIXEL_ID>/events?access_token=...`.
+  3. `try/catch`, log on failure, **never throw**.
+- **Notes:** In a server action, read cookies via `next/headers` `cookies()` (`_fbp`,`_fbc`) and `headers()` (`x-forwarded-for`, `user-agent`). Hash with Node `crypto.createHash('sha256')`. Verify `next/headers` usage against v16 docs.
 
-1. **No component ever uses `margin-top`.** The gap *above* an element is owned by the element *above* it (the `Eyebrow`'s `mb-5`, or a heading's `mb`), or by the container's padding. This kills margin-collapse surprises and the `mt-4`-on-first-child hacks seen in `blocks.tsx:105`.
-2. **Headings keep a sensible default `margin-bottom`** (`H1`/`H2` = `mb-4 lg:mb-6`, `H3` = `mb-1`) because their spacing *is* consistent across the site. These are overridable.
-3. **`P` carries no margin.** Body spacing is too variable; pass it per use (`<P className="mb-24">`).
-4. **All of the above only works once `cn()` is wired in** so `tailwind-merge` lets `className` win. Refactoring `H1` to use `cn` is therefore task **A.2** and a prerequisite, not an afterthought.
-5. **Padding stays on layout containers, never on type components** — e.g. `lokationer:67`'s `px-4 py-8` belongs to the bordered cell wrapper, not the `H2`. When migrating that case, keep the padding on the surrounding `div`/cell and let `H2` render margin-less there (`<H2 className="mb-0">` or a `bare` spacing variant).
+### Task [B.2]: `createBooking` Purchase via CAPI
+- **Logic:** After `db.insert(...).returning(...)` succeeds, generate `eventId = randomUUID()`; call `sendCapiEvent({ eventName:'Purchase', eventId, userData:{ email, phone, firstName: firstName(state.name) }, customData:{ value: total, currency:'DKK', num_items: state.boxCount } })`. Wrap in try/catch mirroring the email block. Change return type to include `eventId` so the client can dedupe.
+- **Edge cases:** Booking must still succeed if token missing / network down. `total` is the already-computed canonical `calcTotalWithoutAddons` value.
 
-**Container rhythm (recommended for new sections):** prefer `flex flex-col` + `gap-*` or `space-y-*` on the text wrapper over per-element margins. Existing sections keep their current margins to stay byte-identical; new work should lean on container rhythm.
+### Task [C.2]: `BookingWizard` funnel emitter
+- **Logic:** Add `emitFunnelEvent(targetStep, booking)` called inside `goNext` *after* state merge. Switch on the step → fire mapped event with `value: calcTotal(merged)`, `currency:'DKK'`. Keep it a pure side-effect; never block navigation. Use a `useRef` guard so re-renders don't double-fire the same step.
+- **Notes:** `value` for `InitiateCheckout` at step 1 may be the default boxCount(20) quote — acceptable.
 
----
+### Task [C.3]: client Purchase dedup
+- **Notes:** `createBooking` now returns `{ id, bookingNumber, eventId }`. On success in `StepApology`, call `track('Purchase', { value: displayTotal, currency:'DKK' }, eventId)` and `track('Lead', undefined, eventId+'-lead')` *before* `router.push`. Same `eventId` as server → dedup.
 
-## 5. User Journey & Flow
-*(developer-facing — this is a primitives task)*
+## 6. Verification Checklist
+- [ ] **Pixel Helper** (Chrome ext.) shows `PageView` on load and one event per booking step.
+- [ ] **Events Manager → Test Events** (with `META_CAPI_TEST_EVENT_CODE`) shows server `Purchase` with matched email/phone (green "advanced matching" indicators).
+- [ ] `Purchase` marked **Deduplicated** (browser + server share `event_id`).
+- [ ] No `facebook.com/tr` or CAPI calls fire before consent; firing begins immediately after "Accepter".
+- [ ] Booking still completes and confirmation email still sends if `META_CAPI_ACCESS_TOKEN` is unset (resilience).
+- [ ] No raw email/phone leaves the server unhashed (inspect CAPI request body).
+- [ ] Manual mobile check: consent banner + booking flow on small screens.
+- [ ] Lighthouse: Pixel script `afterInteractive` doesn't tank LCP.
 
-- [ ] **Step 1:** Dev imports `{ H1, H2, H3, P, Eyebrow }` from `@/components/ui/text`.
-- [ ] **Step 2:** Dev writes `<Eyebrow>…</Eyebrow><H1>…</H1><P>…</P>` and gets the marketing look with zero hand-tuned classes.
-- [ ] **Step 3:** Where spacing differs, dev passes `className="mb-12"` and it reliably wins (cn/tailwind-merge).
-- [ ] **Step 4:** Bigger/smaller heading needed → dev passes `size="display" | "section"`.
+## 7. Comments & Deviations
 
----
+Note [2026-06-04]: **User decisions confirmed** — (1) No privacy/cookie policy existed → creating `/privatlivspolitik`. (2) Conversion event = **`Purchase` only** (user wants self-serve purchasers); dropped the parallel `Lead` event to keep the signal clean. (3) Production domain `heybox.dk` confirmed for Meta domain verification.
 
-## 6. Implementation Roadmap (The To-Do)
+Note [2026-06-04]: Chose **`Purchase` as the conversion event** (with monetary `value`) even though there is no online payment, because it carries value for ROAS/value-based optimization and Meta permits it for confirmed orders.
 
-### Phase A: Foundation
-- [ ] **A.1:** Confirm `cn` signature/exports at `@/lib/utils/index`.
-- [ ] **A.2:** Refactor existing `H1` to route through `cn()` (no visual change, enables overrides). **Prerequisite for everything.**
+Note [2026-06-04]: Decided **CAPI only for `Purchase`** (mid-funnel events are Pixel-only) to avoid building server routes for every step and to keep the change small. If match quality on mid-funnel proves important later, promote `InitiateCheckout`/`AddPaymentInfo` to CAPI too.
 
-### Phase B: Build the primitives (in `text.tsx`)
-- [ ] **B.1:** `H2` with `cva` size variants (`default` | `section` | `display`).
-- [ ] **B.2:** `H3`.
-- [ ] **B.3:** `P` with size variants (`lead` | `body` | `small`), margin-less.
-- [ ] **B.4:** `Eyebrow`.
-- [ ] **B.5:** *(optional)* `H1` size variants — a `display` H1 for the `xl:text-6xl` hero vs. smaller page titles, only if a second H1 scale is actually needed.
+Note [2026-06-04]: Rolling a **hand-built consent gate** instead of a CMP library to honour the "no heavy new dependencies" constraint. If a full cookie policy / granular categories become a legal requirement, revisit with a proper CMP (e.g. Cookiebot/Usercentrics — common in DK).
 
-### Phase C: Migrate consumers (low-risk, verify diff renders identical classes)
-- [ ] **C.1:** `om-os/page.tsx` — 2× H2, Eyebrow×3, body P's.
-- [ ] **C.2:** `lokationer/page.tsx` — Eyebrow×2, H2×2 (incl. the padding-cell case).
-- [ ] **C.3:** `faq/page.tsx` + `Faq.tsx` — `section`-size H2.
-- [ ] **C.4:** `blocks.tsx` — H2 (`display`), H3, body P. Highest-traffic file; do last.
-- [ ] **C.5:** Leave `cta.tsx`, booking flow, and legal pages **as-is** (out of scope).
-
----
-
-## 7. Technical Specifications (To-Do Details)
-
-### Task [A.2]: Refactor H1 to `cn`
-- **Logic:** Replace `` `…fixed… ${className || ""}` `` with `cn("…fixed…", className)`. Rendered output is identical when no className is passed; overrides now win via tailwind-merge.
-- **Spec (unchanged classes):** `text-2xl md:text-3xl lg:text-4xl xl:text-6xl uppercase font-black mb-4 lg:mb-6`
-
-### Task [B.1]: H2
-- **Props:** `{ children, className?, size?: "default" | "section" | "display" }`
-- **Spec:**
-  - `default`: `text-xl md:text-2xl lg:text-3xl uppercase font-black mb-4 lg:mb-6`
-  - `section`: `text-3xl md:text-5xl font-black uppercase mb-8 md:mb-12`
-  - `display`: `text-4xl lg:text-7xl font-black uppercase`
-- **Notes:** Use `cva` like `button.tsx`. cta's non-uppercase H2 is intentionally excluded.
-
-### Task [B.2]: H3
-- **Spec:** `text-lg font-bold uppercase mb-1` — note `font-bold` (not `font-black`).
-
-### Task [B.3]: P
-- **Props:** `{ children, className?, size?: "lead" | "body" | "small" }`
-- **Spec:** `lead`: `md:text-lg lg:text-xl` · `body`: `text-lg md:text-xl` · `small`: `text-sm`
-- **Notes:** No baked margin, no color. Edge case: muted small text passes `text-gray-500`/`text-zinc-400` via className.
-
-### Task [B.4]: Eyebrow
-- **Spec:** `md:text-lg border-b pb-4 mb-5 inline-block` (renders a `<p>`). The `mb-5` intentionally owns the gap to the heading below.
-
-### Task [C.4]: blocks.tsx migration
-- **Notes:** Watch the `index !== 0 ? 'mt-4'` pattern at line 105 — replace with container rhythm or per-`P` `mb`, honoring the "no margin-top" rule. The `xlTitle` H3 (line 137) → pass the `md:text-2xl lg:text-4xl xl:text-5xl` via `className`.
-
----
-
-## 8. Verification Checklist
-- [ ] **Class-identity:** For each migrated element, the rendered `class` attribute matches the pre-migration string (spot-check in DevTools or snapshot). No visual diff.
-- [ ] **Override test:** `<H1 className="mb-0">` actually removes the margin (proves cn/tailwind-merge wiring from A.2).
-- [ ] **Manual check:** Mobile → desktop responsive breakpoints on home, om-os, lokationer, faq.
-- [ ] **Last-child spacing:** No unexpected trailing gap where a heading/P ends a section.
-- [ ] **Scope guard:** Confirm cta.tsx, booking, and legal pages are untouched.
-
-## 9. Comments & Deviations
-Note [2026-06-04]: Two design languages confirmed — marketing (uppercase/`font-black`) vs. app/booking+legal (`font-bold tracking-tight`). This plan deliberately covers only the marketing system; unifying booking/legal would be a separate effort.
-
-Note [2026-06-04]: The single most important technical decision is routing every primitive through `cn()` (task A.2). Without it, the entire "override margins per-use" strategy silently fails because Tailwind resolves conflicts by CSS source order, not class-string order.
+Note [2026-06-04]: **Open questions for the user** —
+1. Is there an existing **privacy/cookie policy page** to link from the consent banner? (Required for GDPR; none found in repo — `handelsbetingelser` exists but is T&C, not privacy.)
+2. Will ads be managed in-house or via an agency? (Affects whether we optimize for `Purchase` vs `Lead`, and who needs Business Manager access.)
+3. Confirm **`heybox.dk`** is the production domain to verify with Meta.

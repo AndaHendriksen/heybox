@@ -54,22 +54,29 @@ function H3({ className, ...props }: React.ComponentProps<"h3">) {
 const pVariants = cva("", {
   variants: {
     size: {
-      default: "md:text-lg",
+      default: "",
       lead: "text-lg md:text-xl leading-relaxed",
       small: "text-sm",
+      xsmall: "text-xs",
     },
+    color: {
+      default: "text-black",
+      gray: "text-gray-500",
+    }
   },
   defaultVariants: {
     size: "default",
+    color: "default"
   },
 })
 
 function P({
   className,
   size,
+  color,
   ...props
 }: React.ComponentProps<"p"> & VariantProps<typeof pVariants>) {
-  return <p className={cn(pVariants({ size }), className)} {...props} />
+  return <p className={cn(pVariants({ size, color }), className)} {...props} />
 }
 
 /** Small underlined label that sits above a heading. Its mb-5 owns the gap below it. */

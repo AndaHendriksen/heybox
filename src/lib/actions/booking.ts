@@ -7,6 +7,9 @@ import type { BookingState } from '@/lib/booking/types'
 import { calcTotalWithoutAddons } from '@/lib/booking/utils'
 import { sendEmail } from '@/lib/email/sweego'
 import { renderBookingConfirmation } from '@/lib/email/booking-confirmation'
+import { sendCapiEvent } from '@/lib/analytics/meta-capi'
+import { firstName } from '@/lib/utils/string'
+import { SITE_URL } from '@/lib/seo'
 
 const INTERNAL_EMAIL = 'hey@heybox.dk'
 
@@ -18,7 +21,7 @@ function generateBookingNumber(): string {
 
 export async function createBooking(
   state: BookingState,
-): Promise<{ id: string; bookingNumber: string } | { error: string }> {
+): Promise<{ id: string; bookingNumber: string; eventId: string } | { error: string }> {
   if (!state.deliveryDate) return { error: 'Leveringsdato mangler' }
 
   try {
@@ -101,7 +104,24 @@ export async function createBooking(
       console.error('Confirmation email threw:', err)
     }
 
-    return { id: created.id, bookingNumber: created.bookingNumber }
+    // Meta Conversions API - server-side Purchase. Shares eventId with the
+    // browser Pixel event so Meta deduplicates the two. Non-blocking: a Meta
+    // failure must not fail the booking (sendCapiEvent never throws).
+    const eventId = crypto.randomUUID()
+    await sendCapiEvent({
+      eventName: 'Purchase',
+      eventId,
+      eventSourceUrl: `${SITE_URL}/booking`,
+      user: {
+        email: state.email,
+        phone: state.phone,
+        phoneCountryCode: state.phoneCountryCode,
+        firstName: firstName(state.name),
+      },
+      customData: { value: total, currency: 'DKK', num_items: state.boxCount },
+    })
+
+    return { id: created.id, bookingNumber: created.bookingNumber, eventId }
   } catch (err) {
     console.error('createBooking failed:', err)
     return { error: 'Noget gik galt. Prøv igen eller kontakt os på hey@heybox.dk' }

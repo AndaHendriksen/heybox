@@ -8,7 +8,7 @@ interface ProgressBarProps {
 export default function ProgressBar({ current, total }: ProgressBarProps) {
   return (
     <div className="mb-4 lg:mb-12">
-      <div className="flex">
+      <div className="flex gap-1">
         {Array.from({ length: total }).map((_, i) => (
           <div
             key={i}

@@ -18,7 +18,8 @@
       "PowerShell(yarn build)",
       "PowerShell(Start-Process -FilePath \"yarn\" -ArgumentList \"start\" -WindowStyle Hidden)",
       "WebFetch(domain:learn.sweego.io)",
-      "WebFetch(domain:www.sweego.io)"
+      "WebFetch(domain:www.sweego.io)",
+      "Bash(npx eslint *)"
     ]
   }
 }

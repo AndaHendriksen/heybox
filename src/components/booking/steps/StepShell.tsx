@@ -1,3 +1,5 @@
+import { P } from "@/components/ui/text"
+
 interface StepShellProps {
   title: string
   description?: string
@@ -8,7 +10,7 @@ export default function StepShell({ title, description, children }: StepShellPro
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight mb-1">{title}</h1>
-      {description && <p className="text-zinc-500 mb-8">{description}</p>}
+      {description && <P color="gray" className="mb-8">{description}</P>}
       {!description && <div className="mb-8" />}
       {children}
     </div>

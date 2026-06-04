@@ -7,6 +7,9 @@
 
 @theme inline {
   --font-sans: var(--app-font-sans);
+  --shadow-primary: 4px 4px 0 0 rgba(0, 0, 0, 1);
+  --shadow-primary-hover: 8px 8px 0 0 rgba(0,0,0,1);
+  --shadow-primary-small: 2px 2px 0 0 rgba(0, 0, 0, 1);
 }
 
 :root {

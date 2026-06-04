@@ -235,12 +235,12 @@ function CardboardSources() {
   ]
   return (
     <Section>
-      <div className="border-b border-black border-x border-gray-300 border-dashed">
-        <div className="text-center mx-auto text-xs text-gray-500 p-4">
-          <p className="mb-2">
+      <div className="border-b border-black border-x border-black border-dashed">
+        <div className="text-center mx-auto p-4">
+          <P size="xsmall" className="mb-2">
             Flyttetal opgøres pr. person (CPR) af Danmarks Statistik. Antallet af kasser og nye kasser pr. år er estimater baseret på gennemsnitlige boligstørrelser og genbrugsrater og kan variere.
-          </p>
-          <p>
+          </P>
+          <P size="xsmall">
             Kilder:{" "}
             {sources.map((s, i) => (
               <span key={s.href}>
@@ -254,7 +254,7 @@ function CardboardSources() {
                 {i < sources.length - 1 ? " · " : ""}
               </span>
             ))}
-          </p>
+          </P>
         </div>
       </div>
     </Section>
