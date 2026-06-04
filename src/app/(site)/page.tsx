@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckIcon, ArrowRight } from "lucide-react";
-import { Faq } from "@/components/sections/Faq";
+import { FaqSection } from "@/components/sections/Faq";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { howToJsonLd, faqJsonLd } from "@/lib/seo";
 import Image from "next/image";
@@ -22,6 +22,7 @@ import {
   formatTon,
 } from "@/lib/stats";
 import { CtaReadyToGoSection } from "@/components/sections/cta";
+import { H1, P } from "@/components/ui/text";
 
 export default function Landing() {
   return (
@@ -38,7 +39,7 @@ export default function Landing() {
       <CardboardStats />
       <CardboardReuse />
       <CardboardSources />
-      <Faq />
+      <FaqSection />
       <CtaReadyToGoSection />
     </>
   );
@@ -65,15 +66,13 @@ function Hero() {
       }
     >
       <div className="lg:px-4 xl:px-8 lg:max-w-[800px]">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-6xl uppercase font-black mb-4 lg:mb-6">
-          Lej flyttekasser i København - nemt og billigt.
-        </h1>
-        <p className="md:text-lg lg:text-2xl mb-8 md:mb-12">
+        <H1>Lej flyttekasser i København - nemt og billigt.</H1>
+        <P size="lead" className="mb-8 md:mb-12">
           Robuste plastkasser til samme pris som papkasser i byggemarkedet.
           Vi leverer og henter dem igen, når du er færdig - og det er inkluderet i prisen.
-        </p>
+        </P>
         <Link href="/booking">
-          <Button size="lg" className="bg-green-300">
+          <Button size="lg">
             Beregn din pris <ArrowRight className="w-6 h-6 ml-1 -mr-3" />
           </Button>
         </Link>

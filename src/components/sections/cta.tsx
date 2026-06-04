@@ -14,7 +14,7 @@ function CtaReadyToGoSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/booking">
-              <Button size="lg" className="bg-green-300">
+              <Button size="lg">
                 Beregn din pris
                 <ArrowRight className="w-4 h-4 ml-1 -mr-3" />
               </Button>
@@ -38,7 +38,7 @@ function CtaCloseBySection() {
         </p>
         <div className="flex justify-center">
           <Link href="/booking">
-            <Button size="lg" className="bg-green-300">
+            <Button size="lg">
               Beregn din pris
               <ArrowRight className="w-4 h-4 ml-1 -mr-3" />
             </Button>

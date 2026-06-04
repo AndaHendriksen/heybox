@@ -1,181 +1,175 @@
-# Plan: Lokationer-side (leveringsområder)
+# Plan: Typography System (H1 → H2, H3, P, Eyebrow)
 
-> **Status:** 🟢 Implemented | **Last Updated:** 2026-06-03
-> **Scope:** `src/app/(site)/lokationer/page.tsx` + ny data-modul
+> **Status:** 🟡 In Progress | **Last Updated:** 2026-06-04
+> **Scope:** `src/components/ui/text.tsx` + marketing `(site)` pages
 
 ---
 
 ## 1. Context & Objectives
 
-**Goal:** En enkel, tekstbaseret "Lokationer"-side der fortæller hvor HeyBox leverer, og som lister **navnene på alle postnumre vi leverer til**, delt op i **København** og **Storkøbenhavn**. Siden skal matche resten af sitets visuelle sprog (sorte borders, store uppercase-overskrifter, `Section`-wrapper) men uden billeder. Den skal også styrke lokal SEO ("flyttekasser København", bynavne).
+**Goal:** Extend the existing `H1` primitive into a complete, reusable typography set (`H2`, `H3`, `P`, plus an `Eyebrow` label) so the marketing pages stop hand-rolling Tailwind class strings. "Done" = every marketing heading/paragraph can be expressed with a component, margins/paddings behave predictably, and the dominant existing styles are preserved 1:1.
 
 **Constraints:**
-- Tailwind only - genbrug eksisterende primitives fra `@/components/sections/blocks` og `@/components/ui/section`.
-- Ingen billeder (modsat `om-os`).
-- Ingen nye dependencies.
-- **Postnummer-listen SKAL stemme overens med leveringslogikken i `src/lib/utils/geo.ts`** (`isStorkobenhavn`). Ellers kan en bruger se en by på listen som booking-flowet afviser, eller omvendt.
-- Følg `AGENTS.md`: denne Next.js-version kan afvige - læs relevant guide i `node_modules/next/dist/docs/` før kode skrives (især metadata-API'et).
-
-## 2. Technical Research & State
-
-- **Affected Files:**
-  - `src/app/(site)/lokationer/page.tsx`: Tom i dag (1 linje). Skal bygges som server-component i samme stil som `om-os/page.tsx` - `export const metadata` + en `default function` der sammensætter sektioner.
-  - `src/lib/utils/geo.ts`: **Sandhedskilde for leveringsområdet.** I dag: `isStorkobenhavn(postcode)` = `num >= 1000 && num <= 2959 && !OUTSIDE_POSTCODES.has(num)`, hvor `OUTSIDE_POSTCODES = {2640, 2670, 2680, 2690, 2960, 2970, 2980, 2990}`. Bemærk: 2960–2990 er allerede uden for ≤2959, så de reelt ekskluderede *inden for* intervallet er **2640, 2670, 2680, 2690**.
-  - `src/components/sections/blocks.tsx`: Genbrugelige sektioner. Relevante: `Section` (wrapper), overskrifts-/border-mønstret brugt i `om-os` (`border-x`, `max-w-[700px] mx-auto`, uppercase `font-black`-headings).
-  - `src/app/(site)/om-os/page.tsx`: Stilreference for hero + tekstsektioner.
-
-- **Existing Logic:** Booking-flowet (`StepAddresses.tsx`) bruger `isStorkobenhavn` til at validere leveringsadresse og afhentningsadresse. Lokationer-siden skal vise præcis det samme univers af postnumre, så forventningen sat på marketing-siden holder i booking.
-
-- **New Components/Hooks:**
-  - **Ny data-modul** `src/lib/locations.ts` - en typed liste over leveringsbyerne (kode + navn + region). Bliver sandhedskilde for *visning*; bør krydstjekkes mod `geo.ts`-logikken (se Task A.1).
-  - Lokale (ikke-eksporterede) sektion-komponenter i `page.tsx`: `LocationsHero`, `LocationGrid`, evt. `NotCoveredNote` og en afsluttende CTA.
-
-## 3. User Journey & Flow
-
-- [ ] **Step 1:** Bruger lander på `/lokationer` (fra menu/footer eller SEO-søgning).
-    - [ ] 1.1 Ser hero: overskrift "Vi leverer i hele Storkøbenhavn" + kort intro.
-- [ ] **Step 2:** Bruger scroller til oversigten over områder.
-    - [ ] 2.1 Sektion **København** med bydele/postnumre.
-    - [ ] 2.2 Sektion **Storkøbenhavn** med omegnskommuner/postnumre.
-- [ ] **Step 3:** Bruger søger sin egen by/postnummer i listen og bekræfter dækning.
-    - [ ] 3.1 (Valgfrit) Lille note om områder vi *ikke* dækker endnu (Greve, Solrød m.fl.), så forventningen er ærlig.
-- [ ] **Step 4:** Bruger klikker CTA "Se hvad det koster" → `/booking`.
-
-## 4. Implementation Roadmap (The To-Do)
-
-### Phase A: Data
-- [ ] **A.1:** Opret `src/lib/locations.ts` med typed liste over leveringsbyer (kode, navn, region) - sandhedskilde for visning, krydstjekket mod `geo.ts`.
-- [ ] **A.2:** (Anbefalet, valgfrit) Tilføj en lille test/assertion der sikrer at hver by i `locations.ts` opfylder `isStorkobenhavn`, så listen og validering ikke driver fra hinanden.
-
-### Phase B: UI & Integration
-- [ ] **B.1:** Byg `metadata` + side-skellet i `page.tsx` (hero-sektion).
-- [ ] **B.2:** Byg `LocationGrid`-sektion der renderer København- og Storkøbenhavn-grupperne fra `locations.ts`.
-- [ ] **B.3:** Tilføj "ikke dækket endnu"-note + afsluttende CTA til `/booking`.
-- [ ] **B.4:** Sørg for at siden er linket fra menu/footer (tjek `src/components/menu.tsx`).
+- Tailwind v4 only, no new dependencies (`clsx`, `tailwind-merge`, `class-variance-authority` already installed).
+- Use the existing `cn` helper from `@/lib/utils/index`.
+- **Scope = marketing `(site)` pages only.** The booking flow (`src/components/booking/**`, `src/app/booking/**`) and legal pages use a *different* design language (`font-bold tracking-tight`, not uppercase) — do **not** unify them in this pass.
+- Backward compatible: replacing existing markup must produce identical rendered classes.
 
 ---
 
-## 5. Technical Specifications (To-Do Details)
+## 2. Technical Research & State
 
-### Task [A.1]: `src/lib/locations.ts` - data-modul
+### Affected Files
+- `src/components/ui/text.tsx`: **The system.** Currently exports only `H1`. Will gain `H2`, `H3`, `P`, `Eyebrow`.
+- `src/lib/utils/index` (`cn`): clsx + tailwind-merge wrapper. **Critical** — see "Key Finding" below.
+- `src/app/(site)/page.tsx`, `om-os/page.tsx`, `lokationer/page.tsx`, `faq/page.tsx`: consumers (migration targets).
+- `src/components/sections/blocks.tsx`, `cta.tsx`, `Faq.tsx`: contain the heaviest heading/paragraph usage.
 
-- **Type:**
-  ```ts
-  export type Region = "koebenhavn" | "storkoebenhavn"
-  export interface DeliveryLocation { code: string; name: string; region: Region }
-  ```
-- **Logic:** Eksportér `DELIVERY_LOCATIONS: DeliveryLocation[]` samt to afledte arrays (`koebenhavn`, `storkoebenhavn`) via `.filter`. Sortér efter `code`.
-- **Foreslået indhold** (navne på postnumre vi leverer til - udledt af `geo.ts`: 1000–2959 minus 2640/2670/2680/2690):
+### Existing Logic — how `H1` works today
+```
+text-2xl md:text-3xl lg:text-4xl xl:text-6xl uppercase font-black mb-4 lg:mb-6
+```
+- Built with a raw template literal: `` `... ${className || ""}` `` — **NOT** `cn()`.
+- Bakes a bottom margin (`mb-4 lg:mb-6`) into the component itself.
 
-  **København** (Københavns Kommune + Frederiksberg - bykernen):
-  | Kode | Navn |
-  |------|------|
-  | 1000–1499 | København K |
-  | 1500–1799 | København V |
-  | 1800–1999 | Frederiksberg C |
-  | 2000 | Frederiksberg |
-  | 2100 | København Ø |
-  | 2150 | Nordhavn |
-  | 2200 | København N |
-  | 2300 | København S |
-  | 2400 | København NV |
-  | 2450 | København SV |
-  | 2500 | Valby |
-  | 2700 | Brønshøj |
-  | 2720 | Vanløse |
+### ⚠️ Key Finding — why the current approach breaks margin overrides
+Because `H1` concatenates strings instead of using `cn()`/`tailwind-merge`, calling `<H1 className="mb-0">` renders `... mb-4 lg:mb-6 mb-0`. Tailwind resolves conflicts by **CSS source order, not class-string order**, so the override is unreliable. **Every component in this system must route through `cn()`** so consumers can override spacing. This is the linchpin of the whole padding/margin strategy below.
 
-  **Storkøbenhavn** (omegnskommunerne):
-  | Kode | Navn |
-  |------|------|
-  | 2600 | Glostrup |
-  | 2605 | Brøndby |
-  | 2610 | Rødovre |
-  | 2620 | Albertslund |
-  | 2625 | Vallensbæk |
-  | 2630 | Taastrup |
-  | 2635 | Ishøj |
-  | 2650 | Hvidovre |
-  | 2660 | Brøndby Strand |
-  | 2665 | Vallensbæk Strand |
-  | 2730 | Herlev |
-  | 2740 | Skovlunde |
-  | 2750 | Ballerup |
-  | 2760 | Måløv |
-  | 2765 | Smørum |
-  | 2770 | Kastrup |
-  | 2791 | Dragør |
-  | 2800 | Kongens Lyngby |
-  | 2820 | Gentofte |
-  | 2830 | Virum |
-  | 2840 | Holte |
-  | 2850 | Nærum |
-  | 2860 | Søborg |
-  | 2870 | Dyssegård |
-  | 2880 | Bagsværd |
-  | 2900 | Hellerup |
-  | 2920 | Charlottenlund |
-  | 2930 | Klampenborg |
-  | 2942 | Skodsborg |
-  | 2950 | Vedbæk |
+### Reference: `class-variance-authority` is the established pattern
+`button.tsx` and `label.tsx` already use `cva` + `cn`. We should follow that convention for size variants rather than inventing a new prop shape.
 
-  > **Bemærk om 1000–1799:** Det centrale København består teknisk af hundredvis af gade-/firmapostnumre. På siden grupperes de som "København K" og "København V" (vis evt. som interval "1050–1799") frem for at liste hvert 4-cifret nummer - ellers bliver listen ulæselig.
+---
 
-  > **Ikke dækket endnu (inden for nærområdet, men ekskluderet i `geo.ts`):** 2640 Hedehusene, 2670 Greve, 2680 Solrød Strand, 2690 Karlslunde. Bruges i "ikke dækket"-noten (Task B.3) så forventningen er ærlig.
+## 3. Variance Audit (the heart of this request)
 
-- **⚠️ Verificér navnene:** Listen ovenfor er udledt manuelt fra postnummer-intervallet. Slå hvert navn op (officiel PostNord/postnummer-liste) før implementering, så der ikke vises forkerte bynavne.
+### H2 — found 6 distinct treatments
+| # | Source | Classes | Notes |
+|---|--------|---------|-------|
+| 1 | `om-os:72,134`, `lokationer:89` | `text-xl md:text-2xl lg:text-3xl uppercase font-black mb-4 lg:mb-6` | **DOMINANT (×4).** Margin matches H1. |
+| 2 | `lokationer:67` | same sizes, but `px-4 lg:px-8 py-8 lg:py-12` (no mb) | Lives inside a bordered cell → padding, not margin. |
+| 3 | `Faq.tsx:15` | `text-3xl md:text-5xl font-black uppercase mb-8 md:mb-12` | Section-title scale (bigger). |
+| 4 | `blocks.tsx:54` (SectionInfo) | `text-4xl lg:text-7xl font-black uppercase` | Hero/display scale (biggest). |
+| 5 | `cta.tsx:11,33` | `text-3xl md:text-5xl font-bold tracking-tight mb-6` | **NOT uppercase** — different voice. |
+| 6 | `blocks.tsx:101` | `text-xl md:text-2xl lg:text-3xl uppercase font-black leading-[1.2] tracking-tight mb-4` | = #1 + tighter leading/tracking. |
 
-### Task [A.2]: Konsistens-tjek (valgfrit men anbefalet)
-- **Notes:** Brug `/test`-skill til en lille test: `DELIVERY_LOCATIONS.every(l => isStorkobenhavn(l.code))` skal være `true`, og de fire ekskluderede koder skal give `false`. Fanger drift mellem marketing-liste og booking-validering.
+**Decision — H2 default = treatment #1** (`text-xl md:text-2xl lg:text-3xl uppercase font-black mb-4 lg:mb-6`). It is the most common and steps down cleanly from H1 (one size-tier smaller, same margin).
+- Expose a `size` variant via `cva`: `display` (#4), `section` (#3), `default` (#1).
+- Treatment #5 (cta) is a deliberately different style (sentence-case, tracking-tight). **Leave cta.tsx untouched** — do not force it into the uppercase system.
 
-### Task [B.1]: `metadata` + hero
-- **Logic:** Kopiér mønstret fra `om-os/page.tsx`:
-  ```ts
-  export const metadata: Metadata = {
-    title: "Lokationer",
-    description: "Vi leverer og henter flyttekasser i hele Storkøbenhavn - fra København K til Vedbæk. Se alle de byer og postnumre vi dækker.",
-    alternates: { canonical: "/lokationer" },
-    openGraph: { title: "Lokationer", description: "...", url: "/lokationer", type: "website" },
-  }
-  ```
-- **Hero:** `Section` > `div.border-x.pt-24` > `max-w-[700px] mx-auto px-4`, med:
-  - Lille pre-label: "Lokationer" (`border-b pb-4 mb-5 inline-block`).
-  - `<h1>` uppercase `font-black`: "Vi leverer i hele Storkøbenhavn".
-  - Intro-`<p>`: kort tekst om gratis levering + afhentning i hele området.
-- **Code Reference:** `om-os/page.tsx:44-63` (`AboutUs`).
+### H3 — found 1 treatment (consistent)
+| Source | Classes |
+|--------|---------|
+| `blocks.tsx:137` | `text-lg font-bold uppercase mb-1` (+ optional `md:text-2xl lg:text-4xl xl:text-5xl` when `xlTitle`) |
+| `om-os:110,117` (commented) | `text-lg font-bold uppercase` |
 
-### Task [B.2]: `LocationGrid`
-- **Input/Props:** `{ title: string; locations: DeliveryLocation[] }` (kaldes to gange: København + Storkøbenhavn).
-- **Logic:** Inden i en `Section` med `border-x`: en overskrift (`<h2>` uppercase font-black, samme stil som `om-os`), efterfulgt af et responsivt grid af bynavne. Forslag: `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-px` hvor hver celle viser `name` (og evt. `code` mindre/gråt). Genbrug det stiplede/sorte border-look for at matche `SectionThreeInfoColumns`.
-- **Notes:** Hold det rent tekst - ingen billeder. Overvej `aria`-venlig liste (`<ul>`/`<li>`) frem for bare divs af hensyn til tilgængelighed og SEO.
+**Decision — H3 default = `text-lg font-bold uppercase mb-1`.** Note it uses `font-bold` (H1/H2 use `font-black`) — preserve that intentional weight step-down. The `xlTitle` case is a one-off; handle it with a `className` override rather than a variant.
 
-### Task [B.3]: "Ikke dækket"-note + CTA
-- **Notes:**
-  - Lille afsnit: "Vi udvider løbende. Lige nu leverer vi endnu ikke i fx Greve, Solrød og Hedehusene - men skriv til os." (Hold ærligt, undgå at love noget.)
-  - Afsluttende CTA-knap til `/booking` ("Se hvad det koster" / "Book nu"), genbrug `Button`-mønster fra `blocks.tsx` (`bg-green-300`, `ArrowRight`).
+### P — the messy one (8+ treatments, wildly varied margins)
+| Group | Example sources | Classes |
+|-------|-----------------|---------|
+| Lead / body (large) | `om-os:75,142`, `lokationer:48,92` | `md:text-lg lg:text-xl` |
+| Body (alt scale) | `blocks.tsx:57,105` | `text-lg md:text-xl` (+ conditional `mt-4`) |
+| Hero lead | `page.tsx:70` | `md:text-lg lg:text-2xl mb-8 md:mb-12` |
+| Small / muted | `blocks:139`, booking | `text-sm text-gray-500 mt-2` / `text-xs text-zinc-400` |
+| **Bottom margins seen on body P** | various | `mb-6`, `mb-8`, `mb-12`, **`mb-24`** — no consistency |
 
-### Task [B.4]: Navigation
-- **Notes:** Tjek `src/components/menu.tsx` (og evt. footer) for om `/lokationer` skal tilføjes som menupunkt. Afklar med bruger om den skal i hovedmenuen eller kun footer/SEO.
+**Decision — `P` ships with NO baked margin and NO color.** Body-paragraph spacing ranges from `mb-6` to `mb-24` depending on section; baking any value in would fight every other usage. Default `P` = `md:text-lg lg:text-xl` (the dominant lead style). Expose a `size` variant (`lead` = default, `body` = `text-lg md:text-xl`, `small` = `text-sm`). Spacing is always passed per-use via `className` (now safe because of `cn`).
 
-## 6. Verification Checklist
-- [ ] **Konsistens:** Hver by på siden valideres som `valid` i booking (`isStorkobenhavn`), og de 4 ekskluderede koder vises IKKE som dækket. (Task A.2)
-- [ ] **Navne korrekte:** Alle bynavne krydstjekket mod officiel postnummer-liste.
-- [ ] **Manual Check:** Mobil-responsivitet på by-grid'et (2 kolonner på lille skærm, flere på desktop); borders flugter med resten af sitet.
-- [ ] **SEO:** `metadata` + `canonical` sat; bynavne står som læsbar tekst (ikke billeder); siden er crawlbar og linket internt.
-- [ ] **A11y:** By-listen er semantisk markup (`ul/li`), kontrast OK.
+### Eyebrow — found 4+ identical usages → promote to its own component
+| Source | Classes |
+|--------|---------|
+| `om-os:52,71,133`, `lokationer:46,88` | `md:text-lg border-b pb-4 mb-5 inline-block` |
 
-## 7. Comments & Deviations
+**Decision — extract an `<Eyebrow>` component** (the small underlined label that sits *above* a heading). It is structurally distinct from body `P` and repeats verbatim 5×. Its `mb-5` deliberately owns the gap to the heading below it (see margin strategy).
 
-Note [2026-06-03]: Valgte at gruppere det centrale København (1000–1799) som "København K/V" frem for at liste hvert gade-postnummer, da der ellers ville være hundredvis af items. De reelt ekskluderede postnumre i nærområdet er 2640/2670/2680/2690 (2960–2990 ligger allerede uden for ≤2959-intervallet i `geo.ts`).
+---
 
-Note [2026-06-03]: Anbefaler `src/lib/locations.ts` som sandhedskilde for *visning*, men understreger at den skal holdes i sync med `isStorkobenhavn` i `geo.ts` (sandhedskilde for *validering*) via en lille test - ellers risikerer marketing-side og booking-flow at vise modstridende dækning.
+## 4. The Margin / Padding Strategy (explicit answer to the request)
 
-Note [2026-06-03] - IMPLEMENTERET: Oprettede `src/lib/locations.ts` (data, 43 byer) og byggede `src/app/(site)/lokationer/page.tsx` (hero + to LocationGrid-sektioner + "ikke dækket"-note + CTA). Tilføjede `/lokationer` til menu, footer og `sitemap.ts`.
-- **Afvigelse fra A.2:** Projektet har INGEN test-runner installeret (ingen jest/vitest), og constraint = ingen nye deps. Droppede derfor det formelle testfil og verificerede konsistensen manuelt: alle 43 postnumre opfylder `isStorkobenhavn`, og de 4 ekskluderede (2640/2670/2680/2690) er holdt ude. Bør laves til en rigtig test, hvis der senere tilføjes et test-setup.
-- **Afvigelse fra B.2:** Droppede det skrøbelige `nth-child`-border-mønster (brød på tværs af breakpoints) til fordel for `gap-px bg-gray-300` + `bg-white`-celler, som giver rene gridlines ved alle kolonneantal.
-- **Åbne spørgsmål afgjort med defaults:** (1) Central-KBH vist som intervaller ("1000–1499 København K"). (2) `/lokationer` tilføjet til BÅDE menu og footer. (3) Ikke-dækkede områder nævnes ærligt i en note. Sig til, hvis du vil have det anderledes.
-- Verificeret: `tsc --noEmit` = exit 0 (efter `next typegen`), eslint rent på de nye filer.
+**Problem:** `H1` bakes `mb-4 lg:mb-6`. If every component bakes its own margin we hit (a) the last-child trailing-gap problem, and (b) unpredictable overrides (see §2 Key Finding).
 
-**Åbne spørgsmål til bruger:**
-1. Skal de individuelle 1000–1799-postnumre vises som intervaller ("1050–1799 København V") eller bare som bynavne uden koder?
-2. Skal `/lokationer` i hovedmenuen, eller kun i footer/til SEO?
-3. Skal vi overhovedet nævne de ikke-dækkede områder (Greve/Solrød/Hedehusene), eller helt udelade dem?
+**Chosen model — "Top-down ownership + overridable defaults":**
+
+1. **No component ever uses `margin-top`.** The gap *above* an element is owned by the element *above* it (the `Eyebrow`'s `mb-5`, or a heading's `mb`), or by the container's padding. This kills margin-collapse surprises and the `mt-4`-on-first-child hacks seen in `blocks.tsx:105`.
+2. **Headings keep a sensible default `margin-bottom`** (`H1`/`H2` = `mb-4 lg:mb-6`, `H3` = `mb-1`) because their spacing *is* consistent across the site. These are overridable.
+3. **`P` carries no margin.** Body spacing is too variable; pass it per use (`<P className="mb-24">`).
+4. **All of the above only works once `cn()` is wired in** so `tailwind-merge` lets `className` win. Refactoring `H1` to use `cn` is therefore task **A.2** and a prerequisite, not an afterthought.
+5. **Padding stays on layout containers, never on type components** — e.g. `lokationer:67`'s `px-4 py-8` belongs to the bordered cell wrapper, not the `H2`. When migrating that case, keep the padding on the surrounding `div`/cell and let `H2` render margin-less there (`<H2 className="mb-0">` or a `bare` spacing variant).
+
+**Container rhythm (recommended for new sections):** prefer `flex flex-col` + `gap-*` or `space-y-*` on the text wrapper over per-element margins. Existing sections keep their current margins to stay byte-identical; new work should lean on container rhythm.
+
+---
+
+## 5. User Journey & Flow
+*(developer-facing — this is a primitives task)*
+
+- [ ] **Step 1:** Dev imports `{ H1, H2, H3, P, Eyebrow }` from `@/components/ui/text`.
+- [ ] **Step 2:** Dev writes `<Eyebrow>…</Eyebrow><H1>…</H1><P>…</P>` and gets the marketing look with zero hand-tuned classes.
+- [ ] **Step 3:** Where spacing differs, dev passes `className="mb-12"` and it reliably wins (cn/tailwind-merge).
+- [ ] **Step 4:** Bigger/smaller heading needed → dev passes `size="display" | "section"`.
+
+---
+
+## 6. Implementation Roadmap (The To-Do)
+
+### Phase A: Foundation
+- [ ] **A.1:** Confirm `cn` signature/exports at `@/lib/utils/index`.
+- [ ] **A.2:** Refactor existing `H1` to route through `cn()` (no visual change, enables overrides). **Prerequisite for everything.**
+
+### Phase B: Build the primitives (in `text.tsx`)
+- [ ] **B.1:** `H2` with `cva` size variants (`default` | `section` | `display`).
+- [ ] **B.2:** `H3`.
+- [ ] **B.3:** `P` with size variants (`lead` | `body` | `small`), margin-less.
+- [ ] **B.4:** `Eyebrow`.
+- [ ] **B.5:** *(optional)* `H1` size variants — a `display` H1 for the `xl:text-6xl` hero vs. smaller page titles, only if a second H1 scale is actually needed.
+
+### Phase C: Migrate consumers (low-risk, verify diff renders identical classes)
+- [ ] **C.1:** `om-os/page.tsx` — 2× H2, Eyebrow×3, body P's.
+- [ ] **C.2:** `lokationer/page.tsx` — Eyebrow×2, H2×2 (incl. the padding-cell case).
+- [ ] **C.3:** `faq/page.tsx` + `Faq.tsx` — `section`-size H2.
+- [ ] **C.4:** `blocks.tsx` — H2 (`display`), H3, body P. Highest-traffic file; do last.
+- [ ] **C.5:** Leave `cta.tsx`, booking flow, and legal pages **as-is** (out of scope).
+
+---
+
+## 7. Technical Specifications (To-Do Details)
+
+### Task [A.2]: Refactor H1 to `cn`
+- **Logic:** Replace `` `…fixed… ${className || ""}` `` with `cn("…fixed…", className)`. Rendered output is identical when no className is passed; overrides now win via tailwind-merge.
+- **Spec (unchanged classes):** `text-2xl md:text-3xl lg:text-4xl xl:text-6xl uppercase font-black mb-4 lg:mb-6`
+
+### Task [B.1]: H2
+- **Props:** `{ children, className?, size?: "default" | "section" | "display" }`
+- **Spec:**
+  - `default`: `text-xl md:text-2xl lg:text-3xl uppercase font-black mb-4 lg:mb-6`
+  - `section`: `text-3xl md:text-5xl font-black uppercase mb-8 md:mb-12`
+  - `display`: `text-4xl lg:text-7xl font-black uppercase`
+- **Notes:** Use `cva` like `button.tsx`. cta's non-uppercase H2 is intentionally excluded.
+
+### Task [B.2]: H3
+- **Spec:** `text-lg font-bold uppercase mb-1` — note `font-bold` (not `font-black`).
+
+### Task [B.3]: P
+- **Props:** `{ children, className?, size?: "lead" | "body" | "small" }`
+- **Spec:** `lead`: `md:text-lg lg:text-xl` · `body`: `text-lg md:text-xl` · `small`: `text-sm`
+- **Notes:** No baked margin, no color. Edge case: muted small text passes `text-gray-500`/`text-zinc-400` via className.
+
+### Task [B.4]: Eyebrow
+- **Spec:** `md:text-lg border-b pb-4 mb-5 inline-block` (renders a `<p>`). The `mb-5` intentionally owns the gap to the heading below.
+
+### Task [C.4]: blocks.tsx migration
+- **Notes:** Watch the `index !== 0 ? 'mt-4'` pattern at line 105 — replace with container rhythm or per-`P` `mb`, honoring the "no margin-top" rule. The `xlTitle` H3 (line 137) → pass the `md:text-2xl lg:text-4xl xl:text-5xl` via `className`.
+
+---
+
+## 8. Verification Checklist
+- [ ] **Class-identity:** For each migrated element, the rendered `class` attribute matches the pre-migration string (spot-check in DevTools or snapshot). No visual diff.
+- [ ] **Override test:** `<H1 className="mb-0">` actually removes the margin (proves cn/tailwind-merge wiring from A.2).
+- [ ] **Manual check:** Mobile → desktop responsive breakpoints on home, om-os, lokationer, faq.
+- [ ] **Last-child spacing:** No unexpected trailing gap where a heading/P ends a section.
+- [ ] **Scope guard:** Confirm cta.tsx, booking, and legal pages are untouched.
+
+## 9. Comments & Deviations
+Note [2026-06-04]: Two design languages confirmed — marketing (uppercase/`font-black`) vs. app/booking+legal (`font-bold tracking-tight`). This plan deliberately covers only the marketing system; unifying booking/legal would be a separate effort.
+
+Note [2026-06-04]: The single most important technical decision is routing every primitive through `cn()` (task A.2). Without it, the entire "override margins per-use" strategy silently fails because Tailwind resolves conflicts by CSS source order, not class-string order.

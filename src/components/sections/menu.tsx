@@ -26,7 +26,7 @@ export function Menu() {
           Om os
         </Link>
         <Link href="/booking">
-          <Button size="sm" className="bg-green-300">
+          <Button size="sm">
             Beregn din pris
             <ArrowRight className="w-4 h-4 ml-1 -mr-2" />
           </Button>
@@ -69,7 +69,7 @@ export function Menu() {
             Om os
           </Link>
           <Link href="/booking" onClick={() => setOpen(false)} className="mt-2">
-            <Button size="sm" className="bg-green-300 w-full">
+            <Button size="sm" className="w-full">
               Beregn din pris
               <ArrowRight className="w-4 h-4 ml-1 -mr-2" />
             </Button>

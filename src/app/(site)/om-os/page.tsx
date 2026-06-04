@@ -15,6 +15,7 @@ import {
   formatTon,
 } from "@/lib/stats"
 import { CtaReadyToGoSection } from "@/components/sections/cta"
+import { H1, H2, P, Eyebrow } from "@/components/ui/text"
 
 export const metadata: Metadata = {
   title: "Om os",
@@ -47,16 +48,14 @@ function AboutUs() {
   return (
     <Section>
       <div className="flex items-center border-x pt-24">
-          <div className="max-w-[700px] mx-auto px-4">
-            <p className="md:text-lg border-b pb-4 mb-5 inline-block">Om os</p>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl uppercase font-black mb-4 lg:mb-6">
-            To venner siden dagplejen.
-          </h1>
-          <p className="mb-24 md:text-lg lg:text-xl">
+        <div className="max-w-[700px] mx-auto px-4">
+          <Eyebrow>Om os</Eyebrow>
+          <H1>To venner siden dagplejen.</H1>
+          <P size="lead" className="mb-12 md:mb-18">
             Vi er Anda og Miko og vi har kendt hinanden siden Miko startede i dagpleje hos Anda's mor.
             Vi husker begge tydeligt den første samtale vi nogensinde havde: "Hvordan kan vi gøre det lettere for
             folk at flytte og hvordan kan vi på samme tid undgå alt det papaffald?".
-          </p>
+          </P>
           <Image className="border border-black mb-24 shadow-[4px_4px_0_0_rgba(0,0,0,1)]" src="/images/anda-miko-01.png" alt="Anda og Miko fra barndommen" width={800} height={800} />
         </div>
       </div>
@@ -69,16 +68,14 @@ function OurMission() {
     <Section>
       <div className="flex items-center border-x pb-32">
         <div className="max-w-[700px] mx-auto px-4">
-          <p className="md:text-lg border-b pb-4 mb-5 inline-block">Vores mission</p>
-          <h2 className="text-xl md:text-2xl lg:text-3xl uppercase font-black mb-4 lg:mb-6">
-            Gør det lettere at flytte
-          </h2>
-          <p className="md:text-lg lg:text-xl">
+          <Eyebrow>Vores mission</Eyebrow>
+          <H2>Gør det lettere at flytte</H2>
+          <P>
             Vores mission er at gøre det lettere for folk at flytte. Flyttekasser er bare besværlige
             og kluntede at have med at gøre. Du kan bære 5-6 stk ad gangen.
             Og det bliver endnu mere besværligt, hvis du ikke har en bil, for så skal du enten leje en, låne en
             eller tage flere ture i bus eller på cykel. Det er bare bøvlet.
-          </p>
+          </P>
         </div>
       </div>
     </Section>
@@ -131,18 +128,16 @@ function OurVision() {
     <Section>
       <div className="flex items-center border-x border-b py-32">
         <div className="max-w-[700px] mx-auto px-4">
-          <p className="md:text-lg border-b pb-4 mb-5 inline-block">Vores vision</p>
-          <h2 className="text-xl md:text-2xl lg:text-3xl uppercase font-black mb-4 lg:mb-6">
-            Nedbring papaffaldet ved flytninger  
-          </h2>
-          <p className="mb-6 md:text-lg lg:text-xl">
+          <Eyebrow>Vores vision</Eyebrow>
+          <H2>Nedbring papaffaldet ved flytninger</H2>
+          <P className="mb-6">
             Vores vision er at nedbringe den massive mængde papaffaldet der er i Danmark pga. flytninger.
             Vi tror på, at ved at tilbyde en genbrugsløsning, kan vi mindske mængden af pap, der
             bliver smidt ud hvert år.
-          </p>
-          <p className="md:text-lg lg:text-xl">
+          </P>
+          <P>
             For da vi satte os ned og regnede på det, var tallene var værre, end vi troede. Hver flytning efterlader en bunke pap, der oftest kun bruges én gang - og på landsplan løber det op i tal, der er svære at forestille sig.
-          </p>
+          </P>
         </div>
       </div>
     </Section>

@@ -3,6 +3,7 @@ import Image from "next/image"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Section } from "@/components/ui/section"
+import { H2, H3, P } from "@/components/ui/text"
 
 // Shared design primitives used across the marketing pages (home, about, ...).
 // These define the site's visual vocabulary: black borders, pastel gradients,
@@ -51,10 +52,10 @@ export function SectionInfo({
       <div className={`max-w-[1400px] md:px-0 mx-auto md:grid md:grid-cols-2 py-16 md:py-32 ${className || ''}`}>
         <div className="p-6 pl-0">
           {preTitle && <p className="-mt-4">{preTitle}</p>}
-          <h2 className="text-4xl lg:text-7xl font-black uppercase">{title}</h2>
+          <H2 size="display">{title}</H2>
         </div>
         <div className="md:py-6 lg:py-8 md:pr-0 lg:pl-24">
-          <p className="text-lg md:text-xl xl:text-right leading-8">{description}</p>
+          <P className="xl:text-right leading-8">{description}</P>
         </div>
       </div>
     </Section>
@@ -96,18 +97,16 @@ export function SectionContent({
           <Image width="500" height="500" src={`/images/${imgSrc}`} alt={imgAlt} className={`mx-auto ${imgFullSize ? 'w-6/7' : 'w-2/3 lg:w-2/3'}`} />
         </div>
         <div className={`${imgLast ? '' : 'lg:border-l border-black'} h-full px-4 py-12 lg:p-0 flex flex-col justify-center lg:px-16`}>
-          {/*  */}
-          {/* <h2 className="text-2xl md:text-3xl lg:text-4xl uppercase font-bold leading-[1.2] tracking-tight mb-4"> */}
-          <h2 className="text-xl md:text-2xl lg:text-3xl uppercase font-black leading-[1.2] tracking-tight mb-4">
+          <H2 className="leading-[1.2] tracking-tight mb-4 lg:mb-4">
             {title}
-          </h2>
+          </H2>
           {descriptions.map((desc, index) => (
-            <p key={index} className={`text-lg md:text-xl ${index !== 0 ? 'mt-4' : ''}`}>
+            <P key={index} className={index !== 0 ? 'mt-4' : undefined}>
               {desc}
-            </p>
+            </P>
           ))}
           <Link href={ctaLink} className="mt-8 md:mt-12">
-            <Button className="bg-green-300">
+            <Button>
               {ctaText} <ArrowRight className="w-4 h-4 ml-1 -mr-2" />
             </Button>
           </Link>
@@ -134,7 +133,7 @@ export function SectionThreeInfoColumns({
       <div className={`grid md:grid-cols-3 gap-1 relative border-x border-b border-black ${hasBorderTop ? 'border-t' : ''}`}>
         {columns.map((column, index) => (
           <div key={index} className={`px-4 lg:px-8 py-8 lg:py-16 ${index === 0 ? '' : 'border-t md:border-t-0 md:border-l border-gray-400 border-dashed'}`}>
-            <h3 className={`text-lg ${xlTitle ? 'md:text-2xl lg:text-4xl xl:text-5xl' : ''} font-bold uppercase mb-1`}>{column.title}</h3>
+            <H3 className={xlTitle ? 'md:text-2xl lg:text-4xl xl:text-5xl' : undefined}>{column.title}</H3>
             <p>{column.description}</p>
             {column.subdescription && <p className="text-sm text-gray-500 mt-2">{column.subdescription}</p>}
           </div>
