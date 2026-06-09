@@ -3,6 +3,7 @@ import { Montserrat, Inter } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import MetaPixel from "@/components/analytics/MetaPixel";
+import PlausibleTracker from "@/components/analytics/PlausibleTracker";
 import ConsentBanner from "@/components/analytics/ConsentBanner";
 import {
   SITE_URL,
@@ -84,6 +85,7 @@ export default function RootLayout({
         <JsonLd data={localBusinessJsonLd()} />
         {children}
         <MetaPixel />
+        <PlausibleTracker />
         <ConsentBanner />
       </body>
     </html>

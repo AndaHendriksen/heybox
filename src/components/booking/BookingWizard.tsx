@@ -7,6 +7,7 @@ import { INITIAL_BOOKING_STATE } from '@/lib/booking/constants'
 import { calcTotal, calcEffectivePricePerBox } from '@/lib/booking/utils'
 import { isStorkobenhavn } from '@/lib/utils/geo'
 import { track, trackCustom } from '@/lib/analytics/meta'
+import { trackPlausibleEvent } from '@/lib/analytics/plausible'
 import ProgressBar from './ProgressBar'
 import BottomBar from './BottomBar'
 import StepAddresses from './steps/StepAddresses'
@@ -80,6 +81,7 @@ export default function BookingWizard() {
     const merged = partial ? { ...booking, ...partial } : booking
     if (partial) updateBooking(partial)
     emitStepEvent(step, merged)
+    trackPlausibleEvent('NextStep', { step: String(step), source: 'booking-wizard' })
     setDir(1)
     setStep((s) => s + 1)
     window.scrollTo(0, 0)
