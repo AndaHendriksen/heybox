@@ -59,7 +59,8 @@ function AddonChoice({
 
 export default function StepAddons({ value, onChange, onNext, onBack }: Props) {
   const tier = getTier(value.boxCount)
-  const cleaningPrice = Math.round(value.boxCount * tier.cleaningPricePerBox)
+  // Rengøring midlertidigt skjult (papkasser kan ikke rengøres) - genaktiveres ved plastikkasser.
+  // const cleaningPrice = Math.round(value.boxCount * tier.cleaningPricePerBox)
   const carryingPrice = Math.round(value.boxCount * tier.carryingPricePerBox)
 
   return (
@@ -68,6 +69,7 @@ export default function StepAddons({ value, onChange, onNext, onBack }: Props) {
       description="Tilføj ekstra services til din bestilling."
     >
       <div className="space-y-8">
+        {/* Rengøring midlertidigt skjult - papkasser kan ikke rengøres. Genaktiveres ved plastikkasser.
         <div className="space-y-2">
           <P className="font-medium">Rengøring</P>
           <AddonChoice
@@ -78,6 +80,7 @@ export default function StepAddons({ value, onChange, onNext, onBack }: Props) {
             price={cleaningPrice}
           />
         </div>
+        */}
         <div className="space-y-2">
           <P className="font-medium">Levering</P>
           <AddonChoice

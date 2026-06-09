@@ -70,11 +70,14 @@ function OurMission() {
         <div className="max-w-[700px] mx-auto px-4">
           <Eyebrow>Vores mission</Eyebrow>
           <H2>Gør det lettere at flytte</H2>
-          <P className="md:text-lg">
+          <P className="md:text-lg mb-4">
             Vores mission er at gøre det lettere for folk at flytte. Flyttekasser er bare besværlige
             og kluntede at have med at gøre. Du kan bære 5-6 stk ad gangen.
             Og det bliver endnu mere besværligt, hvis du ikke har en bil, for så skal du enten leje en, låne en
             eller tage flere ture i bus eller på cykel. Det er bare bøvlet.
+          </P>
+          <P className="md:text-lg">
+            Så vi er ude på en mission om at gøre det så simpelt og billigt som muligt at leje flyttekasser.
           </P>
         </div>
       </div>
@@ -113,7 +116,7 @@ function OurVision() {
             bliver smidt ud hvert år.
           </P>
           <P className="md:text-lg">
-            For da vi satte os ned og regnede på det, var tallene var værre, end vi troede. Hver flytning efterlader en bunke pap, der oftest kun bruges én gang - og på landsplan løber det op i tal, der er svære at forestille sig.
+            For da vi satte os ned og regnede på det, var tallene værre, end vi troede. Hver flytning efterlader en bunke pap, der oftest kun bruges én gang - og på landsplan løber det op i tal, der er svære at forestille sig.
           </P>
         </div>
       </div>
@@ -161,12 +164,11 @@ function Decision() {
   return (
     <SectionContent
       imgLast={true}
-      imgSrc="heybox-angle-modified.png"
+      imgSrc="heybox-pap-shadow.png"
       imgAlt="Indkøbsvogn fra byggemarked - illustration"
-      imgBg="from-green-50 to-green-100"
       title="Vores løsning er simpel"
       descriptions={[
-        "Robuste plastkasser, der kan bruges igen og igen, til præcis samme pris som papkasser i byggemarkedet. Vi leverer når du skal bruge dem og henter dem igen, når du er på plads.",
+        "Robuste, professionelle flyttekasser, der kan bruges igen og igen. Vi leverer når du skal bruge dem og henter dem igen, når du er på plads.",
         "Ingen tur til byggemarkedet, ingen tape, ingen affaldsbjerg bagefter. Vi byggede den service, vi selv ville ønske, vi havde haft, da vi flyttede.",
       ]}
       ctaText="Se hvad det koster"

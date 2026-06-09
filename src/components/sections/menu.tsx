@@ -10,7 +10,10 @@ export function Menu() {
 
   return (
     <nav className="fixed top-0 left-0 z-100 w-full bg-white border-b border-black px-4 py-2 flex items-center justify-between">
-      <Link href="/" className="text-xl md:text-2xl font-bold tracking-tight">
+      <Link
+        href="/"
+        className="font-heading text-xl md:text-2xl font-bold tracking-tight"
+      >
         heybox!
       </Link>
 

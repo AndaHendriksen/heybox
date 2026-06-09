@@ -4,7 +4,7 @@ import { and, asc, eq, gte, isNull, or } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { bookings, pricingTiers } from '@/lib/db/schema'
 import type { BookingState } from '@/lib/booking/types'
-import { calcTotalWithoutAddons } from '@/lib/booking/utils'
+import { calcTotal } from '@/lib/booking/utils'
 import { sendEmail } from '@/lib/email/sweego'
 import { renderBookingConfirmation } from '@/lib/email/booking-confirmation'
 import { sendCapiEvent } from '@/lib/analytics/meta-capi'
@@ -42,8 +42,10 @@ export async function createBooking(
     const pickupDate = new Date(state.deliveryDate)
     pickupDate.setDate(pickupDate.getDate() + (tier.base_weeks + state.extraWeeks) * 7)
 
-    // Canonical total = what the customer was quoted on screen (add-ons are free).
-    const total = calcTotalWithoutAddons(state)
+    // Canonical total = what the customer was quoted on screen, incl. paid add-ons
+    // (e.g. carrying). Cleaning is currently disabled in the UI but the calc stays
+    // intact so it re-activates automatically once it's offered again.
+    const total = calcTotal(state)
 
     const [created] = await db
       .insert(bookings)
@@ -95,9 +97,8 @@ export async function createBooking(
       // customer's address private).
       const internal = await sendEmail({
         to: INTERNAL_EMAIL,
-        subject: `Ny booking: ${created.bookingNumber}`,
-        html,
-        text,
+        subject: `Ny booking modtaget!`,
+        text: 'Ny booking modtaget!'
       })
       if ('error' in internal) console.error('Internal booking email failed:', internal.error)
     } catch (err) {

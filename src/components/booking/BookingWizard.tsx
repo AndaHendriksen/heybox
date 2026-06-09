@@ -15,7 +15,6 @@ import StepBoxCount from './steps/StepBoxCount'
 import StepAddons from './steps/StepAddons'
 import StepContact from './steps/StepContact'
 import StepSummary from './steps/StepSummary'
-import StepApology from './steps/StepApology'
 
 const TOTAL_STEPS = 5
 
@@ -104,7 +103,7 @@ export default function BookingWizard() {
       case 3: return { onNext: () => goNext({ deliveryDate: booking.deliveryDate ?? getNextWeekend() }), showBack: true }
       case 4: return { onNext: () => goNext(), showBack: true }
       case 5: return { nextLabel: 'Se opsummering', nextFormId: 'contact-form', showBack: true }
-      case 6: return { onNext: () => goNext(), nextLabel: 'Bekræft og betal', showBack: true }
+      // Step 6 (opsummering) er sidste step: ingen BottomBar - bekræft-knap + tilbage ligger i StepSummary.
       default: return { showBack: false }
     }
   })()
@@ -164,16 +163,13 @@ export default function BookingWizard() {
               />
             )}
             {step === 6 && (
-              <StepSummary booking={booking} />
-            )}
-            {step === 7 && (
-              <StepApology booking={booking} />
+              <StepSummary booking={booking} onBack={goBack} />
             )}
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {step <= 6 && (
+      {step <= 5 && (
         <BottomBar
           showPriceBar={showPriceBar}
           boxCount={booking.boxCount}

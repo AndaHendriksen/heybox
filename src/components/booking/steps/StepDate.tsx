@@ -39,17 +39,17 @@ function formatDanish(date: Date): string {
 
 export default function StepDate({ value, onChange }: Props) {
   const defaultDate = useMemo(() => nextWeekend(), [])
-  const selected = value.deliveryDate ?? defaultDate
+  const selected = value.deliveryDate!
   const tier = getTier(value.boxCount)
   const totalWeeks = tier.baseWeeks + value.extraWeeks
-  const pickupDate = addDays(selected, totalWeeks * 7)
+  const pickupDate = selected ? addDays(selected, totalWeeks * 7) : undefined
 
   function handleSelect(date: Date | undefined) {
     if (date) onChange({ deliveryDate: date })
   }
 
   return (
-    <StepShell title="Hvornår skal vi levere?" description='Vi leverer pt. kun i weekenderne.'>
+    <StepShell title="Hvornår skal vi levere?" description='Vi leverer pt. kun om lørdagen.'>
       <div className="flex justify-center">
         <Calendar
           mode="single"
@@ -57,15 +57,15 @@ export default function StepDate({ value, onChange }: Props) {
           onSelect={handleSelect}
           defaultMonth={defaultDate}
           weekStartsOn={1}
-          modifiers={{
-            inRange: { after: selected, before: pickupDate },
+          modifiers={selected ? {
+            inRange: { after: selected, before: pickupDate! },
             rangeEnd: pickupDate,
-          }}
+          } : {}}
           disabled={(date) => {
             const day = date.getDay()
             const today = new Date()
             today.setHours(0, 0, 0, 0)
-            return (day !== 0 && day !== 6) || date < today
+            return (day !== 6) || date < today
           }}
           classNames={{
             root: 'w-full',
@@ -112,7 +112,7 @@ export default function StepDate({ value, onChange }: Props) {
         </div>
         <div className="text-right">
           <P>
-            +{tier.extraWeekPricePerBox.toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr/boks
+            +{tier.extraWeekPricePerBox.toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr/kasse
           </P>
         </div>
       </div>

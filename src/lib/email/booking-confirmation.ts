@@ -18,7 +18,7 @@ export interface BookingConfirmationData {
   totalWeeks: number
   addCleaning: boolean
   addCarrying: boolean
-  total: number // canonical total = calcTotalWithoutAddons (matches the screen)
+  total: number // canonical total = calcTotal incl. paid add-ons (matches the screen)
 }
 
 function formatDanishDate(date: Date): string {
@@ -38,14 +38,19 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
   const greetingName = firstName(data.name)
   const subject = `Tak for din bestilling – ${data.bookingNumber}`
 
-  const vat = data.total / 5
+  // Moms midlertidigt skjult – heybox er endnu ikke momsregistreret.
+  // Genaktiver når registreringen er på plads (incl. momsrækkerne nedenfor).
+  // const vat = data.total / 5
   const deliveryDate = formatDanishDate(data.deliveryDate)
   const pickupDate = formatDanishDate(data.pickupDate)
-  const cleaningLabel = data.addCleaning
-    ? 'Vi rengør kasserne'
-    : 'I rengør selv kasserne inden afhentning'
-  // Bæring er for nu altid inkluderet uden merpris (jf. StepApology), uanset addCarrying.
-  const carryingLabel = 'Båret ind/op i lejligheden (uden merpris)'
+  // Rengøring er midlertidigt skjult (papkasser kan ikke rengøres). Bevares til
+  // plastikkasser kommer - så udkommentér linjen herunder + de to "Rengøring"-rækker.
+  // const cleaningLabel = data.addCleaning
+  //   ? 'Vi rengør kasserne'
+  //   : 'I rengør selv kasserne inden afhentning'
+  const carryingLabel = data.addCarrying
+    ? 'Båret ind/op i lejligheden'
+    : 'Stillet ved hoveddøren'
 
   // ---- Plain-text version ----
   const text = [
@@ -60,10 +65,11 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
     `Levering: ${deliveryDate} - ${data.deliveryAddress}, ${data.deliveryPostcode}`,
     `Afhentning: ${pickupDate} - ${data.pickupAddress}, ${data.pickupPostcode}`,
     `Lejeperiode: ${data.totalWeeks} uger`,
-    `Rengøring: ${cleaningLabel}`,
+    // `Rengøring: ${cleaningLabel}`,
     `Bæring: ${carryingLabel}`,
     ``,
-    `Total inkl. moms: ${formatTotal(data.total)} (heraf moms 25%: ${formatTotal(vat)})`,
+    `Total: ${formatTotal(data.total)}`,
+    // `Total inkl. moms: ${formatTotal(data.total)} (heraf moms 25%: ${formatTotal(vat)})`,
     `Betales via MobilePay ved levering.`,
     ``,
     `HVAD SKER DER NU?`,
@@ -116,7 +122,7 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
             ${detailRow('Levering', `${deliveryDate}<br><span style="font-weight:400;color:#52525b;">${data.deliveryAddress}, ${data.deliveryPostcode}</span>`)}
             ${detailRow('Afhentning', `${pickupDate}<br><span style="font-weight:400;color:#52525b;">${data.pickupAddress}, ${data.pickupPostcode}</span>`)}
             ${detailRow('Lejeperiode', `${data.totalWeeks} uger`)}
-            ${detailRow('Rengøring', cleaningLabel)}
+            <!-- Rengøring midlertidigt skjult (pap). Genaktiver: detailRow('Rengøring', cleaningLabel) -->
             ${detailRow('Bæring', carryingLabel)}
           </table>
         </td></tr>
@@ -125,12 +131,11 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fafafa;border-radius:12px;">
             <tr><td style="padding:14px 18px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <!-- Moms midlertidigt skjult – heybox er endnu ikke momsregistreret.
+                     Genaktiver: udkommenter 'vat' ovenfor og tilføj rækken
+                     med <td>Heraf moms 25%</td> + formatTotal(vat) her igen. -->
                 <tr>
-                  <td style="font-size:12px;color:#a1a1aa;padding-bottom:4px;">Heraf moms 25%</td>
-                  <td align="right" style="font-size:12px;color:#a1a1aa;padding-bottom:4px;">${formatTotal(vat)}</td>
-                </tr>
-                <tr>
-                  <td style="font-size:15px;color:#52525b;">Total inkl. moms</td>
+                  <td style="font-size:15px;color:#52525b;">Total</td>
                   <td align="right" style="font-size:22px;font-weight:700;color:#000000;">${formatTotal(data.total)}</td>
                 </tr>
               </table>

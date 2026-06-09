@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Montserrat } from "next/font/google";
+import { Montserrat, Inter } from "next/font/google";
 import "./globals.css";
 import { JsonLd } from "@/components/seo/JsonLd";
 import MetaPixel from "@/components/analytics/MetaPixel";
@@ -16,6 +16,11 @@ const montserrat = Montserrat({
   subsets: ["latin"],
 });
 
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -23,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s - heybox",
   },
   description:
-    "Lej stærke flyttekasser til samme pris som pap. Levering og afhentning i Storkøbenhavn er inkluderet - ingen bil og ingen oprydning bagefter. Beregn din pris online.",
+    "Lej professionelle flyttekasser. Levering og afhentning i Storkøbenhavn er inkluderet - ingen bil og ingen oprydning bagefter. Beregn din pris online.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -32,7 +37,7 @@ export const metadata: Metadata = {
     url: "/",
     title: "heybox! Lej flyttekasser til flytning",
     description:
-      "Lej flyttekasser til samme pris som pap. Levering og afhentning i Storkøbenhavn inkluderet.",
+      "Lej professionelle flyttekasser. Levering og afhentning i Storkøbenhavn inkluderet.",
     images: [
       {
         url: "/og-image.png",
@@ -46,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "heybox! Lej flyttekasser til flytning",
     description:
-      "Lej stærke flyttekasser til samme pris som pap. Levering og afhentning i Storkøbenhavn inkluderet.",
+      "Lej professionelle flyttekasser. Levering og afhentning i Storkøbenhavn inkluderet.",
   },
   robots: {
     index: true,
@@ -70,7 +75,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="da" className={`${montserrat.variable} h-full antialiased`}>
+    <html
+      lang="da"
+      className={`${montserrat.variable} ${inter.variable} h-full antialiased`}
+    >
       <body>
         <JsonLd data={organizationJsonLd()} />
         <JsonLd data={localBusinessJsonLd()} />

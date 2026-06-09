@@ -31,7 +31,7 @@ export interface FaqItem {
 export const FAQ_ITEMS: FaqItem[] = [
   {
     q: "Hvad koster det at leje flyttekasser hos heybox?",
-    a: "Priserne starter ved 13,95 kr. pr. kasse, og levering og afhentning er altid inkluderet. Du betaler stort set samme pris som for papkasser i byggemarkedet - men slipper for turen, slæbet og affaldet bagefter.",
+    a: "Priserne starter ved 13,95 kr. pr. kasse, og levering og afhentning er altid inkluderet. Du slipper for turen til byggemarkedet, slæbet og affaldet bagefter.",
   },
   {
     q: "Hvor leverer I flyttekasser?",
@@ -50,8 +50,8 @@ export const FAQ_ITEMS: FaqItem[] = [
     a: "Du betaler nemt via MobilePay i forbindelse med leveringen. Ingen skjulte gebyrer og ingen ekstraomkostninger - prisen er den, du ser ved bestilling.",
   },
   {
-    q: "Hvorfor er plastkasser bedre end papkasser?",
-    a: "Plastkasserne er stærkere, stables perfekt og lukkes med ét klik - ingen tape og ingen bunde der falder ud. De bruges igen og igen, så du undgår bunker af papaffald efter flytningen.",
+    q: "Hvorfor er jeres flyttekasser bedre end dem fra byggemarkedet?",
+    a: "Vores flyttekasser er lavet i ekstra kraftigt pap, så de er langt stærkere og holder mange flere flytninger end de tynde kasser fra byggemarkedet. Vi leverer og henter dem igen, så du slipper for slæbet og for papaffaldet bagefter.",
   },
 ]
 
@@ -97,7 +97,7 @@ export function howToJsonLd(): JsonLdObject {
     "@type": "HowTo",
     name: "Sådan lejer du flyttekasser hos heybox",
     description:
-      "Lej robuste plastflyttekasser i Storkøbenhavn i tre enkle trin: vi leverer, du pakker og flytter, og vi henter kasserne igen.",
+      "Lej professionelle flyttekasser i Storkøbenhavn i tre enkle trin: vi leverer, du pakker og flytter, og vi henter kasserne igen.",
     step: HOW_IT_WORKS_STEPS.map((s, i) => ({
       "@type": "HowToStep",
       position: i + 1,

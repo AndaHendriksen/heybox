@@ -30,7 +30,7 @@ export function SplitHero({
 }: Readonly<{ media: React.ReactNode; children: React.ReactNode; minHeightClass?: string }>) {
   return (
     <section className={`${minHeightClass} grid grid-cols-1 lg:grid-cols-2 border-b border-black`}>
-      <div className="lg:pt-0 bg-linear-to-br from-green-100 to-green-300 flex items-center p-8 border-b border-black lg:border-b-0 lg:border-r">
+      <div className="lg:pt-0 bg-linear-to-br from-yellow-50 to-orange-100 flex items-center p-8 border-b border-black lg:border-b-0 lg:border-r">
         {media}
       </div>
       <div className="p-4 pb-12 flex items-center justify-center">
@@ -55,7 +55,7 @@ export function SectionInfo({
           <H2 size="display">{title}</H2>
         </div>
         <div className="md:py-6 lg:py-8 md:pr-0 lg:pl-24">
-          <P className="md:text-lg xl:text-right leading-8">{description}</P>
+          <P className="md:text-lg xl:text-right leading-8 text-balance">{description}</P>
         </div>
       </div>
     </Section>

@@ -11,9 +11,9 @@ export function Footer() {
     <footer className="bg-gray-50 py-16 px-6 border-t border-gray-300 border-dashed">
       <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-3 gap-12">
         <div className="col-span-2 md:col-span-1">
-          <div className="text-3xl font-bold tracking-tight mb-6">heybox!</div>
+          <div className="font-heading text-3xl font-bold tracking-tight mb-6">heybox!</div>
           <p className="text-zinc-500 text-sm leading-relaxed max-w-xs">
-            Lej robuste flyttekasser til samme pris som pap. Vi leverer til din dør og henter igen. Altid gratis.
+            Lej robuste flyttekasser. Vi leverer til din dør og henter igen. Altid gratis.
           </p>
         </div>
 

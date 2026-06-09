@@ -19,7 +19,9 @@
       "PowerShell(Start-Process -FilePath \"yarn\" -ArgumentList \"start\" -WindowStyle Hidden)",
       "WebFetch(domain:learn.sweego.io)",
       "WebFetch(domain:www.sweego.io)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "PowerShell(npx tsc --noEmit 2>&1)",
+      "PowerShell(npx eslint src/components/booking/steps/StepSummary.tsx src/components/booking/steps/StepAddons.tsx src/components/booking/BookingWizard.tsx src/lib/email/booking-confirmation.ts src/lib/actions/booking.ts \"src/app/\\(site\\)/page.tsx\" 2>&1)"
     ]
   }
 }

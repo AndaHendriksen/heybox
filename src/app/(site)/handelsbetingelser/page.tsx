@@ -44,7 +44,9 @@ export default function TermsPage() {
             <P>
               Prisen beregnes på baggrund af antal kasser, lejeperiode og eventuelle tilvalg
               som bæring eller rengøring. Den endelige pris fremgår af din bookingbekræftelse.
-              Alle priser er inkl. moms.
+              {/* Moms midlertidigt skjult – heybox er endnu ikke momsregistreret.
+                  Genaktiver når registreringen er på plads: */}
+              {/* Alle priser er inkl. moms. */}
             </P>
           </section>
 

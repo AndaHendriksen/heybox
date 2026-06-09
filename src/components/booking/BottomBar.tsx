@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { formatTotal } from '@/lib/booking/utils'
+import { ChevronLeft } from 'lucide-react'
 
 interface BottomBarProps {
   showPriceBar: boolean
@@ -37,7 +38,7 @@ export default function BottomBar({
               <span className="font-semibold text-zinc-900">
                 {prisPrBoks.toLocaleString('da-DK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr
               </span>
-              {' '}pr. boks
+              /kasse
             </span>
             <span className="text-zinc-500">
               Total{' '}
@@ -52,9 +53,9 @@ export default function BottomBar({
             <button
               type="button"
               onClick={onBack}
-              className="h-12 w-12 cursor-pointer shrink-0 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 transition-colors"
+              className="group h-12 w-12 cursor-pointer shrink-0 rounded-full border border-gray-400 flex items-center justify-center text-gray-2500 hover:border-gray-400 hover:text-gray-700 transition-colors"
             >
-              ←
+              <ChevronLeft size={20} className="text-gray-400 group-hover:text-gray-500" />
             </button>
           )}
           <Button

@@ -1,14 +1,22 @@
 'use client'
 
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import type { LucideIcon } from 'lucide-react'
-import { Truck, Clock, BoxesIcon, SoapDispenserDroplet } from 'lucide-react'
+// SoapDispenserDroplet bruges kun af det udkommenterede rengørings-kort - genimportér ved genaktivering.
+import { Truck, Clock, BoxesIcon, ChevronLeft } from 'lucide-react'
 import type { BookingState } from '@/lib/booking/types'
 import { calcTotal, getTier, formatTotal } from '@/lib/booking/utils'
+import { createBooking } from '@/lib/actions/booking'
+import { track } from '@/lib/analytics/meta'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { P } from '@/components/ui/text'
 
 interface Props {
   booking: BookingState
-  error?: string | null
+  onBack: () => void
 }
 
 function formatDanish(date: Date): string {
@@ -44,12 +52,42 @@ function TimelineCard({
   )
 }
 
-export default function StepSummary({ booking, error }: Props) {
+export default function StepSummary({ booking, onBack }: Props) {
   const tier = getTier(booking.boxCount)
   const total = calcTotal(booking)
   const deliveryDate = booking.deliveryDate ?? new Date()
   const totalWeeks = tier.baseWeeks + booking.extraWeeks
   const pickupDate = addWeeks(deliveryDate, totalWeeks)
+
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [submitAttempted, setSubmitAttempted] = useState(false)
+  const [bookingError, setBookingError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+
+  function handleSubmit() {
+    if (!termsAccepted) {
+      setSubmitAttempted(true)
+      return
+    }
+    if (isPending) return
+
+    startTransition(async () => {
+      setBookingError(null)
+      const result = await createBooking(booking)
+      if ('error' in result) {
+        setBookingError(result.error)
+      } else {
+        // Browser-side Purchase, deduplicated against the server CAPI event via eventID.
+        track(
+          'Purchase',
+          { value: total, currency: 'DKK', num_items: booking.boxCount },
+          result.eventId,
+        )
+        router.push(`/booking/confirmation?number=${result.bookingNumber}`)
+      }
+    })
+  }
 
   const deliveryCarryingLabel = booking.addCarrying
     ? 'Båret ind/op i lejlighed'
@@ -70,7 +108,7 @@ export default function StepSummary({ booking, error }: Props) {
         <div className="space-y-3">
           <TimelineCard icon={BoxesIcon}>
             <P>
-              {booking.boxCount} bokse
+              {booking.boxCount} kasser
             </P>
           </TimelineCard>
           <TimelineCard icon={Truck}>
@@ -97,11 +135,13 @@ export default function StepSummary({ booking, error }: Props) {
             </P>
           </TimelineCard>
 
+          {/* Rengøring midlertidigt skjult - papkasser kan ikke rengøres. Genaktiveres ved plastikkasser.
           {!booking.addCleaning && (
             <TimelineCard icon={SoapDispenserDroplet}>
               <P>I rengør selv kasserne inden afhentning</P>
             </TimelineCard>
           )}
+          */}
 
           <TimelineCard icon={Truck}>
             <P size="small" color="gray" className="mb-1">
@@ -132,11 +172,23 @@ export default function StepSummary({ booking, error }: Props) {
         </TimelineCard>
 
         <TimelineCard>
-          <div className="space-y-1.5 text-sm">
+          <div className="space-y-1.5">
             <div className="flex justify-between gap-4">
-              <P>Leje, {booking.boxCount} kasser</P>
+              <P>Leje af {booking.boxCount} kasser</P>
               <P>
                 {(booking.boxCount * tier.pricePerBox).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr
+              </P>
+            </div>
+            <div className="flex justify-between gap-4">
+              <P>Levering</P>
+              <P>
+                0 kr
+              </P>
+            </div>
+            <div className="flex justify-between gap-4">
+              <P>Afhentning</P>
+              <P>
+                0 kr
               </P>
             </div>
             {booking.extraWeeks > 0 && (
@@ -149,6 +201,7 @@ export default function StepSummary({ booking, error }: Props) {
                 </P>
               </div>
             )}
+            {/* Rengøring midlertidigt skjult - genaktiveres ved plastikkasser (addCleaning er altid false nu).
             {booking.addCleaning && (
               <div className="flex justify-between gap-4">
                 <P>
@@ -159,6 +212,7 @@ export default function StepSummary({ booking, error }: Props) {
                 </P>
               </div>
             )}
+            */}
             {booking.addCarrying && (
               <div className="flex justify-between gap-4">
                 <P>
@@ -171,15 +225,17 @@ export default function StepSummary({ booking, error }: Props) {
             )}
           </div>
           <div className="border-t border-gray-300 mt-3 pt-3 space-y-1.5">
-            <div className="flex justify-between gap-4 text-xs text-zinc-400">
+            {/* Moms midlertidigt skjult – heybox er endnu ikke momsregistreret.
+                Genaktiver hele momsrækken når registreringen er på plads. */}
+            {/* <div className="flex justify-between gap-4 text-zinc-400">
               <P>Heraf moms 25%</P>
               <P>
                 {(total / 5).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr
               </P>
-            </div>
+            </div> */}
             <div className="flex items-baseline justify-between gap-4">
               <P size="lead" className="font-bold">
-                Total inkl. moms
+                Total
               </P>
               <P size="lead" className="font-bold">
                 {formatTotal(total)}
@@ -189,8 +245,51 @@ export default function StepSummary({ booking, error }: Props) {
         </TimelineCard>
       </div>
 
-      {error && (
-        <p className="text-sm text-red-500 text-center mt-4">{error}</p>
+      <P className="mt-16 mb-4">
+        Betaling sker over MobilePay, når vi leverer kasserne.
+      </P>
+
+      <div className="flex items-start gap-2 mb-6">
+        <Checkbox
+          id="terms"
+          checked={termsAccepted}
+          onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+          className=""
+        />
+        <Label htmlFor="terms" className="cursor-pointer">
+          Jeg har læst og accepterer{' '}
+          <a href="/handelsbetingelser" target="_blank" rel="noopener noreferrer" className="underline text-black">
+            vilkår og betingelser
+          </a>
+        </Label>
+      </div>
+
+      {submitAttempted && !termsAccepted && (
+        <P className="text-red-700 mb-4">
+          Du skal acceptere vores vilkår og betingelser for at fortsætte.
+        </P>
+      )}
+
+      <Button
+        className="w-full mt-4"
+        disabled={isPending}
+        onClick={handleSubmit}
+      >
+        {isPending ? 'Bekræfter...' : 'Bekræft booking'}
+      </Button>
+
+      <Button
+        variant="ghost"
+        onClick={onBack}
+        disabled={isPending}
+        className="w-full mt-6 text-zinc-500 hover:text-zinc-700 transition-colors disabled:opacity-50"
+      >
+        <ChevronLeft size={10} className="text-gray-500" />
+        Tilbage
+      </Button>
+
+      {bookingError && (
+        <P className="text-sm text-red-500 text-center mt-4">{bookingError}</P>
       )}
     </div>
   )

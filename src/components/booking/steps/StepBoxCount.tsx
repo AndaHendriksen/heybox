@@ -43,8 +43,8 @@ export default function StepBoxCount({ value, onChange, onNext, onBack }: Props)
 
   return (
     <StepShell
-      title="Hvor mange bokse?"
-      description="Én boks pr. m² er en god tommelfingerregel."
+      title="Hvor mange kasser?"
+      description="Én kasser pr. m² er en god tommelfingerregel."
     >
       <div className="grid grid-cols-4 gap-2">
         {SIZES.map((size) => (
@@ -73,7 +73,7 @@ export default function StepBoxCount({ value, onChange, onNext, onBack }: Props)
           </StepperButton>
         </div>
         <P size="small" color="gray">
-          Bokse
+          Kasser
         </P>
       </div>
 

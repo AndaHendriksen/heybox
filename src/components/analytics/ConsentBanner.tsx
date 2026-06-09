@@ -16,16 +16,22 @@ import { META_PIXEL_ID } from '@/lib/analytics/meta'
 import { Button } from '../ui/button'
 import { P } from '../ui/text'
 
+// Lint-clean hydration flag: false on the server and during the hydration
+// render, true only after the client has mounted.
+const noopSubscribe = () => () => {}
+
 export default function ConsentBanner() {
-  // External store: SSR renders null (undecided), client reads the real value.
-  // Shown only while the user has not decided yet.
+  // Render nothing until hydrated so the banner never appears in the server HTML.
+  // This avoids a flash for visitors who already decided (the server can't read
+  // their localStorage choice). Undecided visitors see it appear right after load.
+  const hydrated = useSyncExternalStore(noopSubscribe, () => true, () => false)
   const consent = useSyncExternalStore(subscribeConsent, getConsent, getConsentServerSnapshot)
 
   function choose(value: 'granted' | 'denied') {
     setConsent(value)
   }
 
-  if (!META_PIXEL_ID || consent !== null) return null
+  if (!hydrated || !META_PIXEL_ID || consent !== null) return null
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4">

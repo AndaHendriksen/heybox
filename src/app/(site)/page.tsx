@@ -54,22 +54,24 @@ function Hero() {
             priority
             width="600"
             height="420"
-            src="/images/heybox-angle-modified.png"
+            src="/images/heybox-pap-shadow.png"
             alt="Grønne plastikflyttekasser fra heybox stablet i en lys stue"
             className="w-full"
           />
-          <div className="text-sm md:text-lg absolute bottom-4 right-2 text-right flex flex-col items-end">
-            <TransparentCard><p className="font-bold">Lej fra 13.95 kr/kasse</p></TransparentCard>
-            <TransparentCard><CheckIcon className="w-4 h-4 mt-0.5" /><p>Inkl. levering og afhentning</p></TransparentCard>
+          <div className="md:text-xl absolute bottom-6 right-2 text-right flex flex-col items-end">
+            <TransparentCard><p className=""><strong>Lej fra 13.95 kr</strong>/kasse</p></TransparentCard>
+            <TransparentCard><CheckIcon className="w-6 h-6 mt-0.5 text-green-500 font-bold" /><p className="text-lg"><span className="text-green-500 font-bold">Inkl.</span> levering og afhentning</p></TransparentCard>
           </div>
         </div>
       }
     >
       <div className="lg:px-4 xl:px-8 lg:max-w-[800px]">
-        <H1>Lej flyttekasser i København - nemt og billigt.</H1>
+        <H1>Lej flyttekasser i København</H1>
         <P size="lead" className="mb-8 md:mb-12">
-          Robuste plastkasser til samme pris som papkasser i byggemarkedet.
-          Vi leverer og henter dem igen, når du er færdig - og det er inkluderet i prisen.
+          {/* Professionelle flyttekasser der er stærkere end de tynde fra byggemarkedet. */}
+          {/* Vi leverer dem til din dør og henter dem igen, når du er færdig - alt sammen inkluderet i prisen. */}
+          Du får professionelle flyttekasser leveret direkte til din dør og afhentet igen når du er færdig - alt
+          sammen inkluderet i prisen. Det kan stort set ikke betale sig at lade være...
         </P>
         <Link href="/booking">
           <Button size="lg">
@@ -84,8 +86,8 @@ function Hero() {
 function WeMakeItEasy() {
   return (
     <SectionInfo
-      title={<>Vi fjerner<br />bøvlet.</>}
-      description="En flytning har rigeligt af bøvl i forvejen. Derfor kører vi kasserne til døren, og henter dem igen når du er færdig, så du kan bruge energien på selve flytningen. Ingen tur til byggemarked, ingen tape, ingen affaldsbjerg bagefter."
+      title={<>Du undgår<br />bøvlet.</>}
+      description="En flytning har rigeligt af bøvl i forvejen. Derfor får du leveret kasserne til døren, og afhentet igen når du er færdig, så du kan bruge energien på selve flytningen."
     />
   )
 }
@@ -98,7 +100,9 @@ function NoDriving() {
       imgSrc="3d-icon-crowded-bus.png"
       imgAlt="Bus proppet med mennesker - illustration"
       title="Ingen tur til byggemarkedet"
-      descriptions={["Drop køen i byggemarkedet. Vores kasser koster det samme som papkasser, men vi leverer dem direkte til din dør, så du kan bruge tiden på det der betyder noget."]}
+      descriptions={[`Flyttekasser er bare besværlige. De fylder meget og er svære at have med at
+        gøre, selv når de er flade. Og det bliver endnu mere besværligt hvis du ikke har bil. Undgå
+        at skulle transportere kasserne med det offentlige eller bruge penge på at låne en bil.`]}
       ctaText="Spar turen"
       ctaLink="/booking"
       bgColor="bg-blue-100"
@@ -112,8 +116,10 @@ function BoxQuality() {
     <SectionContent
       imgSrc="3d-icon-weight.png"
       imgAlt="En tung håndvægt - illustration"
-      title="Stærkere og nemmere end pap"
-      descriptions={["Ingen kasser der skal samles med tape. Ingen bunde der falder ud. Vores kasser er robuste, stables perfekt og lukkes med et enkelt klik."]}
+      title="Stærke flyttekasser"
+      descriptions={[`Kasserne du får leveret, er lavet af stærkt, dobbeltlags bølgepap - kraftigere end de
+        traditionelle flyttekasser du kender. Kasserne har selvlåsende kuvertbund, tåler
+        høj belastning og kan stables sikkert.`]}
       ctaText="Beskyt dine ting"
       ctaLink="/booking"
       bgColor="bg-purple-100"
@@ -129,7 +135,10 @@ function NoCleanup() {
       imgSrc="3d-icon-sleep-cocoon.png"
       imgAlt="Person pakket ind i en dyne - illustration"
       title="Ingen oprydning bagefter"
-      descriptions={["Med papkasser sidder du tilbage med et bjerg af affald når flytningen er overstået. Vi sørger for at hente kasserne, så du bare kan slappe af og nyde dit nye sted."]}
+      descriptions={[`Når du endeligt sætter dig tungt ned i sofaen efter at have brugt timer på at tømme
+        dine flyttekasser, ligger der en stor bunke sammenfoldede kasser i hjørnet. Du kommer ikke til at
+        skulle brugen dem igen før om et par år, så de kommer enten til at fylde i depotet eller også du
+        skal bruge tid på at give eller sælge dem videre. Lad os fjerne besværet for dig.`]}
       ctaText="Nyd tiden"
       ctaLink="/booking"
       bgColor="bg-yellow-100"
@@ -144,15 +153,15 @@ function HowItWorks() {
       columns={[
         {
           title: "1. Vi leverer",
-          description: "Vælg en dato der passer dig, så leverer vi kasserne. Gratis."
+          description: "Vælg en dato der passer dig, så leverer vi. Gratis."
         },
         {
           title: "2. Du pakker & flytter",
-          description: "Ingen tape, ingen samling, ingen frustration. Solide kasser der passer på dine ting."
+          description: "Med robuste kasser der passer på dine ting."
         },
         {
           title: "3. Vi henter",
-          description: "Når du er på plads i din nye bolig, henter vi kasserne igen. Gratis."
+          description: "Når du er på plads, henter vi kasserne igen. Gratis."
         },
       ]}
     />
@@ -201,10 +210,10 @@ function CardboardReuse() {
       imgSrc="3d-icon-trashedbox.png"
       imgAlt="Ødelagt papkasse - illustration"
       imgFullSize={true}
-      title="Papkasser genbruges sjældent"
+      title="Tyndt pap holder ikke længe"
       descriptions={[
-        "Standard papkasser i bølgepap tåler typisk kun 2-6 genbrug, og fugt eller dårlig opbevaring forkorter ofte levetiden yderligere. Derfor ender millioner af kasser som affald hvert år.",
-        "Vores plastkasser er bygget til at blive brugt igen og igen - samme kasser, mange flytninger, ingen affaldsbjerge."
+        "Tynde flyttekasser fra byggemarkedet tåler typisk kun 2-3 flytninger, og fugt eller dårlig opbevaring forkorter ofte levetiden yderligere. Derfor ender millioner af kasser som affald hvert år.",
+        "Vores kasser er lavet i ekstra kraftigt pap, der holder langt flere flytninger - samme kasser, mange flytninger, mindre affald."
       ]}
       ctaText="Stop forbruget"
       ctaLink="/booking"
