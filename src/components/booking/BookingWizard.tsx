@@ -58,30 +58,32 @@ export default function BookingWizard() {
   }
 
   // Emit the funnel-depth signal for the step the user is leaving. Meta uses the
-  // progression InitiateCheckout -> AddToCart -> AddPaymentInfo -> Purchase to
-  // learn how far each visitor got and optimize towards likely purchasers.
-  function emitStepEvent(leavingStep: number, merged: BookingState) {
-    const money = { value: calcTotal(merged), currency: 'DKK' }
+  // progression InitiateCheckout -> AddToCart -> Purchase to learn how far each
+  // visitor got and optimize towards likely purchasers. The final client-side
+  // Purchase event is fired only after booking confirmation in StepSummary.
+  function emitStepEvent(leavingStep: number) {
     switch (leavingStep) {
+      case 1:
+        trackPlausibleEvent('DeliveryAndPickup - Next', { step: String(step), source: 'booking-wizard' })
+        break
       case 2:
-        track('AddToCart', { ...money, num_items: merged.boxCount })
+        trackPlausibleEvent('BoxCount - Next', { step: String(step), source: 'booking-wizard' })
         break
       case 3:
-        trackCustom('SelectDeliveryDate', money)
+        trackPlausibleEvent('Date - Next', { step: String(step), source: 'booking-wizard' })
+        break
+      case 4:
+        trackPlausibleEvent('Addons - Next', { step: String(step), source: 'booking-wizard' })
         break
       case 5:
-        track('AddPaymentInfo', money)
+        trackPlausibleEvent('ContactInfo - Next', { step: String(step), source: 'booking-wizard' })
         break
     }
-    // Entering the summary step.
-    if (leavingStep + 1 === 6) trackCustom('ViewSummary', money)
   }
 
   function goNext(partial?: Partial<BookingState>) {
-    const merged = partial ? { ...booking, ...partial } : booking
     if (partial) updateBooking(partial)
-    emitStepEvent(step, merged)
-    trackPlausibleEvent('NextStep', { step: String(step), source: 'booking-wizard' })
+    emitStepEvent(step)
     setDir(1)
     setStep((s) => s + 1)
     window.scrollTo(0, 0)

@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+research.md
+plan.md
+
 # dependencies
 /node_modules
 /.pnp
@@ -19,6 +22,7 @@
 
 # production
 /build
+/.github/skills
 
 # misc
 .DS_Store

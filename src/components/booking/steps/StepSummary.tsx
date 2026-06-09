@@ -78,12 +78,8 @@ export default function StepSummary({ booking, onBack }: Props) {
       if ('error' in result) {
         setBookingError(result.error)
       } else {
-        // Browser-side Purchase, deduplicated against the server CAPI event via eventID.
-        track(
-          'Purchase',
-          { value: total, currency: 'DKK', num_items: booking.boxCount },
-          result.eventId,
-        )
+        const eventId = result.eventId
+        track('Purchase', { value: total, currency: 'DKK', num_items: booking.boxCount }, eventId)
         router.push(`/booking/confirmation?number=${result.bookingNumber}`)
       }
     })
