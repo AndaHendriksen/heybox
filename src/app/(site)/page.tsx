@@ -58,9 +58,9 @@ function Hero() {
             alt="Grønne plastikflyttekasser fra heybox stablet i en lys stue"
             className="w-full"
           />
-          <div className="md:text-xl absolute bottom-6 right-2 text-right flex flex-col items-end">
+          <div className="md:text-xl absolute bottom-0 md:bottom-6 text-sm right-2 text-right flex flex-col items-end">
             <TransparentCard><p className=""><strong>Lej fra 13.95 kr</strong>/kasse</p></TransparentCard>
-            <TransparentCard><CheckIcon className="w-6 h-6 mt-0.5 text-green-500 font-bold" /><p className="text-lg"><span className="text-green-500 font-bold">Inkl.</span> levering og afhentning</p></TransparentCard>
+            <TransparentCard><CheckIcon className="w-5 h-5 text-green-500 font-bold" /><p><span className="text-green-500 font-bold">Inkl.</span> levering og afhentning</p></TransparentCard>
           </div>
         </div>
       }
