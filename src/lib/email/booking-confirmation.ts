@@ -10,9 +10,9 @@ export interface BookingConfirmationData {
   name: string
   boxCount: number
   deliveryAddress: string
-  deliveryPostcode: string
+  deliveryZipcode: string
   pickupAddress: string
-  pickupPostcode: string
+  pickupZipcode: string
   deliveryDate: Date
   pickupDate: Date
   totalWeeks: number
@@ -62,8 +62,8 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
     ``,
     `DIN BESTILLING`,
     `Antal kasser: ${data.boxCount}`,
-    `Levering: ${deliveryDate} - ${data.deliveryAddress}, ${data.deliveryPostcode}`,
-    `Afhentning: ${pickupDate} - ${data.pickupAddress}, ${data.pickupPostcode}`,
+    `Levering: ${deliveryDate} - ${data.deliveryAddress}, ${data.deliveryZipcode}`,
+    `Afhentning: ${pickupDate} - ${data.pickupAddress}, ${data.pickupZipcode}`,
     `Lejeperiode: ${data.totalWeeks} uger`,
     // `Rengøring: ${cleaningLabel}`,
     `Bæring: ${carryingLabel}`,
@@ -119,8 +119,8 @@ export function renderBookingConfirmation(data: BookingConfirmationData): {
           <p style="margin:0 0 6px 0;font-size:12px;color:#a1a1aa;text-transform:uppercase;letter-spacing:0.5px;">Din bestilling</p>
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
             ${detailRow('Antal kasser', String(data.boxCount))}
-            ${detailRow('Levering', `${deliveryDate}<br><span style="font-weight:400;color:#52525b;">${data.deliveryAddress}, ${data.deliveryPostcode}</span>`)}
-            ${detailRow('Afhentning', `${pickupDate}<br><span style="font-weight:400;color:#52525b;">${data.pickupAddress}, ${data.pickupPostcode}</span>`)}
+            ${detailRow('Levering', `${deliveryDate}<br><span style="font-weight:400;color:#52525b;">${data.deliveryAddress}, ${data.deliveryZipcode}</span>`)}
+            ${detailRow('Afhentning', `${pickupDate}<br><span style="font-weight:400;color:#52525b;">${data.pickupAddress}, ${data.pickupZipcode}</span>`)}
             ${detailRow('Lejeperiode', `${data.totalWeeks} uger`)}
             <!-- Rengøring midlertidigt skjult (pap). Genaktiver: detailRow('Rengøring', cleaningLabel) -->
             ${detailRow('Bæring', carryingLabel)}

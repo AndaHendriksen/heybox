@@ -5,8 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import type { BookingState } from '@/lib/booking/types'
 import { INITIAL_BOOKING_STATE } from '@/lib/booking/constants'
 import { calcTotal, calcEffectivePricePerBox } from '@/lib/booking/utils'
-import { isStorkobenhavn } from '@/lib/utils/geo'
-import { track, trackCustom } from '@/lib/analytics/meta'
+import { track } from '@/lib/analytics/meta'
 import { trackPlausibleEvent } from '@/lib/analytics/plausible'
 import ProgressBar from './ProgressBar'
 import BottomBar from './BottomBar'
@@ -16,6 +15,8 @@ import StepBoxCount from './steps/StepBoxCount'
 import StepAddons from './steps/StepAddons'
 import StepContact from './steps/StepContact'
 import StepSummary from './steps/StepSummary'
+import { isBookingDateAvailable } from '@/lib/actions/booking'
+import { formatToCleanDate } from '@/lib/utils'
 
 const TOTAL_STEPS = 5
 
@@ -31,16 +32,8 @@ const variants = {
   }),
 }
 
-function getNextWeekend(): Date {
-  const d = new Date()
-  d.setHours(0, 0, 0, 0)
-  const day = d.getDay()
-  const daysUntilSat = (6 - day + 7) % 7 || 7
-  d.setDate(d.getDate() + daysUntilSat)
-  return d
-}
-
 export default function BookingWizard() {
+  const [bookingError, setBookingError] = useState<string | null>(null)
   const [step, setStep] = useState(1)
   const [dir, setDir] = useState(1)
   const [booking, setBooking] = useState<BookingState>(INITIAL_BOOKING_STATE)
@@ -89,6 +82,23 @@ export default function BookingWizard() {
     window.scrollTo(0, 0)
   }
 
+  async function checkDate(partial?: Partial<BookingState>) {
+    if (!partial?.deliveryDate) {
+      setBookingError('Du skal vælge en dato.')
+      return false
+    }
+
+    const count = await isBookingDateAvailable(formatToCleanDate(partial.deliveryDate))
+
+    if (count > 40) {
+      setBookingError('Der er ingen ledige kasser på datoen, vælg venligst en anden dato.')
+      return false
+    }
+
+    setBookingError(null)
+    goNext({ deliveryDate: partial.deliveryDate })
+  }
+
   function goBack() {
     setDir(-1)
     setStep((s) => s - 1)
@@ -98,13 +108,13 @@ export default function BookingWizard() {
   const showProgress = step <= TOTAL_STEPS
   const showPriceBar = step >= 2 && step <= 5 && booking.boxCount > 0
   const step1Valid =
-    isStorkobenhavn(booking.deliveryPostcode) && isStorkobenhavn(booking.pickupPostcode)
+    booking.deliveryZipcode && booking.deliveryAddress && booking.pickupZipcode && booking.pickupAddress 
 
   const bottomNavProps = (() => {
     switch (step) {
       case 1: return { onNext: () => goNext(), nextDisabled: !step1Valid, showBack: false }
       case 2: return { onNext: () => goNext(), nextDisabled: booking.boxCount === 0, showBack: true }
-      case 3: return { onNext: () => goNext({ deliveryDate: booking.deliveryDate ?? getNextWeekend() }), showBack: true }
+      case 3: return { onNext: () => checkDate(booking), showBack: true }
       case 4: return { onNext: () => goNext(), showBack: true }
       case 5: return { nextLabel: 'Se opsummering', nextFormId: 'contact-form', showBack: true }
       // Step 6 (opsummering) er sidste step: ingen BottomBar - bekræft-knap + tilbage ligger i StepSummary.
@@ -115,7 +125,7 @@ export default function BookingWizard() {
   return (
     <div className="flex flex-col items-center justify-start pt-1 pb-10 px-4 pb-32">
       <div className="w-full max-w-xl">
-        <ProgressBar current={step} total={TOTAL_STEPS} />
+        <ProgressBar current={step} total={TOTAL_STEPS} showProgress={showProgress} />
 
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div
@@ -129,14 +139,14 @@ export default function BookingWizard() {
           >
             {step === 1 && (
               <StepAddresses
-                value={booking}
+                booking={booking}
                 onChange={updateBooking}
                 onNext={goNext}
               />
             )}
             {step === 2 && (
               <StepBoxCount
-                value={booking}
+                booking={booking}
                 onChange={updateBooking}
                 onNext={goNext}
                 onBack={goBack}
@@ -144,7 +154,7 @@ export default function BookingWizard() {
             )}
             {step === 3 && (
               <StepDate
-                value={booking}
+                booking={booking}
                 onChange={updateBooking}
                 onNext={goNext}
                 onBack={goBack}
@@ -152,7 +162,7 @@ export default function BookingWizard() {
             )}
             {step === 4 && (
               <StepAddons
-                value={booking}
+                booking={booking}
                 onChange={updateBooking}
                 onNext={goNext}
                 onBack={goBack}
@@ -160,7 +170,7 @@ export default function BookingWizard() {
             )}
             {step === 5 && (
               <StepContact
-                value={booking}
+                booking={booking}
                 onChange={updateBooking}
                 onNext={goNext}
                 onBack={goBack}
@@ -180,6 +190,7 @@ export default function BookingWizard() {
           prisPrBoks={calcEffectivePricePerBox(booking)}
           total={calcTotal(booking)}
           onBack={goBack}
+          bookingError={bookingError}
           {...bottomNavProps}
         />
       )}

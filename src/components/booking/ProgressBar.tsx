@@ -1,14 +1,17 @@
 'use client'
 
+import { P } from "../ui/text"
+
 interface ProgressBarProps {
   current: number
   total: number
+  showProgress: boolean
 }
 
-export default function ProgressBar({ current, total }: ProgressBarProps) {
+export default function ProgressBar({ current, total, showProgress }: ProgressBarProps) {
   return (
-    <div className="mb-4 lg:mb-12">
-      <div className="flex gap-1">
+    <div className="mb-4 lg:mb-6">
+      <div className="flex gap-1 mb-0.5">
         {Array.from({ length: total }).map((_, i) => (
           <div
             key={i}
@@ -18,6 +21,7 @@ export default function ProgressBar({ current, total }: ProgressBarProps) {
           />
         ))}
       </div>
+      {showProgress && <P size="small" color="gray">{current}/{total}</P>}
     </div>
   )
 }

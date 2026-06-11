@@ -3,12 +3,11 @@
 import { useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import type { BookingState } from '@/lib/booking/types'
 import StepShell from './StepShell'
 
 interface Props {
-  value: BookingState
+  booking: BookingState
   onChange: (partial: Partial<BookingState>) => void
   onNext: (partial?: Partial<BookingState>) => void
   onBack: () => void
@@ -29,17 +28,17 @@ interface FormValues {
   phoneCountryCode: string
 }
 
-export default function StepContact({ value, onNext, onBack }: Props) {
+export default function StepContact({ booking, onNext, onBack }: Props) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
-      name: value.name,
-      email: value.email,
-      phone: value.phone,
-      phoneCountryCode: value.phoneCountryCode,
+      name: booking.name,
+      email: booking.email,
+      phone: booking.phone,
+      phoneCountryCode: booking.phoneCountryCode,
     },
   })
 

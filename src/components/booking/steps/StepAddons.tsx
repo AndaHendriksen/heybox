@@ -6,7 +6,7 @@ import StepShell from './StepShell'
 import { P } from '@/components/ui/text'
 
 interface Props {
-  value: BookingState
+  booking: BookingState
   onChange: (partial: Partial<BookingState>) => void
   onNext: (partial?: Partial<BookingState>) => void
   onBack: () => void
@@ -57,11 +57,11 @@ function AddonChoice({
   )
 }
 
-export default function StepAddons({ value, onChange, onNext, onBack }: Props) {
-  const tier = getTier(value.boxCount)
+export default function StepAddons({ booking, onChange, onNext, onBack }: Props) {
+  const tier = getTier(booking.boxCount)
   // Rengøring midlertidigt skjult (papkasser kan ikke rengøres) - genaktiveres ved plastikkasser.
-  // const cleaningPrice = Math.round(value.boxCount * tier.cleaningPricePerBox)
-  const carryingPrice = Math.round(value.boxCount * tier.carryingPricePerBox)
+  // const cleaningPrice = Math.round(booking.boxCount * tier.cleaningPricePerBox)
+  const carryingPrice = Math.round(booking.boxCount * tier.carryingPricePerBox)
 
   return (
     <StepShell
@@ -73,7 +73,7 @@ export default function StepAddons({ value, onChange, onNext, onBack }: Props) {
         <div className="space-y-2">
           <P className="font-medium">Rengøring</P>
           <AddonChoice
-            selected={value.addCleaning}
+            selected={booking.addCleaning}
             onChange={(v) => onChange({ addCleaning: v })}
             freeLabel="Rengør selv efter brug"
             paidLabel="Vi rengør dem for jer"
@@ -84,7 +84,7 @@ export default function StepAddons({ value, onChange, onNext, onBack }: Props) {
         <div className="space-y-2">
           <P className="font-medium">Levering</P>
           <AddonChoice
-            selected={value.addCarrying}
+            selected={booking.addCarrying}
             onChange={(v) => onChange({ addCarrying: v })}
             freeLabel="Stillet ved hoveddøren"
             paidLabel="Båret op/ind i boligen"

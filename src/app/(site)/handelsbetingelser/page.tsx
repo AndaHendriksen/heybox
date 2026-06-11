@@ -18,7 +18,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-black mb-3">1. Virksomhedsoplysninger</h2>
             <P>
-              HeyBox er en service leveret af HeyBox ApS, København, Danmark.
+              heybox! er en service leveret af Miko Cooperation, Frederikssund, Danmark.
               Kontakt: <a href="mailto:hey@heybox.dk" className="underline text-black">hey@heybox.dk</a>.
             </P>
           </section>
@@ -26,7 +26,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-black mb-3">2. Serviceydelsen</h2>
             <P className="mb-3">
-              HeyBox tilbyder kortidsudlejning af flyttekasser til privatpersoner i Storkøbenhavn.
+              heybox! tilbyder kortidsudlejning af flyttekasser til privatpersoner i Storkøbenhavn.
               Kasserne leveres til og hentes fra den adresse, der er angivet ved bestilling.
             </P>
             <P>
@@ -38,7 +38,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-black mb-3">3. Bestilling og betaling</h2>
             <P className="mb-3">
-              En bestilling er bindende, når du modtager en bekræftelse fra HeyBox.
+              En bestilling er bindende, når du modtager en bekræftelse fra heybox!.
               Betaling sker kontant via MobilePay ved levering af kasserne.
             </P>
             <P>
@@ -58,7 +58,7 @@ export default function TermsPage() {
               <a href="mailto:hey@heybox.dk" className="underline text-black">hey@heybox.dk</a>.
             </P>
             <P>
-              Ved afbestilling med kortere varsel end 48 timer forbeholder HeyBox sig retten til at
+              Ved afbestilling med kortere varsel end 48 timer forbeholder heybox! sig retten til at
               opkræve et gebyr svarende til ét dagsleje.
             </P>
           </section>
@@ -78,7 +78,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-black mb-3">6. Levering og afhentning</h2>
             <P className="mb-3">
-              HeyBox leverer og afhenter inden for Storkøbenhavn (postnumre 1000–2959 med enkelte
+              heybox! leverer og afhenter inden for Storkøbenhavn (postnumre 1000–2959 med enkelte
               undtagelser). Du vil modtage et tidsvindue for levering og afhentning via email eller SMS.
             </P>
             <P>
@@ -103,7 +103,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-lg font-semibold text-black mb-3">8. Privatlivspolitik</h2>
             <P className="mb-3">
-              HeyBox behandler dine personoplysninger (navn, adresse, email, telefonnummer) udelukkende
+              heybox! behandler dine personoplysninger (navn, adresse, email, telefonnummer) udelukkende
               til brug for at gennemføre din bestilling og kommunikere med dig om den.
             </P>
             <P className="mb-3">

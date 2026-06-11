@@ -1,153 +1,93 @@
-# Plan: Pivot hjemmeside fra plastkasser → robuste papkasser
+---
+# Plan: Replace booking autocomplete with postcode-based select + address input
 
-> **Status:** ✅ Implementeret (Phase B + C + D) — type-check + lint rene | **Last Updated:** 2026-06-08
-> **Scope:** Tekstændringer på hele sitet + ombygning af booking-flowets sidste step
+> **Status:** 🟡 In Progress | **Last Updated:** 2026-06-11
+> **Scope:** src/components/booking/steps/StepAddresses.tsx
 
 ---
 
 ## 1. Context & Objectives
-
-**Goal:** Hele hjemmesidens budskab skifter fra "vi udlejer robuste **plast**kasser (samme pris som pap)" til "vi udlejer **robuste/professionelle flyttekasser** der er stærkere og holder længere end de tynde kasser fra byggemarkedet." Strukturen, sektionsrækkefølgen og designet bevares 1:1.
-
-**Constraints:**
-- Behold sektionsstruktur og rækkefølge på alle sider.
-- Ingen nye dependencies.
-- Brug **Edit-værktøjet** til alle tekstændringer (PowerShell ødelægger UTF-8/æøå) — se [[feedback_file_editing]].
-- **Terminologi *(brugerbeslutning)*:** Skriv "**flyttekasser**" eller "**professionelle flyttekasser**" — IKKE "papflyttekasser"/"plastkasser". Danskere siger bare "flyttekasser", og stort set alle flyttekasser er af pap, så vi behøver ikke fremhæve "pap". Ordet "pap" bruges **kun** hvor vi bevidst kontrasterer tykkelse mod byggemarkedets tynde kasser (B.3-brødtekst, B.5).
-- **Billeder + alt-tekster *(brugerbeslutning)*:** Brugeren skifter selv billeder OG alt-tekster → **rør ikke ved `alt=`-attributter eller billedfiler.**
-
-**Afklarede strategiske valg:**
-1. **Prisanker (D-1) = (c):** Behold pris-badget ("fra 13,95 kr/kasse"), men hook'et/argumentet er **convenience** (vi leverer, henter, alt inkluderet), ikke pris-sammenligning med pap. Fjern alle "samme pris som papkasser i byggemarkedet"-formuleringer.
-2. **Miljønarrativ (D-2) = godkendt:** "Fjenden" omdefineres fra *pap generelt* → *tyndt engangs-pap fra byggemarkedet*. Vores professionelle flyttekasser er den holdbare/genbrugbare løsning.
-
----
+**Goal:** Replace the current Google Places autocomplete address inputs with a local city/postcode select backed by `src/lib/locations.ts`, and show a follow-up free-text address input only after the user chooses a location. This must apply to both the delivery and pickup address blocks.
+**Constraints:** No new external dependencies. Preserve the existing booking state fields (`deliveryAddress`, `deliveryZipcode`, `pickupAddress`, `pickupZipcode`) and validation behavior. Keep styling consistent with the existing Tailwind/UI patterns.
 
 ## 2. Technical Research & State
-
-Sitet er statisk-tekstet (ingen CMS) — al copy ligger hårdkodet i komponenter/pages/`src/lib`.
-
-- **Affected Files (copy):**
-  - `src/app/(site)/page.tsx`: Forsiden — Hero, NoDriving, BoxQuality, NoCleanup, CardboardReuse. **Flest ændringer.**
-  - `src/app/(site)/om-os/page.tsx`: Decision-sektion ("Robuste plastkasser").
-  - `src/lib/seo.ts`: FAQ-tekst + HowTo-beskrivelse. **Driver både JSON-LD og synlig FAQ.**
-  - `src/app/layout.tsx`: Global meta/OG/Twitter.
-  - `src/components/sections/footer.tsx`: Slogan.
-  - `src/app/booking/page.tsx`: Booking-metadata.
-  - `seo.md`: intern reference-doc (lav prioritet).
-
-- **Affected Files (booking-flow, Phase D):**
-  - `src/components/booking/steps/StepApology.tsx`: **Fjernes helt.**
-  - `src/components/booking/BookingWizard.tsx`, `BottomBar.tsx`, `steps/StepSummary.tsx`: Summary bliver sidste step; terms+submit flyttes ind; BottomBar skjules på sidste step.
-  - `src/lib/email/booking-confirmation.ts`: `carryingLabel`-kommentar/logik (afhænger af bæring-spørgsmålet).
-  - `src/lib/stats.ts`: kun kommentar-framing (`genbrugPerKasse=5` **bevares**).
-
-- **Existing Logic at undgå at bryde:**
-  - `seo.ts FAQ_ITEMS` driver **både** `faqJsonLd()` og den synlige `<Faq/>` → ret ét sted, begge opdateres.
-  - `StepApology` kalder `createBooking` + `track('Purchase')` + redirect + terms-checkbox. **Al denne submit-logik flyttes uændret ind i `StepSummary`** — slet ikke logikken sammen med teksten.
-  - `BookingWizard`: 7 steps (Summary=6, Apology=7), `TOTAL_STEPS=5`. BottomBar vises `step <= 6`. Efter ombygning: Summary=sidste step, BottomBar skjules på det (`step <= 5`), Purchase fyrer fra Summary. Analytics `AddPaymentInfo`/`ViewSummary` i `emitStepEvent` bevares.
-
----
+- **Affected Files:**
+  - `src/components/booking/steps/StepAddresses.tsx`: existing booking address UI component and current autocomplete logic.
+  - `src/lib/locations.ts`: source-of-truth list of delivery locations and postcode data.
+- **Existing Logic:**
+  - `StepAddresses.tsx` currently renders two `AddressAutocomplete` components.
+  - Each autocomplete uses Google Maps Places API for suggestions and populates `deliveryAddress`/`pickupAddress` and `deliveryZipcode`/`pickupZipcode`.
+  - The booking wizard continues only when both postcodes validate as Storkøbenhavn.
+- **New Components/Hooks:**
+  - `AddressLocationSelect` (or inline logic inside `StepAddresses`): a select field that lists all delivery locations by `name`, sorted alphabetically.
+  - `AddressDetailsInput`: follow-up text input shown conditionally after a location is selected.
 
 ## 3. User Journey & Flow
+- [ ] **Step 1:** User opens the booking address step.
+    - [ ] 1.1 Delivery block renders a location dropdown and no free-text address initially.
+    - [ ] 1.2 Pickup block renders a location dropdown and no free-text address initially.
+- [ ] **Step 2:** User selects a city/location from the dropdown.
+    - [ ] 2.1 The selected location name is displayed in the select field.
+    - [ ] 2.2 The corresponding postcode is stored in `deliveryZipcode` or `pickupZipcode`.
+    - [ ] 2.3 A new address input appears below the select.
+- [ ] **Step 3:** User enters the street+number or delivery details into the new input.
+    - [ ] 3.1 The typed address is stored in `deliveryAddress` or `pickupAddress`.
+    - [ ] 3.2 Validation remains based on postcode presence and Storkøbenhavn coverage.
 
-- [ ] **Forside:** Hero → "Vi fjerner bøvlet" → Ingen tur til byggemarked → Stærkere end pap → Ingen oprydning → 3 trin → Miljø/affald → FAQ → CTA. *(Samme rækkefølge, ny copy.)*
-- [ ] **Om os:** uændret rækkefølge, ny copy i Decision.
-- [ ] **Booking-flow:** Addresses → BoxCount → Date → Addons → Contact → **Summary (sidste step: terms-checkbox + bekræft-knap inline + MobilePay-note, ingen BottomBar)** → Confirmation. *(StepApology fjernet.)*
+## 4. Implementation Roadmap (The To-Do)
+### Phase A: Setup & Data
+- [ ] **A.1:** Import `DELIVERY_LOCATIONS` from `src/lib/locations.ts` into `StepAddresses.tsx`.
+- [ ] **A.2:** Create a sorted location list by `name` for the select options.
+- [ ] **A.3:** Define a compact internal type for location select values.
 
----
-
-## 4. Implementation Roadmap
-
-### Phase B: Forsiden (`src/app/(site)/page.tsx`) — KLAR
-- [ ] **B.1:** Hero-lead (convenience-hook, "professionelle flyttekasser"). *(Alt-tekst + badge urørt.)*
-- [ ] **B.2:** NoDriving (convenience, drop pris-sammenligning).
-- [ ] **B.3:** BoxQuality (ny titel + brødtekst m. tapeløst foldelåg).
-- [ ] **B.4:** NoCleanup.
-- [ ] **B.5:** CardboardReuse (titel "Tyndt pap holder ikke længe", "2-3 flytninger", "plastkasser"→"vores kasser").
-
-### Phase C: Øvrige sider & SEO — KLAR
-- [ ] **C.1:** `seo.ts` — FAQ-item + pris-FAQ + HowTo-desc.
-- [ ] **C.2:** `layout.tsx` — meta/OG/Twitter.
-- [ ] **C.3:** `om-os/page.tsx` — Decision.
-- [ ] **C.4:** `footer.tsx` — slogan.
-- [ ] **C.5:** `booking/page.tsx` — metadata.
-- [ ] **C.6:** `stats.ts` kommentar-framing + `seo.md`.
-
-### Phase D: Booking-flow — bæring = BETALT (Mulighed B, brugervalgt)
-- [ ] **D.1:** Drop `StepApology`; flyt terms+submit+MobilePay ind i `StepSummary` (sidste step); skjul BottomBar på sidste step; back-knap inline.
-- [ ] **D.2:** `actions/booking.ts`: `calcTotalWithoutAddons` → **`calcTotal`** (bæring opkræves nu) i DB-total, mail-total og CAPI-value. Browser-`Purchase` i StepSummary bruger også `calcTotal`.
-- [ ] **D.3:** `booking-confirmation.ts`: `carryingLabel` afspejler `addCarrying` (ikke længere hardcoded gratis); sørg for at valgte tilvalg vises.
-- [ ] **D.4:** **Udkommentér rengøring** (man kan ikke rengøre pap) i `StepAddons`, `StepSummary` og `booking-confirmation.ts` — men **bevar al kode/funktionalitet** (state-felt, calc-logik, DB) så det kan genaktiveres når plastikkasser kommer.
+### Phase B: UI & Integration
+- [ ] **B.1:** Replace `AddressAutocomplete` with a new address-selection block.
+- [ ] **B.2:** Render a `<select>` for location selection and conditionally render a text input.
+- [ ] **B.3:** Wire selection changes to `onChange()` updates for postcode and clear/fill logic.
+- [ ] **B.4:** Keep the existing postcode validation UI and error message behavior.
 
 ---
 
-## 5. Technical Specifications — endelig copy
+## 5. Technical Specifications (To-Do Details)
 
-### Task [B.1]: Hero — `src/app/(site)/page.tsx`
-- **L70–73 (lead):** "Robuste plastkasser til samme pris som papkasser i byggemarkedet. Vi leverer og henter dem igen…" → **"Professionelle flyttekasser der er langt stærkere end de tynde fra byggemarkedet. Vi leverer dem til din dør og henter dem igen, når du er færdig — alt sammen inkluderet, så du slipper for turen og slæbet."**
-- **L62 (badge):** behold "Lej fra 13.95 kr/kasse". **L69 (H1):** behold. **L59 (alt):** urørt (bruger).
+### Task [A.1]: Import delivery locations
+- **Input/Props:** none
+- **Logic:**
+  - Import `DELIVERY_LOCATIONS` from `src/lib/locations.ts`.
+  - Derive an array sorted by `name`.
+  - Each option should include the display `name`, matching `postcode`, and `code` if needed.
+- **Code Reference:** `src/components/booking/steps/StepAddresses.tsx`
 
-### Task [B.2]: NoDriving — `src/app/(site)/page.tsx`
-- **L100–101:** "Drop køen i byggemarkedet. Vores kasser koster det samme som papkasser, men vi leverer dem direkte til din dør…" → **"Drop køen i byggemarkedet og slæbet med fladpakkede kasser. Vi leverer professionelle flyttekasser direkte til din dør og henter dem igen, så du kan bruge tiden på det der betyder noget."**
+### Task [A.2]: Define location select state and output
+- **Input/Props:**
+  - `id: string`
+  - `label: string`
+  - `value: string` (address text)
+  - `postcode: string`
+  - `onSelect: (address: string, postcode: string) => void`
+  - `onClear: () => void`
+- **Logic:**
+  - Render a `<select>` with an initial placeholder option like `Vælg by / område`.
+  - When an option is chosen, set the booking postcode and clear the address if location changes.
+  - When no location is selected, hide the free-text address input.
+- **Code Reference:** original `AddressAutocomplete` component.
 
-### Task [B.3]: BoxQuality — `src/app/(site)/page.tsx`
-- **L115 (titel):** "Stærkere og nemmere end pap" → **"Stærkere og nemmere end almindelige flyttekasser"** *(bevarer "stærkere og nemmere"-strukturen, fjerner pap-vs-pap-problemet)*.
-- **L116 (brødtekst):** "Ingen kasser der skal samles med tape. Ingen bunde der falder ud. Vores kasser er robuste, stables perfekt og lukkes med et enkelt klik." → **"Vores kasser er lavet i ekstra tykt pap — meget kraftigere end de tynde kasser fra byggemarkedet. Bundene falder ikke ud, de stables sikkert, og det tapeløse foldelåg lukker uden en eneste rulle tape."**
-- **Notes:** Tapeløst foldelåg bekræftet af bruger → "nemmere"/"uden tape" er sande claims.
-
-### Task [B.4]: NoCleanup — `src/app/(site)/page.tsx`
-- **L132:** "Med papkasser sidder du tilbage med et bjerg af affald når flytningen er overstået. Vi sørger for at hente kasserne…" → **"Køber du billige flyttekasser, sidder du tilbage med et bjerg af pap når flytningen er overstået. Vores kasser henter vi igen, så du bare kan slappe af og nyde dit nye sted."**
-
-### Task [B.5]: CardboardReuse — `src/app/(site)/page.tsx`
-- **L204 (titel):** "Papkasser genbruges sjældent" → **"Tyndt pap holder ikke længe"**.
-- **L205–208 (brødtekst):** → **"Tynde flyttekasser fra byggemarkedet tåler typisk kun 2-3 flytninger, og fugt eller dårlig opbevaring forkorter ofte levetiden. Derfor ender millioner af kasser som affald hvert år."** / **"Vores kasser er lavet i ekstra kraftigt pap, der holder langt flere flytninger — samme kasser, mange flytninger, mindre affald."**
-- **Notes:** `genbrugPerKasse=5` i `stats.ts` **bevares** (konservativt ift. affaldsberegningen) jf. bruger. Forsidens "2-3 flytninger" (tyndt byggemarkeds-pap) og statistikkens "5 genbrug pr. kasse" (landsgennemsnit) er bevidst forskellige tal. **L201 (alt):** urørt (bruger).
-
-### Task [C.1]: SEO — `src/lib/seo.ts`
-- **L53–54 (FAQ):** Q "Hvorfor er plastkasser bedre end papkasser?" → **Q: "Hvorfor er jeres flyttekasser bedre end dem fra byggemarkedet?"** A → **"Vores flyttekasser er lavet i ekstra kraftigt pap, så de er langt stærkere og holder mange flere flytninger end de tynde kasser fra byggemarkedet. Vi leverer og henter dem igen, så du slipper for slæbet og for papaffaldet bagefter."**
-- **L34 (pris-FAQ):** "Du betaler stort set samme pris som for papkasser i byggemarkedet - men slipper for turen, slæbet og affaldet bagefter." → **"Levering og afhentning er altid inkluderet, så du slipper for turen til byggemarkedet, slæbet og affaldet bagefter."** *(convenience-hook)*
-- **L99–100 (HowTo desc):** "robuste plastflyttekasser" → **"professionelle flyttekasser"**.
-
-### Task [C.2]: Global meta — `src/app/layout.tsx`
-- **L26 / L35 / L49:** "Lej stærke flyttekasser til samme pris som pap. Levering og afhentning i Storkøbenhavn er inkluderet…" → **"Lej professionelle flyttekasser. Levering og afhentning i Storkøbenhavn er inkluderet — ingen bil og ingen oprydning bagefter. Beregn din pris online."** (kortere variant til OG/Twitter uden sidste sætning).
-
-### Task [C.3]: Om os — `src/app/(site)/om-os/page.tsx`
-- **L169 (Decision):** "Robuste plastkasser, der kan bruges igen og igen, til præcis samme pris som papkasser i byggemarkedet. Vi leverer når du skal bruge dem og henter dem igen, når du er på plads." → **"Robuste, professionelle flyttekasser, der kan bruges igen og igen. Vi leverer når du skal bruge dem og henter dem igen, når du er på plads."**
-- **Mission/vision (papaffald-narrativ):** behold — passer med D-2. **L165 (alt):** urørt (bruger).
-
-### Task [C.4]: Footer — `src/components/sections/footer.tsx`
-- **L16:** "Lej robuste flyttekasser til samme pris som pap. Vi leverer til din dør og henter igen. Altid gratis." → **"Lej robuste flyttekasser. Vi leverer til din dør og henter igen. Altid gratis."** *(bruger: "robuste flyttekasser" er fint)*
-
-### Task [C.5]: Booking-metadata — `src/app/booking/page.tsx`
-- **L9–15:** "robuste flyttekasser" → **"professionelle flyttekasser"** (ellers neutral; ingen "plast"/"pap").
-
-### Task [C.6]: stats.ts + seo.md
-- `stats.ts`: behold tal, opdater evt. kommentarer så de matcher narrativet. `seo.md`: opdater plast-referencer til ny terminologi.
-
-### Task [D.1]: Drop StepApology → flyt afslutning ind i StepSummary
-1. **`StepSummary.tsx`** overtager fra StepApology: `termsAccepted`-state + terms-checkbox (link `/handelsbetingelser`), inline submit-knap nederst ("Bekræft og betal"), submit-logik uændret (`createBooking` → `track('Purchase', …, eventId)` → redirect; fejl → `bookingError`; `useTransition`/`isPending`), synlig MobilePay-note. Props udvides.
-2. **`BookingWizard.tsx`:** fjern `StepApology`-import + `{step===7}`. Summary=sidste step; `bottomNavProps` case 6/7 fjernes. Skjul BottomBar: `{step <= 6 …}` → `{step <= 5 …}`. Bevar `AddPaymentInfo`/`ViewSummary`-events.
-3. **Back-navigation:** inline "← Tilbage"-knap i `StepSummary` (BottomBar-back forsvinder). *(Jeg vælger placering — nederst ved knappen.)*
-4. **`booking-confirmation.ts`:** opdater "jf. StepApology"-kommentar; `carryingLabel` jf. bæring-svar.
-> **Afhænger af bæring-spørgsmålet nedenfor** (bestemmer om StepSummary viser bæring som gratis eller betalt).
-
----
+### Task [B.1]: Render the free-text address input conditionally
+- **Input/Props:** same as above
+- **Logic:**
+  - After a valid location is selected, display a text input with a placeholder such as `Fx: Gammel Kongevej 1`.
+  - The typed value should update `deliveryAddress`/`pickupAddress` via `onChange`.
+  - If the user clears the location, set both address and postcode to empty.
+- **Notes:**
+  - Keep validation icon and invalid-state styling for the postcode.
+  - The text input itself can be plain and does not need postcode validation.
 
 ## 6. Verification Checklist
-- [ ] Grep: `plast`/`plastik`/`plastkasse` = **0** brugervendte hits efter ændringer.
-- [ ] Ingen sætning siger længere "samme pris som pap" (D-1).
-- [ ] Ingen `alt=`/billedfiler ændret (bruger klarer dem).
-- [ ] JSON-LD (FAQ + HowTo) afspejler ny tekst.
-- [ ] Booking gennemføres end-to-end fra StepSummary: terms blokerer, `createBooking`+`Purchase`+redirect virker, MobilePay synlig, back muligt uden BottomBar.
-- [ ] Mobil + desktop: ingen tekst-overflow (Hero-lead, BoxQuality).
-- [ ] Æøå korrekt (Edit, ikke PowerShell).
+- [ ] Unit Tests: verify `StepAddresses` updates `deliveryZipcode`/`pickupZipcode` when location is selected.
+- [ ] Unit Tests: verify free-text address input only appears after location selection.
+- [ ] Manual Check: confirm location dropdown is sorted alphabetically by `name`.
+- [ ] Manual Check: confirm the booking wizard still validates only Storkøbenhavn postcodes.
+- [ ] Manual Check: ensure both delivery and pickup blocks behave identically.
 
 ## 7. Comments & Deviations
-
-Note [2026-06-08]: Alle brugerkommentarer indarbejdet. Terminologi låst til "flyttekasser"/"professionelle flyttekasser" (ikke "papflyttekasser"). D-1=(c) convenience, D-2 godkendt, D-4 = bruger klarer billeder+alt-tekster. Stats `genbrugPerKasse=5` bevares; B.5-copy bruger bevidst "2-3 flytninger" for byggemarkeds-pap.
-
-**Bæring (afklaret): Mulighed B — betalt tilvalg.** Den gratis bæring var en kompensation for manglende plastkasser; nu tilbyder vi bare papkasser, så bæring bliver et normalt betalt tilvalg (som `StepAddons` allerede er bygget til). Derfor:
-- `actions/booking.ts` skifter fra `calcTotalWithoutAddons` → `calcTotal`, så bæring faktisk opkræves (i DB, mail og Meta CAPI). Tidligere blev add-ons givet gratis i hele apology-flowet.
-- Bekræftelsesmailen skal vise de valgte tilvalg korrekt (bæring efter `addCarrying`).
-
-**Rengøring (brugerbeslutning): udkommenteres.** Papkasser kan ikke rengøres, så rengørings-tilvalget skjules i UI (`StepAddons`, `StepSummary`) og i mailen. **Al kode bevares** (BookingState.addCleaning, calc-logik, DB-kolonne, mail-label) som udkommenterede blokke, så det kan genaktiveres når plastikkasser kommer.
+Note [2026-06-11]: The plan replaces the external autocomplete dependency with a locally-driven select + text input flow, preserving the existing booking state interface and validation logic.

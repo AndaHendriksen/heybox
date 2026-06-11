@@ -1,6 +1,7 @@
 'use server'
 
-import { and, asc, eq, gte, isNull, or } from 'drizzle-orm'
+import { count, and, asc, eq, gte, isNull, or } from 'drizzle-orm'
+import { format } from 'date-fns';
 import { db } from '@/lib/db'
 import { bookings, pricingTiers } from '@/lib/db/schema'
 import type { BookingState } from '@/lib/booking/types'
@@ -10,6 +11,8 @@ import { renderBookingConfirmation } from '@/lib/email/booking-confirmation'
 import { sendCapiEvent } from '@/lib/analytics/meta-capi'
 import { firstName } from '@/lib/utils/string'
 import { SITE_URL } from '@/lib/seo'
+import { formatToCleanDate } from '../utils';
+import { combineAddressZipcodeCityAndCountry } from '../utils/geo';
 
 const INTERNAL_EMAIL = 'hey@heybox.dk'
 
@@ -20,9 +23,9 @@ function generateBookingNumber(): string {
 }
 
 export async function createBooking(
-  state: BookingState,
+  booking: BookingState,
 ): Promise<{ id: string; bookingNumber: string; eventId: string } | { error: string }> {
-  if (!state.deliveryDate) return { error: 'Leveringsdato mangler' }
+  if (!booking.deliveryDate) return { error: 'Leveringsdato mangler' }
 
   try {
     const [tier] = await db
@@ -31,7 +34,7 @@ export async function createBooking(
       .where(
         and(
           eq(pricingTiers.is_active, true),
-          or(isNull(pricingTiers.max_boxes), gte(pricingTiers.max_boxes, state.boxCount)),
+          or(isNull(pricingTiers.max_boxes), gte(pricingTiers.max_boxes, booking.boxCount)),
         ),
       )
       .orderBy(asc(pricingTiers.max_boxes))
@@ -39,13 +42,16 @@ export async function createBooking(
 
     if (!tier) return { error: 'Ingen aktiv prisliste fundet - kontakt os på hey@heybox.dk' }
 
-    const pickupDate = new Date(state.deliveryDate)
-    pickupDate.setDate(pickupDate.getDate() + (tier.base_weeks + state.extraWeeks) * 7)
+    const pickupDate = new Date(booking.deliveryDate)
+    pickupDate.setDate(pickupDate.getDate() + (tier.base_weeks + booking.extraWeeks) * 7)
 
     // Canonical total = what the customer was quoted on screen, incl. paid add-ons
     // (e.g. carrying). Cleaning is currently disabled in the UI but the calc stays
     // intact so it re-activates automatically once it's offered again.
-    const total = calcTotal(state)
+    const total = calcTotal(booking)
+
+    const delivery_date = formatToCleanDate(booking.deliveryDate);
+    const pickup_date = formatToCleanDate(pickupDate);
 
     const [created] = await db
       .insert(bookings)
@@ -53,21 +59,21 @@ export async function createBooking(
         user_id: null,
         tier_id: tier.id,
         status: 'pending',
-        delivery_address: state.deliveryAddress,
-        delivery_postcode: state.deliveryPostcode,
-        pickup_address: state.pickupAddress,
-        pickup_postcode: state.pickupPostcode,
-        box_count: state.boxCount,
-        delivery_date: state.deliveryDate,
-        pickup_date: pickupDate,
-        extra_weeks: state.extraWeeks,
-        add_cleaning: state.addCleaning,
-        add_carrying: state.addCarrying,
+        delivery_address: combineAddressZipcodeCityAndCountry(booking.deliveryAddress, booking.deliveryZipcode),
+        delivery_postcode: booking.deliveryZipcode,
+        pickup_address: combineAddressZipcodeCityAndCountry(booking.pickupAddress, booking.pickupZipcode),
+        pickup_postcode: booking.pickupZipcode,
+        box_count: booking.boxCount,
+        delivery_date,
+        pickup_date,
+        extra_weeks: booking.extraWeeks,
+        add_cleaning: booking.addCleaning,
+        add_carrying: booking.addCarrying,
         total_price: total,
-        customer_name: state.name,
-        customer_email: state.email,
-        customer_phone: state.phone,
-        customer_phone_country_code: state.phoneCountryCode,
+        customer_name: booking.name,
+        customer_email: booking.email,
+        customer_phone: booking.phone,
+        customer_phone_country_code: booking.phoneCountryCode,
         booking_number: generateBookingNumber(),
       })
       .returning({ id: bookings.id, bookingNumber: bookings.booking_number })
@@ -76,21 +82,21 @@ export async function createBooking(
     try {
       const { subject, html, text } = renderBookingConfirmation({
         bookingNumber: created.bookingNumber,
-        name: state.name,
-        boxCount: state.boxCount,
-        deliveryAddress: state.deliveryAddress,
-        deliveryPostcode: state.deliveryPostcode,
-        pickupAddress: state.pickupAddress,
-        pickupPostcode: state.pickupPostcode,
-        deliveryDate: new Date(state.deliveryDate),
+        name: booking.name,
+        boxCount: booking.boxCount,
+        deliveryAddress: booking.deliveryAddress,
+        deliveryZipcode: booking.deliveryZipcode,
+        pickupAddress: booking.pickupAddress,
+        pickupZipcode: booking.pickupZipcode,
+        deliveryDate: new Date(booking.deliveryDate),
         pickupDate,
-        totalWeeks: tier.base_weeks + state.extraWeeks,
-        addCleaning: state.addCleaning,
-        addCarrying: state.addCarrying,
+        totalWeeks: tier.base_weeks + booking.extraWeeks,
+        addCleaning: booking.addCleaning,
+        addCarrying: booking.addCarrying,
         total,
       })
 
-      const customer = await sendEmail({ to: state.email, toName: state.name, subject, html, text })
+      const customer = await sendEmail({ to: booking.email, toName: booking.name, subject, html, text })
       if ('error' in customer) console.error('Confirmation email failed:', customer.error)
 
       // Internal notification (Sweego has no native BCC; separate send keeps the
@@ -114,17 +120,39 @@ export async function createBooking(
       eventId,
       eventSourceUrl: `${SITE_URL}/booking`,
       user: {
-        email: state.email,
-        phone: state.phone,
-        phoneCountryCode: state.phoneCountryCode,
-        firstName: firstName(state.name),
+        email: booking.email,
+        phone: booking.phone,
+        phoneCountryCode: booking.phoneCountryCode,
+        firstName: firstName(booking.name),
       },
-      customData: { value: total, currency: 'DKK', num_items: state.boxCount },
+      customData: { value: total, currency: 'DKK', num_items: booking.boxCount },
     })
 
     return { id: created.id, bookingNumber: created.bookingNumber, eventId }
   } catch (err) {
     console.error('createBooking failed:', err)
     return { error: 'Noget gik galt. Prøv igen eller kontakt os på hey@heybox.dk' }
+  }
+}
+
+export async function isBookingDateAvailable(
+  date: string,
+): Promise<number> {
+  try {
+    const [result] = await db
+      .select({ count: count() })
+      .from(bookings)
+      .where(
+        eq(bookings.delivery_date, date)
+      );
+
+    console.log('count', result.count)
+
+    // if (result.count > 80) return false
+
+    return result.count
+  } catch (err) {
+    console.error('createBooking failed:', err)
+    return 0
   }
 }

@@ -2,10 +2,12 @@ export type Package = 'micro' | 'small' | 'medium' | 'large'
 
 export interface BookingState {
   deliveryAddress: string
-  deliveryPostcode: string
+  deliveryZipcode: string
   pickupAddress: string
-  pickupPostcode: string
+  pickupZipcode: string
   deliveryDate: Date | null
+  deliveryDateFinal: string
+  pickupDateFinal: string
   extraWeeks: number
   boxCount: number
   selectedPackage: Package | null

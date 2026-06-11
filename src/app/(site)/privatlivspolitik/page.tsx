@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = {
   title: 'Privatlivs- og cookiepolitik',
   description:
-    'Sådan behandler HeyBox dine personoplysninger og bruger cookies, herunder marketingcookies fra Facebook og Instagram.',
+    'Sådan behandler heybox! dine personoplysninger og bruger cookies, herunder marketingcookies fra Facebook og Instagram.',
   alternates: { canonical: '/privatlivspolitik' },
   robots: { index: true, follow: true },
 }
@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <h2 className="text-lg font-semibold text-black mb-3">1. Dataansvarlig</h2>
             <P>
-              HeyBox ApS, København, Danmark, er dataansvarlig for behandlingen af de
+              Miko Cooperation, Frederikssund, Danmark, er dataansvarlig for behandlingen af de
               personoplysninger, vi indsamler om dig. Har du spørgsmål til denne politik eller
               ønsker du at gøre brug af dine rettigheder, kan du kontakte os på{' '}
               <a href="mailto:hey@heybox.dk" className="underline text-black">hey@heybox.dk</a>.

@@ -8,7 +8,7 @@ import StepShell from './StepShell'
 import { P } from '@/components/ui/text'
 
 interface Props {
-  value: BookingState
+  booking: BookingState
   onChange: (partial: Partial<BookingState>) => void
   onNext?: (partial?: Partial<BookingState>) => void
   onBack?: () => void
@@ -37,11 +37,11 @@ function formatDanish(date: Date): string {
   })
 }
 
-export default function StepDate({ value, onChange }: Props) {
+export default function StepDate({ booking, onChange }: Props) {
   const defaultDate = useMemo(() => nextWeekend(), [])
-  const selected = value.deliveryDate!
-  const tier = getTier(value.boxCount)
-  const totalWeeks = tier.baseWeeks + value.extraWeeks
+  const selected = booking.deliveryDate!
+  const tier = getTier(booking.boxCount)
+  const totalWeeks = tier.baseWeeks + booking.extraWeeks
   const pickupDate = selected ? addDays(selected, totalWeeks * 7) : undefined
 
   function handleSelect(date: Date | undefined) {
@@ -94,16 +94,16 @@ export default function StepDate({ value, onChange }: Props) {
           <P>Ekstra uger:</P>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => onChange({ extraWeeks: Math.max(0, value.extraWeeks - 1) })}
-              disabled={value.extraWeeks === 0}
+              onClick={() => onChange({ extraWeeks: Math.max(0, booking.extraWeeks - 1) })}
+              disabled={booking.extraWeeks === 0}
               className="w-8 h-8 cursor-pointer rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               -
             </button>
-            <P color="gray" className="w-4 text-center font-medium">{value.extraWeeks}</P>
+            <P color="gray" className="w-4 text-center font-medium">{booking.extraWeeks}</P>
             <button
-              onClick={() => onChange({ extraWeeks: Math.min(4, value.extraWeeks + 1) })}
-              disabled={value.extraWeeks === 4}
+              onClick={() => onChange({ extraWeeks: Math.min(4, booking.extraWeeks + 1) })}
+              disabled={booking.extraWeeks === 4}
               className="w-8 h-8 cursor-pointer rounded-full border border-zinc-300 flex items-center justify-center hover:border-primary hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               +
@@ -112,7 +112,7 @@ export default function StepDate({ value, onChange }: Props) {
         </div>
         <div className="text-right">
           <P>
-            +{tier.extraWeekPricePerBox.toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr/kasse
+            +{(tier.extraWeekPricePerBox * booking.extraWeeks).toLocaleString('da-DK', { minimumFractionDigits: 2 })} kr/kasse
           </P>
         </div>
       </div>

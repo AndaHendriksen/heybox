@@ -1,6 +1,6 @@
 export const SITE_URL = "https://heybox.dk"
 export const BRAND = "heybox"
-export const LEGAL_NAME = "HeyBox ApS"
+export const LEGAL_NAME = "Miko Cooperation"
 export const LOCALE = "da_DK"
 export const CONTACT_EMAIL = "hey@heybox.dk"
 export const AREA_SERVED = "Storkøbenhavn"

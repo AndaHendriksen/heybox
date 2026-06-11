@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button'
 import { formatTotal } from '@/lib/booking/utils'
 import { ChevronLeft } from 'lucide-react'
+import { P } from '../ui/text'
 
 interface BottomBarProps {
   showPriceBar: boolean
@@ -15,6 +16,7 @@ interface BottomBarProps {
   nextFormId?: string
   showBack?: boolean
   onBack?: () => void
+  bookingError?: string | null
 }
 
 export default function BottomBar({
@@ -28,9 +30,13 @@ export default function BottomBar({
   nextFormId,
   showBack = false,
   onBack,
+  bookingError
 }: BottomBarProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/10 backdrop-blur-xs border-t border-zinc-100">
+      {bookingError && (
+        <P className="text-sm text-red-500 text-center mt-4">{bookingError}</P>
+      )}
       <div className="max-w-xl mx-auto px-4 py-3 flex flex-col gap-3">
         {showPriceBar && boxCount > 0 && (
           <div className="flex items-center justify-between text-sm">

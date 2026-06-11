@@ -5,7 +5,7 @@ import StepShell from './StepShell'
 import { P } from '@/components/ui/text'
 
 interface Props {
-  value: BookingState
+  booking: BookingState
   onChange: (partial: Partial<BookingState>) => void
   onNext: (partial?: Partial<BookingState>) => void
   onBack: () => void
@@ -33,8 +33,8 @@ function StepperButton({
   )
 }
 
-export default function StepBoxCount({ value, onChange, onNext, onBack }: Props) {
-  const boxCount = value.boxCount
+export default function StepBoxCount({ booking, onChange, onNext, onBack }: Props) {
+  const boxCount = booking.boxCount
 
   function adjustCount(delta: number) {
     const next = Math.max(1, boxCount + delta)

@@ -2,10 +2,11 @@ import type { BookingState, Tier } from './types'
 
 export const INITIAL_BOOKING_STATE: BookingState = {
   deliveryAddress: '',
-  deliveryPostcode: '',
+  deliveryZipcode: '',
   pickupAddress: '',
-  pickupPostcode: '',
+  pickupZipcode: '',
   deliveryDate: null,
+  deliveryDateFinal: '',
   extraWeeks: 0,
   boxCount: 20,
   selectedPackage: null,
@@ -15,6 +16,7 @@ export const INITIAL_BOOKING_STATE: BookingState = {
   email: '',
   phone: '',
   phoneCountryCode: '+45',
+  pickupDateFinal: '',
 }
 
 export const PACKAGES = {

@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { P } from '@/components/ui/text'
+import { formatToCleanDate } from '@/lib/utils'
+import { combineAddressZipcodeAndCity, combineAddressZipcodeCityAndCountry } from '@/lib/utils/geo'
 
 interface Props {
   booking: BookingState
@@ -73,7 +75,12 @@ export default function StepSummary({ booking, onBack }: Props) {
     if (isPending) return
 
     startTransition(async () => {
+      const tier = getTier(booking.boxCount)
       setBookingError(null)
+
+      booking.deliveryDateFinal = formatToCleanDate(booking.deliveryDate!)
+      booking.pickupDateFinal = formatToCleanDate(addWeeks(booking.deliveryDate!, tier.baseWeeks + booking.extraWeeks))
+
       const result = await createBooking(booking)
       if ('error' in result) {
         setBookingError(result.error)
@@ -118,7 +125,7 @@ export default function StepSummary({ booking, onBack }: Props) {
               {deliveryCarryingLabel}
             </P>
             <P>
-              {booking.deliveryAddress}
+              {combineAddressZipcodeAndCity(booking.deliveryAddress, booking.deliveryZipcode)}
             </P>
           </TimelineCard>
 
@@ -150,7 +157,7 @@ export default function StepSummary({ booking, onBack }: Props) {
               {pickupCarryingLabel}
             </P>
             <P>
-              {booking.pickupAddress}
+              {combineAddressZipcodeAndCity(booking.pickupAddress, booking.pickupZipcode)}
             </P>
           </TimelineCard>
         </div>

@@ -7,7 +7,7 @@
 export type Region = "koebenhavn" | "storkoebenhavn"
 
 export interface DeliveryLocation {
-  /** Postcode, or a postcode range for the central-Copenhagen street codes. */
+  /** Zipcode, or a postcode range for the central-Copenhagen street codes. */
   code: string
   /** First numeric postcode in `code` - used to validate against geo.ts. */
   postcode: number
@@ -17,9 +17,9 @@ export interface DeliveryLocation {
 
 export const DELIVERY_LOCATIONS: DeliveryLocation[] = [
   // København (Københavns Kommune + Frederiksberg - bykernen)
-  { code: "1000–1499", postcode: 1050, name: "København K", region: "koebenhavn" },
-  { code: "1500–1799", postcode: 1550, name: "København V", region: "koebenhavn" },
-  { code: "1800–1999", postcode: 1850, name: "Frederiksberg C", region: "koebenhavn" },
+  { code: "1000-1499", postcode: 1050, name: "København K", region: "koebenhavn" },
+  { code: "1500-1799", postcode: 1550, name: "København V", region: "koebenhavn" },
+  { code: "1800-1999", postcode: 1850, name: "Frederiksberg C", region: "koebenhavn" },
   { code: "2000", postcode: 2000, name: "Frederiksberg", region: "koebenhavn" },
   { code: "2100", postcode: 2100, name: "København Ø", region: "koebenhavn" },
   { code: "2150", postcode: 2150, name: "Nordhavn", region: "koebenhavn" },
